@@ -1,0 +1,36 @@
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Sidebar from "../../components/Sidebar";
+import ProfilePanel from "../../components/ProfilePanel";
+import "./AdminProfilePage.css";
+import { fetchCategories } from "../../actions/categoriesActions";
+import { fetchQuizzes } from "../../actions/quizzesActions";
+
+const AdminProfilePage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const token = JSON.parse(localStorage.getItem("jwtToken"));
+
+  useEffect(() => {
+    if (!localStorage.getItem("jwtToken")) navigate("/");
+  }, []);
+
+  useEffect(() => {
+    fetchCategories(dispatch, token);
+    fetchQuizzes(dispatch, token);
+  }, [dispatch]);
+
+  return (
+    <div className="adminProfilePage__container">
+      <div className="adminProfilePage__sidebar">
+        <Sidebar />
+      </div>
+      <div className="adminProfilePage__content" style={{ width: "100%" }}>
+        <ProfilePanel showRole />
+      </div>
+    </div>
+  );
+};
+
+export default AdminProfilePage;

@@ -1,0 +1,4 @@
+node_modules/
+target/
+exam-portal-frontend/build/
+*.log
