@@ -1,0 +1,81 @@
+{
+  "band": "Class 11-12",
+  "quizTitle": "Discover Yourself - Classes 11 to 12",
+  "quizDescription": "A psychometric and career-interest test to support subject and career decisions before higher studies.",
+  "items": [
+    { "dimension": "LOGICAL", "content": "I enjoy analysing data to reach a reasoned conclusion." },
+    { "dimension": "LOGICAL", "content": "I prefer problems that have a logical, provable answer." },
+    { "dimension": "LOGICAL", "content": "I like breaking a complex problem into smaller logical parts." },
+    { "dimension": "LOGICAL", "content": "Building a step-by-step method or algorithm appeals to me." },
+
+    { "dimension": "MUSICAL", "content": "I appreciate the structure and harmony within a piece of music." },
+    { "dimension": "MUSICAL", "content": "I would enjoy composing, arranging, or producing music." },
+    { "dimension": "MUSICAL", "content": "I can identify changes in pitch, tempo, and rhythm easily." },
+    { "dimension": "MUSICAL", "content": "Sound and rhythm strongly shape how I experience things." },
+
+    { "dimension": "NATURALIST", "content": "I am drawn to biology, ecology, or environmental topics." },
+    { "dimension": "NATURALIST", "content": "I enjoy observing and classifying patterns in nature." },
+    { "dimension": "NATURALIST", "content": "Protecting the environment matters a great deal to me." },
+    { "dimension": "NATURALIST", "content": "I would enjoy fieldwork studying plants, animals, or ecosystems." },
+
+    { "dimension": "VERBAL", "content": "I communicate complex ideas well in writing or speech." },
+    { "dimension": "VERBAL", "content": "I enjoy analysing literature, arguments, or language." },
+    { "dimension": "VERBAL", "content": "Learning and using new vocabulary or languages appeals to me." },
+    { "dimension": "VERBAL", "content": "I would enjoy a career built around words and communication." },
+
+    { "dimension": "INTERPERSONAL", "content": "I read other people's emotions and motivations accurately." },
+    { "dimension": "INTERPERSONAL", "content": "I am effective at collaborating and building teams." },
+    { "dimension": "INTERPERSONAL", "content": "I enjoy roles where I guide, mentor, or coordinate others." },
+    { "dimension": "INTERPERSONAL", "content": "I adapt easily to different people and social situations." },
+
+    { "dimension": "KINESTHETIC", "content": "I have strong physical coordination and control." },
+    { "dimension": "KINESTHETIC", "content": "I would enjoy work that is practical and hands-on." },
+    { "dimension": "KINESTHETIC", "content": "I learn skills fastest by practising them physically." },
+    { "dimension": "KINESTHETIC", "content": "Making, building, or performing with my body appeals to me." },
+
+    { "dimension": "SPATIAL", "content": "I can mentally rotate and manipulate three-dimensional shapes." },
+    { "dimension": "SPATIAL", "content": "I tend to think in images and visualise solutions." },
+    { "dimension": "SPATIAL", "content": "I would enjoy design, architecture, or other visual fields." },
+    { "dimension": "SPATIAL", "content": "I interpret diagrams, plans, and spatial data easily." },
+
+    { "dimension": "INTRAPERSONAL", "content": "I have a clear sense of my values and goals." },
+    { "dimension": "INTRAPERSONAL", "content": "I reflect deeply on my thoughts and choices." },
+    { "dimension": "INTRAPERSONAL", "content": "I understand my emotions and what drives me." },
+    { "dimension": "INTRAPERSONAL", "content": "I make decisions guided by self-knowledge." },
+
+    { "dimension": "EXISTENTIAL", "content": "I reflect on the meaning and purpose of life." },
+    { "dimension": "EXISTENTIAL", "content": "I am drawn to philosophical or spiritual questions." },
+    { "dimension": "EXISTENTIAL", "content": "I think about humanity's place in the universe." },
+    { "dimension": "EXISTENTIAL", "content": "Questions with no easy answer intrigue me." },
+
+    { "dimension": "R", "content": "I would enjoy engineering, mechanical, or technical work." },
+    { "dimension": "R", "content": "I prefer concrete, hands-on work over abstract discussion." },
+    { "dimension": "R", "content": "Operating machinery or building structures appeals to me." },
+    { "dimension": "R", "content": "I like solving real, physical problems with tools." },
+
+    { "dimension": "I", "content": "I would enjoy research or scientific investigation." },
+    { "dimension": "I", "content": "I like analysing evidence and data to answer questions." },
+    { "dimension": "I", "content": "Understanding theories and how things work appeals to me." },
+    { "dimension": "I", "content": "I am drawn to careers in science, medicine, or research." },
+
+    { "dimension": "A", "content": "I would enjoy a creative career in art, design, or media." },
+    { "dimension": "A", "content": "I like producing original, expressive work." },
+    { "dimension": "A", "content": "Creative freedom matters to me in what I do." },
+    { "dimension": "A", "content": "I am drawn to fields that value imagination." },
+
+    { "dimension": "S", "content": "I would enjoy a career in teaching, healthcare, or counselling." },
+    { "dimension": "S", "content": "Helping others grow and develop matters to me." },
+    { "dimension": "S", "content": "I am drawn to work that serves people and communities." },
+    { "dimension": "S", "content": "Supporting and guiding others is fulfilling for me." },
+
+    { "dimension": "E", "content": "I would enjoy business, management, or entrepreneurship." },
+    { "dimension": "E", "content": "I like leading teams and driving results." },
+    { "dimension": "E", "content": "Persuading and negotiating come naturally to me." },
+    { "dimension": "E", "content": "I am drawn to roles with leadership and influence." },
+
+    { "dimension": "C", "content": "I would enjoy work in accounting, administration, or data." },
+    { "dimension": "C", "content": "I like structured tasks with clear procedures." },
+    { "dimension": "C", "content": "I value accuracy, order, and careful record-keeping." },
+    { "dimension": "C", "content": "Managing details and systems appeals to me." }
+  ]
+}

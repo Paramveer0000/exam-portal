@@ -1,0 +1,81 @@
+{
+  "band": "Class 6-8",
+  "quizTitle": "Discover Yourself - Classes 6 to 8",
+  "quizDescription": "A friendly psychometric test that explores how you like to learn, think, and what interests you.",
+  "items": [
+    { "dimension": "LOGICAL", "content": "I enjoy solving number puzzles and brain teasers." },
+    { "dimension": "LOGICAL", "content": "I like figuring out how things work by thinking step by step." },
+    { "dimension": "LOGICAL", "content": "Maths problems are fun for me to solve." },
+    { "dimension": "LOGICAL", "content": "I notice patterns in numbers and shapes quickly." },
+
+    { "dimension": "MUSICAL", "content": "I often hum, sing, or tap out rhythms." },
+    { "dimension": "MUSICAL", "content": "I can remember tunes after hearing them once or twice." },
+    { "dimension": "MUSICAL", "content": "I enjoy listening to and making music." },
+    { "dimension": "MUSICAL", "content": "I notice when a note or a beat sounds wrong." },
+
+    { "dimension": "NATURALIST", "content": "I like watching animals, plants, and insects." },
+    { "dimension": "NATURALIST", "content": "I enjoy spending time outdoors in nature." },
+    { "dimension": "NATURALIST", "content": "I can tell different kinds of plants or animals apart." },
+    { "dimension": "NATURALIST", "content": "I like collecting things like rocks, leaves, or shells." },
+
+    { "dimension": "VERBAL", "content": "I enjoy reading stories and books." },
+    { "dimension": "VERBAL", "content": "I like telling stories or making up my own." },
+    { "dimension": "VERBAL", "content": "Playing with words is fun for me." },
+    { "dimension": "VERBAL", "content": "I learn new words easily." },
+
+    { "dimension": "INTERPERSONAL", "content": "I make friends easily." },
+    { "dimension": "INTERPERSONAL", "content": "I can tell how my friends are feeling." },
+    { "dimension": "INTERPERSONAL", "content": "I like working together in a group." },
+    { "dimension": "INTERPERSONAL", "content": "Other people often come to me for help." },
+
+    { "dimension": "KINESTHETIC", "content": "I like sports, dancing, or moving around." },
+    { "dimension": "KINESTHETIC", "content": "I learn best by doing things with my hands." },
+    { "dimension": "KINESTHETIC", "content": "I am good at building or making things." },
+    { "dimension": "KINESTHETIC", "content": "Sitting still for a long time is hard for me." },
+
+    { "dimension": "SPATIAL", "content": "I like drawing, painting, or making models." },
+    { "dimension": "SPATIAL", "content": "I can picture things clearly in my mind." },
+    { "dimension": "SPATIAL", "content": "I am good at puzzles like mazes and jigsaws." },
+    { "dimension": "SPATIAL", "content": "I can find my way around new places easily." },
+
+    { "dimension": "INTRAPERSONAL", "content": "I know what I am good at and what I find hard." },
+    { "dimension": "INTRAPERSONAL", "content": "I like spending some quiet time on my own to think." },
+    { "dimension": "INTRAPERSONAL", "content": "I understand my own feelings." },
+    { "dimension": "INTRAPERSONAL", "content": "I set goals for myself." },
+
+    { "dimension": "EXISTENTIAL", "content": "I ask big questions about life and the world." },
+    { "dimension": "EXISTENTIAL", "content": "I often wonder why things exist." },
+    { "dimension": "EXISTENTIAL", "content": "I think about things we cannot see or fully explain." },
+    { "dimension": "EXISTENTIAL", "content": "I like talking about what things really mean." },
+
+    { "dimension": "R", "content": "I like fixing or building things with tools." },
+    { "dimension": "R", "content": "I enjoy working outdoors." },
+    { "dimension": "R", "content": "I like taking things apart to see how they work." },
+    { "dimension": "R", "content": "I would rather make something than read about it." },
+
+    { "dimension": "I", "content": "I like doing experiments to find things out." },
+    { "dimension": "I", "content": "I ask a lot of 'why' and 'how' questions." },
+    { "dimension": "I", "content": "I enjoy figuring out why things happen." },
+    { "dimension": "I", "content": "Science interests me." },
+
+    { "dimension": "A", "content": "I like making art, music, or stories." },
+    { "dimension": "A", "content": "I enjoy using my imagination." },
+    { "dimension": "A", "content": "I like to express myself in creative ways." },
+    { "dimension": "A", "content": "I would enjoy designing or decorating things." },
+
+    { "dimension": "S", "content": "I like helping other people." },
+    { "dimension": "S", "content": "I enjoy teaching or explaining things to others." },
+    { "dimension": "S", "content": "I care about how others feel." },
+    { "dimension": "S", "content": "I like taking care of people or animals." },
+
+    { "dimension": "E", "content": "I like being the leader of a group." },
+    { "dimension": "E", "content": "I enjoy convincing others about my ideas." },
+    { "dimension": "E", "content": "I like starting new projects or clubs." },
+    { "dimension": "E", "content": "I am comfortable speaking in front of others." },
+
+    { "dimension": "C", "content": "I like keeping my things neat and organised." },
+    { "dimension": "C", "content": "I enjoy following clear steps and rules." },
+    { "dimension": "C", "content": "I like working with numbers and lists." },
+    { "dimension": "C", "content": "I am careful and tidy with my work." }
+  ]
+}

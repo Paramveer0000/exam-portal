@@ -1,0 +1,81 @@
+{
+  "band": "Class 9-10",
+  "quizTitle": "Discover Yourself - Classes 9 to 10",
+  "quizDescription": "A psychometric test exploring your intelligences and career interests as you approach stream selection.",
+  "items": [
+    { "dimension": "LOGICAL", "content": "I enjoy working through maths and science problems logically." },
+    { "dimension": "LOGICAL", "content": "I like to test an idea to see whether it is actually true." },
+    { "dimension": "LOGICAL", "content": "I can spot when an argument does not add up." },
+    { "dimension": "LOGICAL", "content": "Organising information into clear steps comes naturally to me." },
+
+    { "dimension": "MUSICAL", "content": "I like learning an instrument or making my own tunes." },
+    { "dimension": "MUSICAL", "content": "Music helps me concentrate or express how I feel." },
+    { "dimension": "MUSICAL", "content": "I can keep a steady beat and notice rhythm in things." },
+    { "dimension": "MUSICAL", "content": "I pay attention to the melody and instruments in a song." },
+
+    { "dimension": "NATURALIST", "content": "I enjoy learning how living things grow and survive." },
+    { "dimension": "NATURALIST", "content": "I notice changes in weather, seasons, and the environment." },
+    { "dimension": "NATURALIST", "content": "I like sorting living things into groups or categories." },
+    { "dimension": "NATURALIST", "content": "Caring for plants or animals interests me." },
+
+    { "dimension": "VERBAL", "content": "I express my ideas clearly in writing." },
+    { "dimension": "VERBAL", "content": "I enjoy debates, essays, or learning new languages." },
+    { "dimension": "VERBAL", "content": "Reading different kinds of texts comes easily to me." },
+    { "dimension": "VERBAL", "content": "I like playing with words, puns, and wordplay." },
+
+    { "dimension": "INTERPERSONAL", "content": "I usually understand other people's points of view." },
+    { "dimension": "INTERPERSONAL", "content": "I enjoy leading or organising group work." },
+    { "dimension": "INTERPERSONAL", "content": "I can help settle disagreements between friends." },
+    { "dimension": "INTERPERSONAL", "content": "Working with people gives me energy." },
+
+    { "dimension": "KINESTHETIC", "content": "I enjoy activities that need physical skill and coordination." },
+    { "dimension": "KINESTHETIC", "content": "I prefer hands-on tasks over reading about them." },
+    { "dimension": "KINESTHETIC", "content": "I am good at sports, crafts, or working with tools." },
+    { "dimension": "KINESTHETIC", "content": "I remember things better after doing them myself." },
+
+    { "dimension": "SPATIAL", "content": "I can imagine how an object would look from another angle." },
+    { "dimension": "SPATIAL", "content": "I read maps, charts, and diagrams easily." },
+    { "dimension": "SPATIAL", "content": "I enjoy design, drawing, or the visual arts." },
+    { "dimension": "SPATIAL", "content": "I remember places and layouts well." },
+
+    { "dimension": "INTRAPERSONAL", "content": "I reflect on why I feel or act the way I do." },
+    { "dimension": "INTRAPERSONAL", "content": "I am aware of my strengths and weaknesses." },
+    { "dimension": "INTRAPERSONAL", "content": "I like to plan and think about my future." },
+    { "dimension": "INTRAPERSONAL", "content": "I understand what motivates me." },
+
+    { "dimension": "EXISTENTIAL", "content": "I think about deep questions like why we are here." },
+    { "dimension": "EXISTENTIAL", "content": "I am interested in ideas about life, meaning, and the universe." },
+    { "dimension": "EXISTENTIAL", "content": "I wonder about right, wrong, and what matters most." },
+    { "dimension": "EXISTENTIAL", "content": "Big-picture questions fascinate me." },
+
+    { "dimension": "R", "content": "I enjoy hands-on technical or mechanical work." },
+    { "dimension": "R", "content": "I like using machines, tools, or equipment." },
+    { "dimension": "R", "content": "Practical, physical tasks suit me well." },
+    { "dimension": "R", "content": "I would enjoy working with my hands or outdoors." },
+
+    { "dimension": "I", "content": "I enjoy researching and analysing problems." },
+    { "dimension": "I", "content": "I like understanding the reasons behind things." },
+    { "dimension": "I", "content": "Experiments and investigations appeal to me." },
+    { "dimension": "I", "content": "I would enjoy studying a science subject deeply." },
+
+    { "dimension": "A", "content": "I enjoy creative activities like art, design, or writing." },
+    { "dimension": "A", "content": "I like expressing original ideas in my own way." },
+    { "dimension": "A", "content": "I would enjoy performing or creating for others." },
+    { "dimension": "A", "content": "I value creativity and self-expression." },
+
+    { "dimension": "S", "content": "I enjoy helping, teaching, or supporting others." },
+    { "dimension": "S", "content": "I would like a job where I care for people." },
+    { "dimension": "S", "content": "Volunteering or community work appeals to me." },
+    { "dimension": "S", "content": "I feel good when I help someone learn or improve." },
+
+    { "dimension": "E", "content": "I enjoy leading, persuading, or organising people." },
+    { "dimension": "E", "content": "I like starting and running my own projects." },
+    { "dimension": "E", "content": "I am comfortable taking charge and making decisions." },
+    { "dimension": "E", "content": "Convincing others of an idea or plan appeals to me." },
+
+    { "dimension": "C", "content": "I enjoy organising information and keeping records." },
+    { "dimension": "C", "content": "I like tasks that have clear rules and procedures." },
+    { "dimension": "C", "content": "I am accurate and pay attention to detail." },
+    { "dimension": "C", "content": "Working with data and spreadsheets appeals to me." }
+  ]
+}
