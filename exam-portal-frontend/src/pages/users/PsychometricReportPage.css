@@ -1,0 +1,100 @@
+.psychReport__container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fff;
+  color: #222;
+}
+
+.psychReport__header {
+  border-bottom: 3px solid rgb(68, 177, 49);
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.psychReport__header h1 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.psychReport__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  color: #555;
+  font-size: 0.95rem;
+  margin-top: 6px;
+}
+
+.psychReport__section {
+  margin: 26px 0;
+}
+
+.psychReport__section h2 {
+  font-size: 1.15rem;
+  border-left: 5px solid rgb(68, 177, 49);
+  padding-left: 8px;
+  margin-bottom: 12px;
+}
+
+.psychReport__bar {
+  background: #eee;
+  border-radius: 4px;
+  height: 14px;
+  overflow: hidden;
+}
+
+.psychReport__bar > div {
+  background: rgb(68, 177, 49);
+  height: 100%;
+}
+
+.psychReport__riasec--dominant {
+  background: #eaf7e6;
+  font-weight: 600;
+}
+
+.psychReport__careers .psychReport__careerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+}
+
+.psychReport__stars {
+  color: #f5a623;
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.psychReport__printBtn {
+  margin: 10px 0 20px;
+}
+
+@media print {
+  /* Only the report itself on paper. */
+  body * {
+    visibility: hidden;
+  }
+  .psychReport__container,
+  .psychReport__container * {
+    visibility: visible;
+  }
+  .psychReport__container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+  }
+  .psychReport__printBtn,
+  .psychReport__backBtn {
+    display: none !important;
+  }
+  .psychReport__section {
+    page-break-inside: avoid;
+  }
+}
