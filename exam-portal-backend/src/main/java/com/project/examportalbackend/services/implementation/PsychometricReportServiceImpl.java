@@ -233,11 +233,20 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
     }
 
     /**
-     * Ranks the career_suggestions table by base_weight x the mean of the
-     * student's scores on the row's driving dimensions (MI shares as %, RIASEC
-     * mapped onto the same 0-100 scale). Normalized so the best field = 100.
+     * Ranks the career_suggestions table by base_weight x the mean "prominence"
+     * of the row's driving dimensions. MI shares and RIASEC scores live on
+     * different scales (MI ~ a share around 100/9 %, RIASEC a mean on /10), so a
+     * raw average lets whichever system a field happens to use dominate. We
+     * instead express each dimension relative to its OWN system's average
+     * (1.0 = average, >1 = above average), which puts MI- and RIASEC-driven
+     * fields on comparable footing and lets a spike in either lift its careers.
+     * Normalized so the best field = 100.
      */
     private List<CareerRow> rankCareers(Map<String, Double> mi, Map<String, Double> ri) {
+        double miAvg = 100.0 / MI_DIMS.size(); // MI shares sum to ~100 over 9 dims
+        double riMean = RIASEC_LETTERS.stream().mapToDouble(l -> ri.getOrDefault(l, 0.0)).average().orElse(0);
+        double riDenom = riMean > 0 ? riMean : 1;
+
         List<CareerSuggestion> all = careerSuggestionRepository.findAll();
         Map<CareerSuggestion, Double> scores = new LinkedHashMap<>();
         for (CareerSuggestion cs : all) {
@@ -247,10 +256,10 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
             for (String dim : dims) {
                 String d = dim.trim();
                 if (mi.containsKey(d)) {
-                    total += mi.get(d);
+                    total += mi.get(d) / miAvg;   // prominence within MI
                     n++;
                 } else if (ri.containsKey(d)) {
-                    total += ri.get(d) * 10; // /10 -> 0-100 scale
+                    total += ri.get(d) / riDenom; // prominence within RIASEC
                     n++;
                 }
             }

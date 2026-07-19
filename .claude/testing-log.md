@@ -170,3 +170,21 @@ gotchas, and open issues that are NOT in the source code or git history.
   Seed data KEPT for demo: school zpsyschool, student zpsystudent (both pw known to user session),
   quiz 17 "ZPsyTest", report at /psychometricReport/7. assert self-check needs -ea to fire.
   Scoring rule: chosen option ordinal = Likert points (option1=1..option4=4).
+
+### 2026-07-20 00:10 — Psychometric question banks + scoring validation  [type: change]
+- what: seeded 3 tagged question banks (Class 6-8/9-10/11-12), validated scoring accuracy
+  against known-profile fixtures, tuned career formula.
+- files: docs/psychometric-sources.md (construct citations), seed/psychometric/*.json (3 banks,
+  60 items each, all 15 dims x4, original age-scaled Likert items), seed/psychometric/seed-banks.ps1
+  (idempotent API seeder -> seeded-index.json), seed/psychometric/validate-scoring.ps1 (fixtures),
+  docs/psychometric-validation.md (18/18 results), PsychometricReportServiceImpl.rankCareers (fix).
+- result: PASS 18/18. Seeded quizzes 19/20/21 under demo school psychobank (student psychobankstudent,
+  both pw seedpass123). Verified DB: each quiz 60 items, 15 dims x4. Fixtures: MI spikes
+  (LOGICAL/VERBAL/INTERPERSONAL/KINESTHETIC) -> correct rank1 + quotient + careers; RIASEC R spike
+  -> R dominant, Holland RIA, hands-on careers; sum sanity (MI~100, domains fixed sums, ranks 1..9
+  perm); boundary (uniform -> even, no crash).
+- notes: FOUND + FIXED a scoring quirk — career ranking averaged MI shares (~10-20) with RIASEC
+  mapped to 0-100, so RIASEC-driven fields dominated even MI spikes (KINESTHETIC spike wrongly topped
+  Engineering). Fixed to score each dimension by prominence within its own system (value/system-avg).
+  Documented in docs/psychometric-validation.md. Re-seed: run seed-banks.ps1; re-validate: validate-scoring.ps1.
+  Item wording original (public MI/RIASEC constructs, cited); no proprietary items copied.
