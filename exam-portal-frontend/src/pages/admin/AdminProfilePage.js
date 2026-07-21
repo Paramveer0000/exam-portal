@@ -27,7 +27,7 @@ const AdminProfilePage = () => {
         <Sidebar />
       </div>
       <div className="adminProfilePage__content" style={{ width: "100%" }}>
-        <ProfilePanel showRole />
+        <ProfilePanel showRole showLogo />
       </div>
     </div>
   );

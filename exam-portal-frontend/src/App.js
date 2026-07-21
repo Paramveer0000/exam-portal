@@ -2,10 +2,12 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RequireStudentOnboarding from "./components/RequireStudentOnboarding";
 import AdminAddCategoryPage from "./pages/admin/categories/AdminAddCategoryPage";
 import AdminCategoriesPage from "./pages/admin/categories/AdminCategoriesPage";
 import AdminUpdateCategoryPage from "./pages/admin/categories/AdminUpdateCategoryPage";
 import AdminProfilePage from "./pages/admin/AdminProfilePage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AdminQuizzesPage from "./pages/admin/quizzes/AdminQuizzesPage";
@@ -20,12 +22,15 @@ import UserQuizManualPage from "./pages/users/UserQuizManualPage";
 import UserQuestionsPage from "./pages/users/UserQuestionsPage";
 import UserQuizResultPage from "./pages/users/UserQuizResultPage";
 import PsychometricReportPage from "./pages/users/PsychometricReportPage";
+import OnboardingPage from "./pages/users/OnboardingPage";
 import AdminQuizResultPage from "./pages/admin/AdminQuizResultPage";
 import AdminReportsPage from "./pages/admin/AdminReportsPage";
 import AdminStudentsPage from "./pages/admin/AdminStudentsPage";
 import SuperAdminDashboardPage from "./pages/superadmin/SuperAdminDashboardPage";
 import SuperAdminAdminsPage from "./pages/superadmin/SuperAdminAdminsPage";
 import SuperAdminProfilePage from "./pages/superadmin/SuperAdminProfilePage";
+import SuperAdminAiSettingsPage from "./pages/superadmin/SuperAdminAiSettingsPage";
+import SuperAdminResultsPage from "./pages/superadmin/SuperAdminResultsPage";
 
 const ADMIN_ROLES = ["ADMIN", "SUPER_ADMIN"];
 const USER_ROLES = ["USER"];
@@ -35,7 +40,9 @@ const adminRoute = (element) => (
   <ProtectedRoute allowedRoles={ADMIN_ROLES}>{element}</ProtectedRoute>
 );
 const userRoute = (element) => (
-  <ProtectedRoute allowedRoles={USER_ROLES}>{element}</ProtectedRoute>
+  <ProtectedRoute allowedRoles={USER_ROLES}>
+    <RequireStudentOnboarding>{element}</RequireStudentOnboarding>
+  </ProtectedRoute>
 );
 const superAdminRoute = (element) => (
   <ProtectedRoute allowedRoles={SUPER_ADMIN_ROLES}>{element}</ProtectedRoute>
@@ -63,8 +70,20 @@ const App = () => {
           path="/superadmin/profile"
           element={superAdminRoute(<SuperAdminProfilePage />)}
         />
+        <Route
+          path="/superadmin/results"
+          element={superAdminRoute(<SuperAdminResultsPage />)}
+        />
+        <Route
+          path="/superadmin/ai-settings"
+          element={superAdminRoute(<SuperAdminAiSettingsPage />)}
+        />
 
         {/* Admin (Super Admin inherits access) */}
+        <Route
+          path="/adminDashboard"
+          element={adminRoute(<AdminDashboardPage />)}
+        />
         <Route
           path="/adminProfile"
           element={adminRoute(<AdminProfilePage />)}
@@ -113,6 +132,14 @@ const App = () => {
         />
 
         {/* Student */}
+        <Route
+          path="/onboarding"
+          element={
+            <ProtectedRoute allowedRoles={USER_ROLES}>
+              <OnboardingPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/profile" element={userRoute(<UserProfilePage />)} />
         <Route path="/quizzes" element={userRoute(<UserQuizzesPage />)} />
         <Route path="/quiz/*" element={userRoute(<UserQuizzesPage />)} />

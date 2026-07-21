@@ -45,10 +45,31 @@ public class ProfileServiceImpl implements ProfileService {
             }
         }
 
+        // Students may switch which school (teacher) they belong to; the field is
+        // meaningless for ADMIN/SUPER_ADMIN accounts, so it's only honored here.
+        if (authFacade.isStudent() && request.getTeacherId() != null
+                && !request.getTeacherId().equals(user.getTeacherId())) {
+            User teacher = userRepository.findById(request.getTeacherId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "School not found"));
+            boolean isAdmin = teacher.getRoles().stream()
+                    .anyMatch(r -> AuthFacade.ROLE_ADMIN.equals(r.getRoleName()));
+            if (!isAdmin || !teacher.isEnabled()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected school is not available");
+            }
+            user.setTeacherId(teacher.getUserId());
+        }
+
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setUsername(request.getUsername());
         user.setPhoneNumber(request.getPhoneNumber());
+        user.setGrade(request.getGrade());
+        user.setBoard(request.getBoard());
+        user.setSchoolName(request.getSchoolName());
+        // Logo is only touched when supplied, so a plain profile save keeps it.
+        if (request.getLogo() != null) {
+            user.setLogo(request.getLogo());
+        }
         User saved = userRepository.save(user);
 
         // The JWT subject is the username, so a rename needs a fresh token to keep

@@ -70,8 +70,22 @@
   white-space: nowrap;
 }
 
-.psychReport__printBtn {
+.psychReport__actions {
+  display: flex;
+  gap: 10px;
   margin: 10px 0 20px;
+  flex-wrap: wrap;
+}
+
+.psychReport__ai {
+  background: #f5faf3;
+  border: 1px solid rgb(68, 177, 49);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.psychReport__ai p {
+  line-height: 1.6;
 }
 
 @media print {
@@ -90,8 +104,8 @@
     width: 100%;
     padding: 0;
   }
-  .psychReport__printBtn,
-  .psychReport__backBtn {
+  .psychReport__backBtn,
+  .psychReport__actions {
     display: none !important;
   }
   .psychReport__section {

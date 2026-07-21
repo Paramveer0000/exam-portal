@@ -69,6 +69,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/register/school").permitAll()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/teachers").permitAll()
+                // Platform branding: logo is public (header on every page);
+                // only a SUPER_ADMIN may change it.
+                .antMatchers(HttpMethod.GET, "/api/platform/**").permitAll()
+                .antMatchers("/api/platform/**").hasAuthority("SUPER_ADMIN")
 
                 // Any authenticated user may manage their own profile.
                 .antMatchers("/api/profile/**").authenticated()
@@ -82,27 +86,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Teachers manage their own students.
                 .antMatchers("/api/students/**").hasAuthority("ADMIN")
 
-                .antMatchers(HttpMethod.POST, "/api/category/**").hasAuthority("ADMIN")
+                // Content (classes/quizzes/questions) is created and managed ONLY by
+                // SUPER_ADMIN. Schools (ADMIN) get read access to assign classes; students
+                // read to browse/take. hasAuthority("SUPER_ADMIN") excludes plain ADMIN.
+                .antMatchers(HttpMethod.POST, "/api/category/**").hasAuthority("SUPER_ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/category/**").hasAnyAuthority("USER", "ADMIN")
-                .antMatchers(HttpMethod.PUT, "/api/category/**").hasAuthority("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/api/category/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/category/**").hasAuthority("SUPER_ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/category/**").hasAuthority("SUPER_ADMIN")
 
                 // Student exam delivery (answers stripped) lives under /api/quiz/**.
-                .antMatchers(HttpMethod.POST, "/api/quiz/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/quiz/**").hasAuthority("SUPER_ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/quiz/**").hasAnyAuthority("USER", "ADMIN")
-                .antMatchers(HttpMethod.PUT, "/api/quiz/**").hasAuthority("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/api/quiz/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/quiz/**").hasAuthority("SUPER_ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/quiz/**").hasAuthority("SUPER_ADMIN")
 
-                // Question CRUD (answers included) is admin-only; students never call it.
-                .antMatchers("/api/question/**").hasAuthority("ADMIN")
+                // Question CRUD (answers included): SUPER_ADMIN only. Reads allow ADMIN
+                // (super admin via hierarchy) so content can be viewed; students never call it.
+                .antMatchers(HttpMethod.GET, "/api/question/**").hasAuthority("ADMIN")
+                .antMatchers("/api/question/**").hasAuthority("SUPER_ADMIN")
 
                 .antMatchers(HttpMethod.POST, "/api/quizResult/**").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/api/quizResult/all/**").hasAuthority("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/quizResult/**").hasAnyAuthority("USER", "ADMIN")
 
                 // Psychometric report: students read their own, teachers their
-                // students' (per-row scoping in the service).
+                // students' (per-row scoping in the service). POST = generate AI summary.
                 .antMatchers(HttpMethod.GET, "/api/psychometric-report/**").hasAnyAuthority("USER", "ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/psychometric-report/**").hasAnyAuthority("USER", "ADMIN")
 
                 .anyRequest().denyAll()
                 .and()

@@ -127,6 +127,18 @@ const reassignUnowned = async (adminId, token) => {
   }
 };
 
+const fetchResultsBySchool = async (token) => {
+  try {
+    const { data } = await axios.get(
+      "/api/admin/results-by-school",
+      authConfig(token)
+    );
+    return { data, error: null };
+  } catch (error) {
+    return { data: null, error: errText(error) };
+  }
+};
+
 // Mints a token to act as the given admin (returns { user, jwtToken }).
 const impersonate = async (adminId, token) => {
   try {
@@ -153,6 +165,7 @@ const adminServices = {
   fetchActivity,
   fetchUnowned,
   reassignUnowned,
+  fetchResultsBySchool,
   impersonate,
 };
 

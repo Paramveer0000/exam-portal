@@ -188,3 +188,300 @@ gotchas, and open issues that are NOT in the source code or git history.
   Engineering). Fixed to score each dimension by prominence within its own system (value/system-avg).
   Documented in docs/psychometric-validation.md. Re-seed: run seed-banks.ps1; re-validate: validate-scoring.ps1.
   Item wording original (public MI/RIASEC constructs, cited); no proprietary items copied.
+
+### 2026-07-20 01:00 — Feature: student school switch + exam pagination  [type: change]
+- what: (1) student profile shows School (teacher name) and can switch schools via a dropdown;
+  (2) exam page now paginates 6 questions/page with Previous/Next nav, Submit only on last page.
+- files: backend UpdateProfileRequest.teacherId, ProfileServiceImpl.updateProfile (student-only,
+  validates target has ADMIN role + is enabled, else 400); frontend ProfilePanel.js (showSchool
+  prop, teacher dropdown via authServices.getTeachers, School row), UserProfilePage.js
+  (showSchool=true), UserQuestionsPage.js (QUESTIONS_PER_PAGE=6, page state, bottom nav, Submit
+  moved from top to bottom/last-page-only; page resets to 0 on fresh attempt).
+- result: PASS. API verified: psychobankstudent switch teacherId 28->30 (accepted), reverted 30->28
+  (accepted), switch to a non-ADMIN target (a student id) -> 400 (rejected) as expected. Frontend
+  compiles clean (pre-existing warning only).
+- notes: teacherId change is silently ignored for ADMIN/SUPER_ADMIN callers (guarded by
+  authFacade.isStudent()) — only students can move schools. Progress bar/mandatory-questions check
+  unaffected (still counts across all pages, not just current page). Not browser-driven this pass;
+  verified via API + compile check.
+
+### 2026-07-20 01:20 — Fix: unpublished quiz visible to students + timer runs when disabled  [type: bug]
+- what: (1) a quiz with Publish Quiz OFF was still visible and startable by students;
+  (2) a quiz with Enable exam timer OFF still ran a countdown and auto-submitted.
+- files: backend QuizServiceImpl.getQuizzes/getQuizByCategory (student branch now filters
+  q.isIActive()), getExamQuestions (403 "not published yet" if !quiz.isIActive() for students);
+  frontend UserQuestionsPage.js (countdown effect no longer falls back to a legacy 2min/question
+  timer when timerEnabled is false — no timer, no auto-submit, UI shows "No time limit"; also
+  waits for `quiz` to resolve before deciding, fixing a latent race where quiz loading after
+  questions could lock in the wrong decision).
+- result: PASS. API-verified full cycle: created quiz isActive=false -> absent from student
+  GET /api/quiz/, exam-start GET .../exam -> 403; set isActive=true -> appears in list, exam-start
+  succeeds. Frontend compiles clean.
+- notes: root cause for (1) — publish (iActive) was stored but never read anywhere outside the
+  admin UI; QuizServiceImpl had zero isIActive() filtering. Root cause for (2) — the timer effect's
+  ternary always produced a duration even when timerEnabled was false. JSON property for the
+  publish flag is `iActive` (not `isActive`) due to Lombok's isIActive() getter on the Quiz.iActive
+  field — noted here since it trips up ad-hoc API testing.
+
+### 2026-07-20 01:35 — Fix: Publish Quiz toggle never actually published  [type: bug]
+- what: user reported that after publishing a quiz it still didn't show for students — my prior
+  fix (filter by isIActive()) was correct but exposed a DEEPER pre-existing bug: the publish flag
+  was never actually being set true in the first place.
+- root cause: Quiz.iActive (field name, 2 leading caps) makes Lombok generate isIActive()/
+  setIActive(). Jackson's property-name mangling collapses that to JSON key "iactive" (lowercase,
+  verified via raw GET), NOT "isActive". The frontend (AdminAddQuiz.js, AdminUpdateQuiz.js) has
+  always sent/read "isActive" — silently ignored on write (quiz created with iActive=false
+  regardless of toggle) and undefined on read (Update form's toggle always initialized unchecked).
+  This bug predates this session; it's why "unpublished but running" was reported at all.
+- files: models/Quiz.java (@JsonProperty("isActive") pins the wire name so it can't drift again;
+  comment explains the mangling). Frontend AdminAddQuiz.js/AdminUpdateQuiz.js reverted back to the
+  natural "isActive" key (matches every other boolean field in the app) now that the backend honors it.
+- result: PASS full cycle verified via API: GET now returns "isActive" (was "iactive"); POST with
+  isActive:true persists True; new quiz immediately visible to student + exam-start works.
+- notes: this is the actual fix the "publish quiz not showing" report needed — the earlier
+  isIActive()-filtering change was necessary but not sufficient, since the flag could never be
+  set true through the UI to begin with.
+
+### 2026-07-20 01:45 — Change: drop per-class links from student sidebar  [type: change]
+- what: SidebarUser was auto-fetching categories and adding one nav link per class
+  (e.g. "Psychometric Class 6-8/9-10/11-12"), cluttering the sidebar. Removed.
+- files: components/SidebarUser.js — dropped the fetchCategories effect and dynamic
+  menuItems build; sidebar is now a static 3-item list (Profile, Report Card, All Quizzes).
+- result: compiles clean. Classes/subjects are still browsable via "All Quizzes" (UserQuizzesPage),
+  unaffected by this change.
+
+### 2026-07-20 15:15 — Feature: mandatory 2-step student onboarding  [type: change]
+- what: after login, a student with an incomplete profile is hard-gated to /onboarding on
+  EVERY route until Step 1 (basic info: name/phone/school) then Step 2 (academics: grade/board/
+  school name) are both filled. Existing complete students unaffected; incomplete ones (including
+  demo account psychobankstudent, which has no grade/board/schoolName) will hit the wizard next login.
+- files: V13__student_academics.sql (users.grade/board/school_name, nullable); User.java (+3 fields);
+  UpdateProfileRequest + ProfileServiceImpl (accept/persist them, unconditional like firstName);
+  pages/users/OnboardingPage.js (new — 2-step wizard, exports isBasicComplete/isAcademicsComplete
+  used as the single source of truth for "complete"); components/RequireStudentOnboarding.js (new
+  gate, wraps userRoute() in App.js, redirects to /onboarding); App.js (/onboarding route, role-gated
+  only, NOT wrapped by the onboarding gate itself — avoids a redirect loop); ProfilePanel.js (grade/
+  board/schoolName view rows + edit fields under showSchool, so students can revise after onboarding).
+- result: PASS. Backend round-trip verified: step-2 payload (grade=9, board=CBSE, schoolName=...)
+  persisted and read back correctly. Confirmed existing untouched student still reads null academics
+  (will be gated on next login, as intended). Frontend compiles clean.
+- notes: completeness is DERIVED from the fields (no separate "onboarded" flag) — avoids the kind of
+  boolean/data drift bug the iActive mismatch caused earlier. IMPORTANT: ProfilePanel.saveProfile and
+  ProfileServiceImpl.updateProfile always send/persist grade/board/schoolName together with the rest
+  of the profile (service sets them unconditionally from the request) — any future caller of
+  /api/profile/ MUST include current grade/board/schoolName values or it will silently wipe them,
+  same footgun pattern as the old iActive key mismatch. OnboardingPage's two submit handlers already
+  do this correctly (each step sends the OTHER step's current values from Redux `user`, not blank).
+
+### 2026-07-20 15:30 — Change: split Profile page into Profile / Academics sections  [type: change]
+- what: view table split into two labeled tables ("Profile": name/username/phone/school/role/status,
+  "Academics": grade/board/school name); Edit Profile form split into two labeled field groups the
+  same way. Student-only (showSchool); non-student profiles unaffected (no Academics section).
+- files: components/ProfilePanel.js.
+- result: compiles clean. Single Save button still saves both sections together (no split-save flow
+  added — not requested, avoids extra complexity).
+
+### 2026-07-20 15:45 — Feature: AI report generation (platform LLM key)  [type: change]
+- what: SUPER_ADMIN sets ONE platform LLM API key; students/teachers click "Generate AI Report"
+  on the psychometric report to get an LLM counsellor narrative (cached per attempt).
+- files: V14__ai_features.sql (platform_ai_settings single row + psychometric_reports.ai_summary);
+  models/PlatformAiSettings.java (@JsonIgnore api_key), repo; dto/AiSettingsDto (masked keyHint,
+  keyConfigured — never raw key) + UpdateAiSettingsRequest (blank key = keep stored);
+  services/AiService(+Impl) (settings CRUD + OpenAI-compatible /chat/completions via RestTemplate,
+  no new dependency); AdminController GET/PUT /api/admin/ai-settings (SUPER_ADMIN only);
+  PsychometricReportServiceImpl.getAiSummary (same ownership scoping as report, builds prompt from
+  computed profile, caches ai_summary); PsychometricReportController POST /{id}/ai-summary
+  (+SecurityConfig POST rule USER,ADMIN); frontend aiServices.js, SuperAdminAiSettingsPage.js
+  (+sidebar link + route), PsychometricReportPage.js "Generate AI Report" button + AI section.
+- result: PASS security-critical paths (verified via API):
+  * GET ai-settings returns {provider,baseUrl,model,keyConfigured,keyHint} — NEVER the raw key
+    (@JsonIgnore on entity + masked DTO). PUT with blank apiKey keeps the stored key; masked hint "****ABCD".
+  * generate: owner+no-key -> 503 "AI is not configured"; owner+bad-key -> 502 "AI provider request
+    failed" with NO key leaked in the error; stranger student -> 403; student reading ai-settings -> 403.
+  * V14 applied, settings row seeded with no key (feature disabled until a real key is added).
+  Backend compiles + boots, frontend compiles clean.
+- notes: real successful LLM call NOT exercised (no real key on hand, and I must not enter credentials) —
+  pipeline verified end-to-end up to the provider request. User adds a real key in Super Admin > AI
+  Settings to enable. Provider is OpenAI-compatible (OpenAI/Groq/OpenRouter/custom base_url); for
+  Anthropic use an OpenAI-compatible gateway or their compat endpoint. Key stored plaintext in DB
+  (acceptable for this app's model; a KMS/secret store would be the productionization step). Errors from
+  the provider are deliberately generic to avoid leaking the key or upstream internals. Demo super-admin
+  passwords are unknown to me; used a throwaway SUPER_ADMIN (zsatest) for testing, since removed.
+
+### 2026-07-20 16:00 — Change: top-right register buttons on Super Admin Schools page  [type: change]
+- what: two action buttons in the top-right header of SuperAdminAdminsPage — "+ Register Partner /
+  School" (role=ADMIN) and "+ Register Super Admin" (role=SUPER_ADMIN). The create form is now hidden
+  by default; a button opens it pre-set to that role with a Close link. Uses the existing createAdmin
+  flow (no backend change).
+- files: pages/superadmin/SuperAdminAdminsPage.js.
+- result: compiles clean (pre-existing eslint warnings only). Create still collapses on success.
+
+### 2026-07-20 18:30 — MAJOR: super-admin-only content + school class-assignment  [type: change]
+- what: only SUPER_ADMIN creates/edits/deletes classes (categories), quizzes, questions. Schools
+  (ADMIN) can no longer create content — they ASSIGN existing classes to their own students, who then
+  see the published quizzes in their assigned classes.
+- files: V15__super_admin_content_and_class_assignment.sql (student_class join table + reassign all
+  categories/quizzes created_by to lowest-id SUPER_ADMIN); models/StudentClass.java (@IdClass composite),
+  repo; SecurityConfig (category/quiz/question POST/PUT/DELETE -> hasAuthority SUPER_ADMIN, which
+  EXCLUDES plain ADMIN; GET stays USER,ADMIN so admins can read to assign); CategoryServiceImpl.getCategories
+  (student -> assigned categories; admin/super -> all); QuizServiceImpl (student sees published quizzes in
+  assigned classes; getExamQuestions + QuizResultController.submitQuiz gate on assignment instead of
+  teacherId==createdBy); StudentService(+Impl) getAssignedClasses/assignClass/unassignClass (ownership via
+  loadStudent); StudentController /{id}/classes[/{catId}] GET/POST/DELETE; frontend studentsServices
+  (assign APIs), AdminStudentsPage (Classes button -> checkbox assign panel), Sidebar.js (Classes/Subjects
+  nav hidden for plain ADMIN, shown for SUPER_ADMIN), SuperAdminSidebar (Classes/Subjects links).
+- result: PASS end-to-end (API):
+  * ADMIN create class/quiz/question -> 403 (all three). SUPER_ADMIN create class -> OK.
+  * student with no assignment -> [] quizzes; exam-start on a class not assigned -> 403.
+  * school assigns class -> student sees that class's PUBLISHED quiz (id 27) and can take it.
+  * school assigning to another school's student -> 403 (ownership).
+  * V15 applied: student_class table created (InnoDB, FK cascade), all categories+quizzes reassigned
+    created_by -> user 4 (a SUPER_ADMIN).
+  Backend compiles+boots, frontend compiles clean. Test data purged (back to 15 users).
+- notes: teacher_id still links students to their school (for management + assignment); it's no longer
+  used for content visibility (assignment is). IMPORTANT DATA STATE: the seeded psychometric banks
+  (quizzes 19/20/21) are is_active=0 (unpublished — they were seeded before the iActive publish-key fix),
+  so students won't see them until a SUPER_ADMIN republishes them via Update Subject. Only quiz 27
+  "Mentalist" (cat 15) is currently published. PowerShell gotcha for future testers: Invoke-RestMethod
+  on an empty JSON array [] returns $null, and @($null).Count == 1 — an empty student quiz list reads as
+  "1" unless you check the actual ids.
+
+### 2026-07-20 19:00 — Feature: Super Admin All Results grouped by school  [type: change]
+- what: new Super Admin "All Results" page — every quiz attempt grouped by partner school, then by
+  student, then attempt rows (class, subject, marks, pass/fail, date, link to report).
+- files: dto/SchoolResultsDto.java (nested school->student->row); AdminService.getResultsBySchool +
+  AdminServiceImpl (groups all quiz_results: student.teacherId -> school, quiz.category -> class;
+  user cache); AdminController GET /api/admin/results-by-school (SUPER_ADMIN via class guard);
+  frontend adminServices.fetchResultsBySchool, pages/superadmin/SuperAdminResultsPage.js (accordion
+  per school with student sub-tables), sidebar link + route /superadmin/results.
+- result: PASS. Verified via API as dalveer (SUPER_ADMIN): 3 schools returned —
+  Cambridge (2 students), Psy School (1), Psycho Bank (1) — with correct per-student attempt counts.
+  Frontend compiles clean.
+- notes: reset dalveer's password to `super123` (hash-copy method) so a SUPER_ADMIN account is usable
+  for the new super-admin-only features (content mgmt, AI settings, all-results). Students with no
+  school (teacherId null) would group under schoolId=null "No school". Report link reuses the existing
+  ownership-scoped /psychometricReport/{quizResId} (super admin sees all).
+
+### 2026-07-20 18:45 — Feature: admin/super-admin logo upload (round PNG)  [type: change]
+- what: schools (ADMIN) and platform admins (SUPER_ADMIN) can upload/change a PNG logo in their
+  profile settings; shown as a round avatar. Students unaffected.
+- files: V16__user_logo.sql (users.logo MEDIUMTEXT); User.logo; UpdateProfileRequest.logo;
+  ProfileServiceImpl (sets logo ONLY when request.logo != null, so plain profile saves don't wipe it —
+  avoids the grade/board-style footgun); ProfilePanel.js (showLogo prop; round 120px avatar using
+  user.logo; hidden file input, PNG-only + <1MB check, base64 data URL sent as {logo} then reload);
+  AdminProfilePage + SuperAdminProfilePage pass showLogo.
+- result: PASS. V16 applied. API round-trip as psychobank: upload logo -> persisted; subsequent
+  profile save WITHOUT logo -> logo preserved (not wiped). Frontend compiles clean. Test logo reset to null.
+- notes: logo stored as base64 data URL in DB (MEDIUMTEXT) — simple, no file storage/CDN. 1MB client
+  cap keeps rows reasonable; the DB column allows ~16MB. Round display via border-radius + objectFit:cover.
+  Not yet shown in header/sidebar branding — only the profile avatar; extend later if wanted.
+
+### 2026-07-20 19:20 — Feature: School (ADMIN) dashboard  [type: change]
+- what: a dashboard for schools/partners mirroring the super-admin one but scoped to their own
+  students: summary tiles (My Students, Exam Attempts, Passed, Pass Rate, Classes Available) + a
+  per-student table (status, attempts, passed).
+- files: pages/admin/AdminDashboardPage.js (client-side compute from existing endpoints:
+  /api/students/, /api/quizResult/all (teacher-scoped), /api/category/); App.js route /adminDashboard
+  (adminRoute); Sidebar.js "Dashboard" nav item at top (admin); ProtectedRoute.homePathForRoles ADMIN
+  now lands on /adminDashboard instead of /adminProfile.
+- result: PASS. No backend change — all data already ownership-scoped server-side. Verified endpoints
+  as psychobank: 22 results returned (field "passed" present), 1 student, 1 class. Frontend compiles clean.
+- notes: QuizResult JSON boolean field serializes as "passed" (Lombok isPassed() -> Jackson "passed");
+  dashboard reads r.passed. A SUPER_ADMIN who opens the admin Sidebar's Dashboard sees platform-wide
+  numbers (since /students and /quizResult/all return all for them) under the "School Dashboard" label —
+  acceptable, super admins have their own dashboard.
+
+### 2026-07-20 19:30 — Fix: logo upload "Username is required"  [type: bug]
+- what: logo upload failed with 400 "Username is required".
+- root cause: onLogoChange sent {logo} only, but ProfileServiceImpl.updateProfile requires
+  username + phoneNumber (StringUtils.hasText guards). Fixed: send current firstName/lastName/
+  username/phoneNumber alongside the new logo (service still only overwrites logo when present).
+- files: components/ProfilePanel.js. Also added requirement note under the upload button:
+  "PNG only · square recommended (e.g. 256×256 px) · max 1 MB".
+- result: compiles clean. Matches the earlier passing API round-trip (full fields + logo -> 200).
+
+### 2026-07-20 21:55 — Feature: platform company logo in header (super-admin only)  [type: change]
+- what: SUPER_ADMIN uploads a company logo in Platform Settings; it replaces the "Exam-Portal" text
+  in the top-left header on EVERY page for all users (incl. login page). The header logo is a button
+  that redirects to the user's dashboard (or /login if logged out).
+- files: V17__platform_branding.sql (platform_settings single row, company_logo MEDIUMTEXT);
+  models/PlatformSettings.java, repo; controllers/PlatformController.java (GET /api/platform/branding
+  public, PUT SUPER_ADMIN); SecurityConfig (GET /api/platform/** permitAll, others SUPER_ADMIN);
+  frontend platformServices.js, Header.js (loads branding, shows logo, brand click -> homePathForRoles
+  dashboard), SuperAdminAiSettingsPage.js (retitled "Platform Settings"; new Company Logo card with
+  upload/remove + requirement note, PNG/<1MB).
+- result: PASS. V17 applied. API verified: public GET works (no auth); student PUT -> 403; super admin
+  PUT sets logo and public GET reflects it. Frontend compiles clean. Test logo cleared.
+- notes: logo is base64 in DB, served to everyone via the public GET (branding is not sensitive).
+  Distinct from the per-user profile logo (V16). Requirement note on the card: PNG, landscape ~200x60,
+  max 1MB. Header brand doubles as the "dashboard redirect button".
+
+### 2026-07-22 02:10 — Session: AI settings test/prompt, question CRUD fixes, dimension override, AI-report gating  [type: change]
+- what: multi-part session, several independent features/fixes:
+  1. Super Admin sidebar label "AI Settings" -> "Setting". Added `POST /api/admin/ai-settings/test`
+     (fires one real chat completion via existing `aiService.complete`) + "Test connection" button
+     with live/down status badge on the settings page.
+  2. Added an editable `system_prompt` (V18 migration, `platform_ai_settings.system_prompt` TEXT,
+     nullable) so the AI report narrative's instructions are admin-configurable; blank = falls back
+     to the hardcoded `DEFAULT_AI_SYSTEM_PROMPT` in `PsychometricReportServiceImpl`.
+  3. Admin Questions page: collapsed-by-default question rows (click to expand), search box,
+     select-all + bulk delete.
+  4. **Real bug found & fixed**: `DELETE /api/question/{id}` returned 200 but never actually removed
+     the row — `Quiz.questions` is an eager `Set<Question>` with `cascade=ALL`; deleting the child
+     without first removing it from `quiz.getQuestions()` let Hibernate's collection dirty-check
+     silently re-persist it on flush. Fix: `quiz.getQuestions().remove(existing)` before
+     `questionRepository.delete(existing)` in `QuestionServiceImpl.deleteQuestion`. Verified via
+     direct DB query (count 60->59, row gone) — this was pre-existing, not something introduced
+     this session. NOTE: **plain ADMIN cannot write questions at all** (SecurityConfig restricts
+     `/api/question/**` non-GET to SUPER_ADMIN only, per the 2026-07-20 content-ownership change) —
+     the admin Questions page now hides Add/Update/Delete/bulk-select for plain ADMIN and shows a
+     view-only note instead, since every write 403'd silently before.
+  5. Questions can now have 2-4 options (e.g. Yes/No) instead of always 4: backend validation
+     requires only option1+option2; scoring (`PsychometricReportServiceImpl`) normalizes each
+     answer by that question's own option count (`maxOrdinal`) instead of a hardcoded `/4.0`, so a
+     2-option question isn't capped at half credit. Frontend hides blank option rows.
+  6. Duplicate-question guard: `existsByQuizAndContentIgnoreCase` — add/update now 409s on identical
+     content within the same quiz (case-insensitive).
+  7. Add/Update Question pages got a "Back to Questions" button + auto-redirect after the success
+     popup; `quizTitle` now carried through the round-trip (was silently dropped before).
+     AdminQuestionsPage now refetches on `location.key` (not just mount) so returning from
+     Add/Update always shows the fresh list.
+  8. **Optional per-option dimension override** (V19 migration: `option{1-4}_dimension` nullable
+     VARCHAR(20) on `questions`). NULL (default) = old behavior, scores into the question's own
+     `dimension`. When set, that option scores into its own dimension instead — e.g. a Yes/No
+     question where Yes measures one MI/RIASEC trait and No measures another. New
+     `PsychometricReportServiceImpl.effectiveDimension(q, ordinal)` resolves it. Frontend: new
+     shared `components/DimensionSelect.js`, a "Scores as (optional)" select under each option in
+     Add/Update Question, blank by default.
+  9. Psychometric report page ("Download PDF" via `window.print()`): AI narrative generation is now
+     a hard prerequisite, not a separate skippable step — only "Generate AI Report" shows until a
+     summary exists, then it swaps to "Download PDF". "Regenerate" removed from the UI *and* backend
+     now 409s on `regenerate=true` once `PsychometricReport.aiSummary` is set (one-time only, by
+     explicit user request). Print CSS also now hides the whole `.psychReport__actions` bar (only
+     two of three buttons were hidden before).
+- files: SecurityConfig unchanged (not touched, see note in #4); AdminController (+test endpoint);
+  AiServiceImpl/AiService/AiSettingsDto/UpdateAiSettingsRequest/PlatformAiSettings (system_prompt);
+  QuestionServiceImpl (delete-collection fix, 2-4 option validation, duplicate guard,
+  option-dimension validation); Question.java (+option{1-4}Dimension); QuestionRepository
+  (+existsByQuizAndContentIgnoreCase); PsychometricReportServiceImpl (maxOrdinal, effectiveDimension,
+  DEFAULT_AI_SYSTEM_PROMPT, one-time-generate lock); PsychometricReportController (unchanged);
+  migrations V18__ai_system_prompt.sql, V19__question_option_dimension.sql; frontend:
+  SuperAdminSidebar.js, SuperAdminAiSettingsPage.js, aiServices.js, Question.js, AdminQuestionsPage.js,
+  AdminAddQuestionsPage.js, AdminUpdateQuestionPage.js, DimensionSelect.js (new),
+  PsychometricReportPage.js/.css, questionsServices.js (surface real error message body, not just
+  statusText).
+- result: PASS on everything verified live via curl + direct DB queries (dalveer SUPER_ADMIN token):
+  delete fix (60->59->restored 60), 2-option add succeeds / 1-option 400s, dimension-override add
+  persists correctly, duplicate guard 409s, migrations V18/V19 applied cleanly, backend boots clean
+  after every change. Frontend compiles clean each time (only pre-existing useEffect/eqeqeq warnings
+  in files not touched by the fix). All test rows/questions created during verification were deleted
+  afterward. Backend was restarted ~9 times this session via kill-port-8081 + relaunch, because
+  devtools' auto-restart did NOT pick up plain `mvnw compile` runs — always kill-and-relaunch after
+  a backend change here, don't rely on devtools.
+- notes / follow-ups: (a) the ADMIN-can't-write-questions restriction is a real product gap vs.
+  CLAUDE.md's "Admins own categories/quizzes/questions" — that doc line is stale post the
+  2026-07-20 super-admin-only-content change; flag if this needs revisiting. (b) session ended with
+  both dev servers (`:8081`, `:3000`) killed and MySQL (XAMPP) left running. (c) datasource password
+  for this box is genuinely empty — pass `--spring.datasource.password=` every backend launch (see
+  Runtime facts above); this was re-discovered/re-applied ~9 times this session, worth double-checking
+  it's still accurate next session.

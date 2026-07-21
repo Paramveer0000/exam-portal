@@ -27,8 +27,8 @@ const UserProfilePage = () => {
         <SidebarUser />
       </div>
       <div className="userProfilePage__content" style={{ width: "100%" }}>
-        {/* Students don't see their role. */}
-        <ProfilePanel showRole={false} />
+        {/* Students don't see their role, but do see/change their school. */}
+        <ProfilePanel showRole={false} showSchool={true} />
       </div>
     </div>
   );

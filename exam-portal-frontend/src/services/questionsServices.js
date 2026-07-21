@@ -49,11 +49,9 @@ const addQuestion = async (question, token) => {
     console.log("questionsServices:addQuestion()  Success: ", data);
     return { data: data, isAdded: true, error: null };
   } catch (error) {
-    console.error(
-      "questionsServices:addQuestion()  Error: ",
-      error.response.statusText
-    );
-    return { data: null, isAdded: false, error: error.response.statusText };
+    const message = error.response.data?.message || error.response.statusText;
+    console.error("questionsServices:addQuestion()  Error: ", message);
+    return { data: null, isAdded: false, error: message };
   }
 };
 
@@ -97,14 +95,12 @@ const updateQuestion = async (question, token) => {
       error: null,
     };
   } catch (error) {
-    console.error(
-      "questionsServices:updateQuestion() Error: ",
-      error.response.statusText
-    );
+    const message = error.response.data?.message || error.response.statusText;
+    console.error("questionsServices:updateQuestion() Error: ", message);
     return {
       data: null,
       isUpdated: false,
-      error: error.response.statusText,
+      error: message,
     };
   }
 };

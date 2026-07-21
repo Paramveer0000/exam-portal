@@ -34,6 +34,9 @@ const UserQuestionsPage = () => {
   const userId = user ? user.userId : null;
   const [timeRemaining, setTimeRemaining] = useState(questions.length * 2 * 60);
   const [answeredCount, setAnsweredCount] = useState(0);
+  const QUESTIONS_PER_PAGE = 6;
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(questions.length / QUESTIONS_PER_PAGE));
   console.log("timeRemaining ", timeRemaining);
 
   // Count how many of THIS quiz's questions have a saved answer.
@@ -52,19 +55,22 @@ const UserQuestionsPage = () => {
     }
   };
 
-  // Start the countdown ONCE, only after the questions have loaded. Duration is
-  // the school-set timer if enabled, else the legacy 2 minutes per question.
+  // Start the countdown ONCE, only after both the questions AND the quiz
+  // config have loaded (quiz can arrive slightly later than questions).
+  // If the school has NOT enabled a timer, there is no countdown at all —
+  // no auto-submit, no fallback timer.
   useEffect(() => {
     if (startedRef.current) return;
     if (!questions || questions.length === 0) return;
+    if (quiz === undefined) return; // wait for quiz config to resolve
     startedRef.current = true;
 
-    const totalSecs =
-      quiz && quiz.timerEnabled && quiz.timerMinutes
-        ? quiz.timerMinutes * 60
-        : questions.length * 2 * 60;
-    setTimeRemaining(totalSecs);
+    if (!quiz || !quiz.timerEnabled || !quiz.timerMinutes) {
+      setTimeRemaining(0); // no time limit
+      return;
+    }
 
+    setTimeRemaining(quiz.timerMinutes * 60);
     intervalRef.current = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
@@ -178,6 +184,7 @@ const UserQuestionsPage = () => {
     }
     fetchExamQuestions(dispatch, quizId, token).then((data) => {
       setQuestions(data.payload);
+      setPage(0);
       // Countdown is started by the timer effect once questions are set.
     });
   }, []);
@@ -215,12 +222,6 @@ const UserQuestionsPage = () => {
         )}
         <div className="userQuestionsPage__content--options">
           <Button
-            className="userQuestionsPage__content--button"
-            onClick={() => submitQuizHandler()}
-          >
-            Submit Quiz
-          </Button>
-          <Button
             variant="outline-danger"
             className="userQuestionsPage__content--button"
             onClick={exitQuizHandler}
@@ -228,30 +229,84 @@ const UserQuestionsPage = () => {
             Exit Quiz
           </Button>
           <div className="userQuestionsPage__content--spinner">
-            <ReactSpinnerTimer
-              timeInSeconds={timeRemaining || 1}
-              totalLaps={1}
-              onLapInteraction={() => {}}
-              isRefresh={false}
-              isPause={false}
-            />
-            <h4 style={{ marginTop: "18px" }}>{`${parseInt(
-              timeRemaining / 60
-            ).zeroPad()} : ${(timeRemaining % 60).zeroPad()}`}</h4>
-            Timer
+            {quiz && quiz.timerEnabled && quiz.timerMinutes ? (
+              <>
+                <ReactSpinnerTimer
+                  timeInSeconds={timeRemaining || 1}
+                  totalLaps={1}
+                  onLapInteraction={() => {}}
+                  isRefresh={false}
+                  isPause={false}
+                />
+                <h4 style={{ marginTop: "18px" }}>{`${parseInt(
+                  timeRemaining / 60
+                ).zeroPad()} : ${(timeRemaining % 60).zeroPad()}`}</h4>
+                Timer
+              </>
+            ) : (
+              <h4 style={{ margin: 0 }}>No time limit</h4>
+            )}
           </div>
         </div>
-        {questions ? (
-          questions.map((q, index) => {
-            return (
-              <Question
-                key={index}
-                number={index + 1}
-                question={q}
-                onAnswered={recomputeAnswered}
-              />
-            );
-          })
+        {questions && questions.length > 0 ? (
+          <>
+            {questions
+              .slice(
+                page * QUESTIONS_PER_PAGE,
+                page * QUESTIONS_PER_PAGE + QUESTIONS_PER_PAGE
+              )
+              .map((q, i) => {
+                const index = page * QUESTIONS_PER_PAGE + i;
+                return (
+                  <Question
+                    key={index}
+                    number={index + 1}
+                    question={q}
+                    onAnswered={recomputeAnswered}
+                  />
+                );
+              })}
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                margin: "20px 0",
+              }}
+            >
+              <Button
+                variant="secondary"
+                disabled={page === 0}
+                onClick={() => {
+                  setPage((p) => Math.max(0, p - 1));
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                ← Previous
+              </Button>
+
+              <span>
+                Page {page + 1} of {totalPages}
+              </span>
+
+              {page < totalPages - 1 ? (
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setPage((p) => Math.min(totalPages - 1, p + 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                >
+                  Next →
+                </Button>
+              ) : (
+                <Button variant="success" onClick={() => submitQuizHandler()}>
+                  Submit Quiz
+                </Button>
+              )}
+            </div>
+          </>
         ) : (
           <Loader />
         )}

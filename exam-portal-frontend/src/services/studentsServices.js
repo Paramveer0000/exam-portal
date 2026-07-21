@@ -66,5 +66,52 @@ const deleteStudent = async (studentId, token) => {
   }
 };
 
-const studentsServices = { fetchStudents, updateStudent, setStatus, resetPassword, deleteStudent };
+// Class (category) assignment.
+const getAssignedClasses = async (studentId, token) => {
+  try {
+    const { data } = await axios.get(
+      `/api/students/${studentId}/classes`,
+      authConfig(token)
+    );
+    return { data, error: null };
+  } catch (error) {
+    return { data: null, error: errText(error) };
+  }
+};
+
+const assignClass = async (studentId, catId, token) => {
+  try {
+    await axios.post(
+      `/api/students/${studentId}/classes/${catId}`,
+      {},
+      authConfig(token)
+    );
+    return { ok: true, error: null };
+  } catch (error) {
+    return { ok: false, error: errText(error) };
+  }
+};
+
+const unassignClass = async (studentId, catId, token) => {
+  try {
+    await axios.delete(
+      `/api/students/${studentId}/classes/${catId}`,
+      authConfig(token)
+    );
+    return { ok: true, error: null };
+  } catch (error) {
+    return { ok: false, error: errText(error) };
+  }
+};
+
+const studentsServices = {
+  fetchStudents,
+  updateStudent,
+  setStatus,
+  resetPassword,
+  deleteStudent,
+  getAssignedClasses,
+  assignClass,
+  unassignClass,
+};
 export default studentsServices;

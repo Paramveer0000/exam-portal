@@ -8,6 +8,7 @@ import * as questionsConstants from "../../../constants/questionsConstants";
 import "./AdminAddQuestionsPage.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import DimensionSelect from "../../../components/DimensionSelect";
 
 const AdminAddQuestionsPage = () => {
   const [content, setContent] = useState("");
@@ -18,12 +19,22 @@ const AdminAddQuestionsPage = () => {
   const [option4, setOption4] = useState("");
   const [answer, setAnswer] = useState(null);
   const [dimension, setDimension] = useState("");
+  // Optional per-option overrides — most questions leave these blank and just
+  // use `dimension` above; set one when different answers measure different traits.
+  const [option1Dimension, setOption1Dimension] = useState("");
+  const [option2Dimension, setOption2Dimension] = useState("");
+  const [option3Dimension, setOption3Dimension] = useState("");
+  const [option4Dimension, setOption4Dimension] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const urlParams = new URLSearchParams(window.location.search);
   const quizId = urlParams.get("quizId");
+  const quizTitle = urlParams.get("quizTitle");
   const token = JSON.parse(localStorage.getItem("jwtToken"));
+  const backToQuestionsUrl = `/adminQuestions/?quizId=${quizId}${
+    quizTitle ? `&quizTitle=${quizTitle}` : ""
+  }`;
 
   const onSelectAnswerHandler = (e) => {
     setAnswer(e.target.value);
@@ -43,6 +54,10 @@ const AdminAddQuestionsPage = () => {
         option2: option2,
         option3: option3,
         option4: option4,
+        option1Dimension: option1Dimension,
+        option2Dimension: option2Dimension,
+        option3Dimension: option3Dimension,
+        option4Dimension: option4Dimension,
         answer: answer,
         dimension: dimension,
         quiz: {
@@ -51,10 +66,12 @@ const AdminAddQuestionsPage = () => {
       };
 
       addQuestion(dispatch, question, token).then((data) => {
-        if (data.type === questionsConstants.ADD_QUESTION_SUCCESS)
-          swal("Question Added!", `${content} succesfully added`, "success");
-        else {
-          swal("Question Not Added!", `${content} not added`, "error");
+        if (data.type === questionsConstants.ADD_QUESTION_SUCCESS) {
+          swal("Question Added!", `${content} succesfully added`, "success").then(() =>
+            navigate(backToQuestionsUrl)
+          );
+        } else {
+          swal("Question Not Added!", data.payload || `${content} not added`, "error");
         }
       });
     } else {
@@ -69,6 +86,13 @@ const AdminAddQuestionsPage = () => {
       </div>
       <div className="adminAddQuestionPage__content">
         <FormContainer>
+          <Button
+            variant="secondary"
+            className="mb-3"
+            onClick={() => navigate(backToQuestionsUrl)}
+          >
+            ← Back to Questions
+          </Button>
           <h2>Add Question</h2>
           <Form onSubmit={submitHandler}>
             <Form.Group className="my-3" controlId="content">
@@ -101,6 +125,17 @@ const AdminAddQuestionsPage = () => {
                   setOption1(e.target.value);
                 }}
               ></Form.Control>
+              <div className="mt-1">
+                <label htmlFor="option1-dimension" className="form-text">
+                  Scores as (optional — leave blank to use the dimension below)
+                </label>
+                <DimensionSelect
+                  id="option1-dimension"
+                  value={option1Dimension}
+                  onChange={(e) => setOption1Dimension(e.target.value)}
+                  blankLabel="Use question's dimension"
+                />
+              </div>
             </Form.Group>
 
             <Form.Group className="my-3" controlId="option2">
@@ -117,10 +152,21 @@ const AdminAddQuestionsPage = () => {
                   setOption2(e.target.value);
                 }}
               ></Form.Control>
+              <div className="mt-1">
+                <label htmlFor="option2-dimension" className="form-text">
+                  Scores as (optional — leave blank to use the dimension below)
+                </label>
+                <DimensionSelect
+                  id="option2-dimension"
+                  value={option2Dimension}
+                  onChange={(e) => setOption2Dimension(e.target.value)}
+                  blankLabel="Use question's dimension"
+                />
+              </div>
             </Form.Group>
 
             <Form.Group className="my-3" controlId="option3">
-              <Form.Label>Option 3</Form.Label>
+              <Form.Label>Option 3 (optional)</Form.Label>
               <Form.Control
                 style={{ textAlign: "top" }}
                 as="textarea"
@@ -128,15 +174,27 @@ const AdminAddQuestionsPage = () => {
                 type="text"
                 placeholder="Enter Option 3"
                 value={option3}
-                required
                 onChange={(e) => {
                   setOption3(e.target.value);
                 }}
               ></Form.Control>
+              {option3 && (
+                <div className="mt-1">
+                  <label htmlFor="option3-dimension" className="form-text">
+                    Scores as (optional — leave blank to use the dimension below)
+                  </label>
+                  <DimensionSelect
+                    id="option3-dimension"
+                    value={option3Dimension}
+                    onChange={(e) => setOption3Dimension(e.target.value)}
+                    blankLabel="Use question's dimension"
+                  />
+                </div>
+              )}
             </Form.Group>
 
             <Form.Group className="my-3" controlId="option4">
-              <Form.Label>Option 4</Form.Label>
+              <Form.Label>Option 4 (optional)</Form.Label>
               <Form.Control
                 style={{ textAlign: "top" }}
                 as="textarea"
@@ -144,42 +202,33 @@ const AdminAddQuestionsPage = () => {
                 type="text"
                 placeholder="Enter Option 4"
                 value={option4}
-                required
                 onChange={(e) => {
                   setOption4(e.target.value);
                 }}
               ></Form.Control>
+              {option4 && (
+                <div className="mt-1">
+                  <label htmlFor="option4-dimension" className="form-text">
+                    Scores as (optional — leave blank to use the dimension below)
+                  </label>
+                  <DimensionSelect
+                    id="option4-dimension"
+                    value={option4Dimension}
+                    onChange={(e) => setOption4Dimension(e.target.value)}
+                    blankLabel="Use question's dimension"
+                  />
+                </div>
+              )}
             </Form.Group>
 
             <div className="my-3">
               <label htmlFor="dimension-select">Dimension this question measures:</label>
-              <Form.Select
-                aria-label="Choose Dimension"
+              <DimensionSelect
                 id="dimension-select"
                 value={dimension}
                 onChange={(e) => setDimension(e.target.value)}
-              >
-                <option value="">Choose Dimension</option>
-                <optgroup label="Multiple Intelligences">
-                  <option value="LOGICAL">Logical-Mathematical</option>
-                  <option value="MUSICAL">Musical-Rhythmic</option>
-                  <option value="NATURALIST">Naturalistic</option>
-                  <option value="VERBAL">Verbal-Linguistic</option>
-                  <option value="INTERPERSONAL">Interpersonal</option>
-                  <option value="KINESTHETIC">Bodily-Kinesthetic</option>
-                  <option value="SPATIAL">Visual-Spatial</option>
-                  <option value="INTRAPERSONAL">Intrapersonal</option>
-                  <option value="EXISTENTIAL">Existential</option>
-                </optgroup>
-                <optgroup label="Career Interest (RIASEC)">
-                  <option value="R">R — Realistic</option>
-                  <option value="I">I — Investigative</option>
-                  <option value="A">A — Artistic</option>
-                  <option value="S">S — Social</option>
-                  <option value="E">E — Enterprising</option>
-                  <option value="C">C — Conventional</option>
-                </optgroup>
-              </Form.Select>
+                blankLabel="Choose Dimension"
+              />
             </div>
 
             <div className="my-3">
@@ -192,8 +241,8 @@ const AdminAddQuestionsPage = () => {
                 <option value="n/a">Choose Option</option>
                 <option value="option1">Option 1</option>
                 <option value="option2">Option 2</option>
-                <option value="option3">Option 3</option>
-                <option value="option4">Option 4</option>
+                {option3 && <option value="option3">Option 3</option>}
+                {option4 && <option value="option4">Option 4</option>}
                 {/* {categories ? (
                   categories.map((cat, index) => (
                     <option key={index} value={cat.catId}>

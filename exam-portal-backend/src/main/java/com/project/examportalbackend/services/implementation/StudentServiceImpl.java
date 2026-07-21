@@ -1,9 +1,14 @@
 package com.project.examportalbackend.services.implementation;
 
+import com.project.examportalbackend.dto.OwnableItemDto;
 import com.project.examportalbackend.dto.StudentDto;
 import com.project.examportalbackend.dto.UpdateProfileRequest;
+import com.project.examportalbackend.models.Category;
+import com.project.examportalbackend.models.StudentClass;
 import com.project.examportalbackend.models.User;
+import com.project.examportalbackend.repository.CategoryRepository;
 import com.project.examportalbackend.repository.QuizResultRepository;
+import com.project.examportalbackend.repository.StudentClassRepository;
 import com.project.examportalbackend.repository.UserRepository;
 import com.project.examportalbackend.security.AuthFacade;
 import com.project.examportalbackend.services.StudentService;
@@ -29,6 +34,10 @@ public class StudentServiceImpl implements StudentService {
     private QuizResultRepository quizResultRepository;
     @Autowired
     private AuthFacade authFacade;
+    @Autowired
+    private StudentClassRepository studentClassRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
     public List<StudentDto> getMyStudents() {
@@ -82,6 +91,36 @@ public class StudentServiceImpl implements StudentService {
         // A student's exam results are theirs alone; remove them with the account.
         quizResultRepository.deleteByUserId(studentId);
         userRepository.delete(student);
+    }
+
+    @Override
+    public List<OwnableItemDto> getAssignedClasses(Long studentId) {
+        loadStudent(studentId); // ownership check
+        List<Long> catIds = studentClassRepository.findByUserId(studentId).stream()
+                .map(StudentClass::getCatId).collect(Collectors.toList());
+        if (catIds.isEmpty()) {
+            return List.of();
+        }
+        return categoryRepository.findAllById(catIds).stream()
+                .map(c -> new OwnableItemDto(c.getCatId(), c.getTitle()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void assignClass(Long studentId, Long catId) {
+        loadStudent(studentId); // ownership check
+        Category category = categoryRepository.findById(catId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
+        if (!studentClassRepository.existsByUserIdAndCatId(studentId, category.getCatId())) {
+            studentClassRepository.save(new StudentClass(studentId, category.getCatId()));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void unassignClass(Long studentId, Long catId) {
+        loadStudent(studentId); // ownership check
+        studentClassRepository.deleteByUserIdAndCatId(studentId, catId);
     }
 
     /**

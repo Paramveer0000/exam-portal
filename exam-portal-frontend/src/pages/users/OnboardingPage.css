@@ -1,0 +1,13 @@
+.onboardingPage__container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 3rem 1rem;
+  min-height: 80vh;
+}
+
+.onboardingPage__card {
+  width: 100%;
+  max-width: 500px;
+  padding: 2rem;
+}

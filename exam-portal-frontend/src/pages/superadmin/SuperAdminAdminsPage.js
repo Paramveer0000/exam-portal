@@ -28,6 +28,13 @@ const SuperAdminAdminsPage = () => {
   const token = JSON.parse(localStorage.getItem("jwtToken"));
   const { admins, activity, error } = useSelector((state) => state.adminReducer);
   const [form, setForm] = useState(emptyForm);
+  const [showCreate, setShowCreate] = useState(false);
+
+  // Open the create form pre-set to a role (from the top-right buttons).
+  const openCreate = (role) => {
+    setForm({ ...emptyForm, role });
+    setShowCreate(true);
+  };
 
   useEffect(() => {
     fetchAdmins(dispatch, token);
@@ -44,8 +51,9 @@ const SuperAdminAdminsPage = () => {
     }
     createAdmin(dispatch, form, token).then((data) => {
       if (data.type === "CREATE_ADMIN_SUCCESS") {
-        swal("Admin created", `${form.username} was added`, "success");
+        swal("Created", `${form.username} was added`, "success");
         setForm(emptyForm);
+        setShowCreate(false);
         fetchMetrics(dispatch, token);
       } else {
         swal("Not created", data.payload || "Failed to create admin", "error");
@@ -132,10 +140,51 @@ const SuperAdminAdminsPage = () => {
     <div style={{ display: "flex" }}>
       <SuperAdminSidebar />
       <div style={{ padding: "1.5rem", flexGrow: 1, maxWidth: "1100px" }}>
-        <h2>Schools</h2>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: "8px",
+          }}
+        >
+          <h2 className="mb-0">Schools</h2>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <Button variant="primary" onClick={() => openCreate("ADMIN")}>
+              + Register Partner / School
+            </Button>
+            <Button
+              variant="outline-primary"
+              onClick={() => openCreate("SUPER_ADMIN")}
+            >
+              + Register Super Admin
+            </Button>
+          </div>
+        </div>
 
+        {showCreate && (
         <Card body className="my-3">
-          <h4>Create School</h4>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <h4 className="mb-0">
+              {form.role === "SUPER_ADMIN"
+                ? "Register Super Admin"
+                : "Register Partner / School"}
+            </h4>
+            <Button
+              variant="link"
+              className="text-secondary"
+              onClick={() => setShowCreate(false)}
+            >
+              Close
+            </Button>
+          </div>
           <Form onSubmit={createHandler}>
             <Row>
               <Col md={4} className="mb-2">
@@ -203,6 +252,7 @@ const SuperAdminAdminsPage = () => {
           </Form>
           {error && <p style={{ color: "red" }}>{error}</p>}
         </Card>
+        )}
 
         <Card body className="my-3">
           <h4>All Schools</h4>

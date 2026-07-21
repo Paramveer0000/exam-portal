@@ -17,10 +17,12 @@ import com.project.examportalbackend.repository.QuestionRepository;
 import com.project.examportalbackend.repository.QuizResultRepository;
 import com.project.examportalbackend.repository.UserRepository;
 import com.project.examportalbackend.security.AuthFacade;
+import com.project.examportalbackend.services.AiService;
 import com.project.examportalbackend.services.PsychometricReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -45,6 +47,14 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
             "KINESTHETIC", "SPATIAL", "INTRAPERSONAL", "EXISTENTIAL");
     static final List<String> RIASEC_LETTERS = Arrays.asList("R", "I", "A", "S", "E", "C");
 
+    // Used when no admin-configured system_prompt is set (see AiSettingsDto).
+    static final String DEFAULT_AI_SYSTEM_PROMPT = "You are a supportive school career counsellor writing for a student "
+            + "and their parents. Interpret ONLY the scores provided; never invent numbers. "
+            + "Use warm, plain, encouraging language (no clinical jargon). Structure: a short "
+            + "opening about their strongest intelligences, a note on their interest style, then "
+            + "concrete, realistic career directions to explore, and one gentle growth tip. "
+            + "150-250 words, a few short paragraphs.";
+
     private static final Map<String, String> RIASEC_NAMES = new LinkedHashMap<>();
     static {
         RIASEC_NAMES.put("R", "Realistic");
@@ -61,6 +71,7 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
     @Autowired private QuizResultRepository quizResultRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private AuthFacade authFacade;
+    @Autowired private AiService aiService;
 
     // ------------------------------------------------------------------ score
 
@@ -81,8 +92,10 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
             if (ordinal == 0) {
                 continue; // unrecognisable submission
             }
-            String dim = q.getDimension();
-            raw.merge(dim, (double) ordinal, Double::sum);
+            String dim = effectiveDimension(q, ordinal);
+            // Fraction of this question's own max (2-4 options), not a fixed /4 scale,
+            // so a 2-option question and a 4-option question contribute comparably.
+            raw.merge(dim, ordinal / (double) maxOrdinal(q), Double::sum);
             counts.merge(dim, 1, Integer::sum);
         }
 
@@ -98,11 +111,11 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
         assert totalMi == 0 || Math.abs(sum - 100.0) < 1.0
                 : "MI percents sum to " + sum + ", expected ~100";
 
-        // RIASEC: mean of the letter's Likert points mapped onto /10 (4 -> 10).
+        // RIASEC: mean of the letter's normalized fractions, mapped onto /10.
         Map<String, Double> riasec = new HashMap<>();
         for (String l : RIASEC_LETTERS) {
             int n = counts.getOrDefault(l, 0);
-            riasec.put(l, n == 0 ? 0 : round1(raw.getOrDefault(l, 0.0) / n / 4.0 * 10));
+            riasec.put(l, n == 0 ? 0 : round1(raw.getOrDefault(l, 0.0) / n * 10));
         }
 
         PsychometricReport report = new PsychometricReport();
@@ -165,6 +178,29 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
                 if (submitted.equals(q.getOption4())) return 4;
                 return 0;
         }
+    }
+
+    /** Dimension the chosen option scores into: its own override, or the question's default. */
+    private String effectiveDimension(Question q, int ordinal) {
+        String override;
+        switch (ordinal) {
+            case 1: override = q.getOption1Dimension(); break;
+            case 2: override = q.getOption2Dimension(); break;
+            case 3: override = q.getOption3Dimension(); break;
+            case 4: override = q.getOption4Dimension(); break;
+            default: override = null;
+        }
+        return StringUtils.hasText(override) ? override : q.getDimension();
+    }
+
+    /** Count of non-blank options (2-4) — a question's own Likert ceiling. */
+    private int maxOrdinal(Question q) {
+        int n = 0;
+        if (StringUtils.hasText(q.getOption1())) n++;
+        if (StringUtils.hasText(q.getOption2())) n++;
+        if (StringUtils.hasText(q.getOption3())) n++;
+        if (StringUtils.hasText(q.getOption4())) n++;
+        return Math.max(n, 1);
     }
 
     // ------------------------------------------------------------------- read
@@ -230,6 +266,57 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
 
         return PsychometricReportDto.from(report, result, student, miRows, domains,
                 riasecRows, hollandCode, quotients, rankCareers(mi, ri));
+    }
+
+    // -------------------------------------------------------------- AI summary
+
+    @Override
+    public String getAiSummary(Long quizResId, boolean regenerate) {
+        // getReport() enforces the same ownership scoping and gives us the
+        // already-computed profile to feed the model.
+        PsychometricReportDto dto = getReport(quizResId);
+        PsychometricReport report = reportRepository.findByQuizResId(quizResId);
+
+        if (report.getAiSummary() != null && !report.getAiSummary().isBlank()) {
+            if (regenerate) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "AI report already generated for this attempt; it cannot be regenerated");
+            }
+            return report.getAiSummary();
+        }
+
+        String configuredPrompt = aiService.getSettings().getSystemPrompt();
+        String system = StringUtils.hasText(configuredPrompt) ? configuredPrompt : DEFAULT_AI_SYSTEM_PROMPT;
+        String summary = aiService.complete(system, buildAiPrompt(dto));
+
+        report.setAiSummary(summary);
+        reportRepository.save(report);
+        return summary;
+    }
+
+    private String buildAiPrompt(PsychometricReportDto dto) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Student: ").append(dto.getStudentName()).append('\n');
+        sb.append("Test: ").append(dto.getQuizTitle()).append('\n');
+        sb.append("\nMultiple Intelligences (percent, rank):\n");
+        dto.getMultipleIntelligences().stream()
+                .sorted(Comparator.comparingInt(MiRow::getRank))
+                .forEach(r -> sb.append("- ").append(r.getDimension())
+                        .append(": ").append(r.getPercent()).append("% (rank ").append(r.getRank()).append(")\n"));
+        sb.append("\nLearning domains:\n");
+        dto.getDomains().forEach(d -> sb.append("- ").append(d.getName())
+                .append(": ").append(d.getPercent()).append("%\n"));
+        sb.append("\nRIASEC interest code: ").append(dto.getHollandCode()).append('\n');
+        dto.getRiasec().forEach(r -> sb.append("- ").append(r.getLetter()).append(' ')
+                .append(r.getName()).append(": ").append(r.getScore()).append("/10\n"));
+        sb.append("\nQuotients:\n");
+        dto.getQuotients().forEach(q -> sb.append("- ").append(q.getCode())
+                .append(": ").append(q.getPercent()).append("%\n"));
+        sb.append("\nTop recommended career fields (best first):\n");
+        dto.getCareers().forEach(c -> sb.append("- ").append(c.getField())
+                .append(" (").append(c.getStars()).append("/5)\n"));
+        sb.append("\nWrite the counsellor's narrative now.");
+        return sb.toString();
     }
 
     /**

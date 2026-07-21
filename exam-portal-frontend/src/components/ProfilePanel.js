@@ -1,20 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Form, Row, Table } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import Image from "react-bootstrap/Image";
 import swal from "sweetalert";
 import profileServices from "../services/profileServices";
+import authServices from "../services/authServices";
+import { BOARDS, GRADES } from "../pages/users/OnboardingPage";
 
 /**
  * Shared profile view for any role: details table, plus Edit Profile and
  * Change Password sections that are hidden behind buttons until clicked.
+ * showSchool: students only — shows the school (teacher) they're under and
+ * lets them switch to a different one.
  */
-const ProfilePanel = ({ showRole = false }) => {
+const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }) => {
   const user = useSelector((state) => state.loginReducer.user);
   const token = JSON.parse(localStorage.getItem("jwtToken"));
 
   const [showEdit, setShowEdit] = useState(false);
   const [showPw, setShowPw] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const [firstName, setFirstName] = useState(user ? user.firstName || "" : "");
   const [lastName, setLastName] = useState(user ? user.lastName || "" : "");
@@ -24,8 +29,26 @@ const ProfilePanel = ({ showRole = false }) => {
   );
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [teachers, setTeachers] = useState([]);
+  const [teacherId, setTeacherId] = useState(
+    user && user.teacherId ? String(user.teacherId) : ""
+  );
+  const [grade, setGrade] = useState(user ? user.grade || "" : "");
+  const [board, setBoard] = useState(user ? user.board || "" : "");
+  const [schoolName, setSchoolName] = useState(
+    user ? user.schoolName || "" : ""
+  );
+
+  useEffect(() => {
+    if (showSchool) {
+      authServices.getTeachers().then((list) => setTeachers(list || []));
+    }
+  }, [showSchool]);
 
   if (!user) return null;
+
+  const currentSchoolName =
+    teachers.find((t) => t.userId === user.teacherId)?.name || "—";
 
   const saveProfile = (e) => {
     e.preventDefault();
@@ -33,8 +56,15 @@ const ProfilePanel = ({ showRole = false }) => {
       swal("Required", "Username and phone cannot be empty", "info");
       return;
     }
+    const payload = { firstName, lastName, username, phoneNumber };
+    if (showSchool) {
+      if (teacherId) payload.teacherId = Number(teacherId);
+      payload.grade = grade;
+      payload.board = board;
+      payload.schoolName = schoolName;
+    }
     profileServices
-      .updateProfile({ firstName, lastName, username, phoneNumber }, token)
+      .updateProfile(payload, token)
       .then(({ data, error }) => {
         if (data && data.jwtToken) {
           localStorage.setItem("jwtToken", JSON.stringify(data.jwtToken));
@@ -46,6 +76,50 @@ const ProfilePanel = ({ showRole = false }) => {
           swal("Update failed", error || "Could not update profile", "error");
         }
       });
+  };
+
+  const onLogoChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = ""; // allow re-selecting the same file
+    if (!file) return;
+    if (file.type !== "image/png") {
+      swal("PNG only", "Please choose a PNG image.", "info");
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      swal("Too large", "Please choose a PNG under 1 MB.", "info");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setUploadingLogo(true);
+      // The profile update requires the identity fields, so send the current
+      // values alongside the new logo (the service only overwrites the logo).
+      profileServices
+        .updateProfile(
+          {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            username: user.username,
+            phoneNumber: user.phoneNumber,
+            logo: reader.result,
+          },
+          token
+        )
+        .then(({ data, error }) => {
+          setUploadingLogo(false);
+          if (data && data.jwtToken) {
+            localStorage.setItem("jwtToken", JSON.stringify(data.jwtToken));
+            localStorage.setItem("user", JSON.stringify(data.user));
+            swal("Logo updated", "Your logo was saved", "success").then(() =>
+              window.location.reload()
+            );
+          } else {
+            swal("Upload failed", error || "Could not save logo", "error");
+          }
+        });
+    };
+    reader.readAsDataURL(file);
   };
 
   const changePasswordHandler = (e) => {
@@ -71,13 +145,43 @@ const ProfilePanel = ({ showRole = false }) => {
   return (
     <div style={{ maxWidth: "700px", margin: "0 auto", width: "100%" }}>
       <Image
-        width="20%"
-        height="20%"
         roundedCircle
-        src="images/user.png"
-        style={{ display: "block", margin: "1rem auto" }}
+        src={showLogo && user.logo ? user.logo : "images/user.png"}
+        style={{
+          display: "block",
+          margin: "1rem auto",
+          width: "120px",
+          height: "120px",
+          objectFit: "cover",
+          border: "2px solid #eee",
+          background: "#fff",
+        }}
       />
 
+      {showLogo && (
+        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+          <Form.Label
+            htmlFor="logo-upload"
+            className="btn btn-outline-primary btn-sm mb-0"
+            style={{ cursor: uploadingLogo ? "default" : "pointer" }}
+          >
+            {uploadingLogo ? "Uploading…" : user.logo ? "Change logo (PNG)" : "Upload logo (PNG)"}
+          </Form.Label>
+          <input
+            id="logo-upload"
+            type="file"
+            accept="image/png"
+            hidden
+            disabled={uploadingLogo}
+            onChange={onLogoChange}
+          />
+          <div style={{ fontSize: "0.8rem", color: "#888", marginTop: "6px" }}>
+            PNG only · square recommended (e.g. 256×256 px) · max 1 MB
+          </div>
+        </div>
+      )}
+
+      <h5 className="text-start mt-2">Profile</h5>
       <Table bordered>
         <tbody>
           <tr>
@@ -92,6 +196,12 @@ const ProfilePanel = ({ showRole = false }) => {
             <td>Phone</td>
             <td>{user.phoneNumber}</td>
           </tr>
+          {showSchool && (
+            <tr>
+              <td>School</td>
+              <td>{currentSchoolName}</td>
+            </tr>
+          )}
           {showRole && user.roles && user.roles[0] && (
             <tr>
               <td>Role</td>
@@ -104,6 +214,28 @@ const ProfilePanel = ({ showRole = false }) => {
           </tr>
         </tbody>
       </Table>
+
+      {showSchool && (
+        <>
+          <h5 className="text-start mt-4">Academics</h5>
+          <Table bordered>
+            <tbody>
+              <tr>
+                <td>Grade</td>
+                <td>{user.grade ? `Class ${user.grade}` : "—"}</td>
+              </tr>
+              <tr>
+                <td>Board</td>
+                <td>{user.board || "—"}</td>
+              </tr>
+              <tr>
+                <td>School name</td>
+                <td>{user.schoolName || "—"}</td>
+              </tr>
+            </tbody>
+          </Table>
+        </>
+      )}
 
       <div className="d-flex gap-2 my-3">
         <Button variant="primary" onClick={() => setShowEdit((v) => !v)}>
@@ -118,6 +250,7 @@ const ProfilePanel = ({ showRole = false }) => {
         <Card body className="my-3 text-start">
           <h4>Edit Profile</h4>
           <Form onSubmit={saveProfile}>
+            <h6 className="text-muted">Profile</h6>
             <Row>
               <Col md={6} className="mb-2">
                 <Form.Label>First name</Form.Label>
@@ -150,7 +283,67 @@ const ProfilePanel = ({ showRole = false }) => {
                 />
               </Col>
             </Row>
-            <Button type="submit" variant="primary" className="mt-2">
+
+            {showSchool && (
+              <>
+                <hr />
+                <h6 className="text-muted">Academics</h6>
+                <Row>
+                  <Col md={6} className="mb-2">
+                    <Form.Label>School</Form.Label>
+                    <Form.Select
+                      value={teacherId}
+                      onChange={(e) => setTeacherId(e.target.value)}
+                    >
+                      <option value="">Choose a school</option>
+                      {teachers.map((t) => (
+                        <option key={t.userId} value={t.userId}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+                  <Col md={6} className="mb-2">
+                    <Form.Label>Grade / Class</Form.Label>
+                    <Form.Select
+                      value={grade}
+                      onChange={(e) => setGrade(e.target.value)}
+                    >
+                      <option value="">Choose your grade</option>
+                      {GRADES.map((g) => (
+                        <option key={g} value={g}>
+                          Class {g}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+                  <Col md={6} className="mb-2">
+                    <Form.Label>Board</Form.Label>
+                    <Form.Select
+                      value={board}
+                      onChange={(e) => setBoard(e.target.value)}
+                    >
+                      <option value="">Choose your board</option>
+                      {BOARDS.map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+                  <Col md={6} className="mb-2">
+                    <Form.Label>School name</Form.Label>
+                    <Form.Control
+                      value={schoolName}
+                      placeholder="Your actual school's name"
+                      onChange={(e) => setSchoolName(e.target.value)}
+                    />
+                  </Col>
+                </Row>
+              </>
+            )}
+
+            <Button type="submit" variant="primary" className="mt-3">
               Save changes
             </Button>
           </Form>

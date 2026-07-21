@@ -52,6 +52,21 @@ public class User implements UserDetails {
     @Column(name = "school_type")
     private String schoolType;
 
+    // Onboarding step 2 (students): grade/board/school name. Completeness is
+    // computed from these being non-blank, not tracked with a separate flag.
+    @Column(name = "grade")
+    private String grade;
+
+    @Column(name = "board")
+    private String board;
+
+    @Column(name = "school_name")
+    private String schoolName;
+
+    // Branding logo (base64 PNG data URL) for ADMIN / SUPER_ADMIN accounts.
+    @Column(name = "logo", columnDefinition = "MEDIUMTEXT")
+    private String logo;
+
     // No cascade: roles are shared reference data. Deleting a user must remove only
     // its user_role join rows, never the ADMIN/USER/SUPER_ADMIN role entities.
     @ManyToMany(fetch = FetchType.EAGER)

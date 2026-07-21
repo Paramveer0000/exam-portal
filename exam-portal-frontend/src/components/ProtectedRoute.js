@@ -15,7 +15,7 @@ const getRoleNames = () => {
 // Where a logged-in user belongs when they hit a route they're not allowed on.
 export const homePathForRoles = (roles) => {
   if (roles.includes("SUPER_ADMIN")) return "/superadmin";
-  if (roles.includes("ADMIN")) return "/adminProfile";
+  if (roles.includes("ADMIN")) return "/adminDashboard";
   return "/profile";
 };
 

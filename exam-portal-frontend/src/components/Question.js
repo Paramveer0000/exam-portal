@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { InputGroup } from "react-bootstrap";
 import "./Question.css";
 import { useNavigate } from "react-router-dom";
@@ -7,11 +7,14 @@ import { deleteQuestion } from "../actions/questionsActions";
 import swal from "sweetalert";
 import * as questionsConstants from "../constants/questionsConstants";
 
-const Question = ({ number, answers, question, isAdmin = false, onAnswered }) => {
+const Question = ({ number, answers, question, isAdmin = false, canEdit = true, onAnswered }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const answer = question.answer;
   const token = JSON.parse(localStorage.getItem("jwtToken"));
+  // Admin list can hold dozens of questions; collapsed by default so Update/Delete
+  // are reachable without scrolling past every option block.
+  const [expanded, setExpanded] = useState(!isAdmin);
 
   const saveAnswer = (quesId, ans) => {
     const newAns = {};
@@ -26,7 +29,12 @@ const Question = ({ number, answers, question, isAdmin = false, onAnswered }) =>
     if (onAnswered) onAnswered(quesId);
   };
   const updateQuestionHandler = (ques) => {
-    navigate(`/adminUpdateQuestion/${ques.quesId}/?quizId=${ques.quiz.quizId}`);
+    const quizTitle = new URLSearchParams(window.location.search).get("quizTitle");
+    navigate(
+      `/adminUpdateQuestion/${ques.quesId}/?quizId=${ques.quiz.quizId}${
+        quizTitle ? `&quizTitle=${quizTitle}` : ""
+      }`
+    );
   };
 
   const deleteQuestionHandler = (ques) => {
@@ -61,9 +69,45 @@ const Question = ({ number, answers, question, isAdmin = false, onAnswered }) =>
 
   return (
     <div className="question__container">
-      <div className="question__content">
-        {number + ". " + question.content}
+      <div
+        className="question__content"
+        onClick={isAdmin ? () => setExpanded((e) => !e) : undefined}
+        style={
+          isAdmin
+            ? { cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }
+            : undefined
+        }
+      >
+        <span>{number + ". " + question.content}</span>
+        {isAdmin && (
+          <div className="question__content--editButtons" style={{ flexShrink: 0 }}>
+            <span style={{ marginRight: "10px", color: "#888" }}>{expanded ? "▲" : "▼"}</span>
+            {canEdit && (
+              <>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateQuestionHandler(question);
+                  }}
+                  style={{ margin: "2px 8px", color: "rgb(68 177 49)", fontWeight: "500", cursor: "pointer" }}
+                >
+                  Update
+                </span>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteQuestionHandler(question);
+                  }}
+                  style={{ margin: "2px 8px", color: "red", fontWeight: "500", cursor: "pointer" }}
+                >
+                  Delete
+                </span>
+              </>
+            )}
+          </div>
+        )}
       </div>
+      {!expanded ? null : (
       <div className="question__options">
         <InputGroup
           onChange={(e) => {
@@ -94,61 +138,41 @@ const Question = ({ number, answers, question, isAdmin = false, onAnswered }) =>
             </div>
           </div>
 
-          <div className="question__options--2">
-            <div className="question__options--optionDiv">
-              <InputGroup.Radio
-                value={question.option3}
-                name={number}
-                aria-label="option 3"
-              />
-              <span className="question__options--optionText">
-                {question.option3}
-              </span>
+          {(question.option3 || question.option4) && (
+            <div className="question__options--2">
+              {question.option3 && (
+                <div className="question__options--optionDiv">
+                  <InputGroup.Radio
+                    value={question.option3}
+                    name={number}
+                    aria-label="option 3"
+                  />
+                  <span className="question__options--optionText">
+                    {question.option3}
+                  </span>
+                </div>
+              )}
+              {question.option4 && (
+                <div className="question__options--optionDiv">
+                  <InputGroup.Radio
+                    value={question.option4}
+                    name={number}
+                    aria-label="option 4"
+                  />
+                  <span className="question__options--optionText">
+                    {question.option4}
+                  </span>
+                </div>
+              )}
             </div>
-            <div className="question__options--optionDiv">
-              <InputGroup.Radio
-                value={question.option4}
-                name={number}
-                aria-label="option 4"
-              />
-              <span className="question__options--optionText">
-                {question.option4}
-              </span>
-            </div>
-          </div>
+          )}
         </InputGroup>
       </div>
-      {isAdmin && (
-        <div>
-          <p
-            style={{ margin: "5px" }}
-          >{`Correct Answer: ${question[answer]}`}</p>
-          <hr />
-          <div className="question__content--editButtons">
-            <div
-              onClick={() => updateQuestionHandler(question)}
-              style={{
-                margin: "2px 8px",
-                textAlign: "center",
-                color: "rgb(68 177 49)",
-                fontWeight: "500",
-                cursor: "pointer",
-              }}
-            >{`Update`}</div>
-
-            <div
-              onClick={() => deleteQuestionHandler(question)}
-              style={{
-                margin: "2px 8px",
-                textAlign: "center",
-                color: "red",
-                fontWeight: "500",
-                cursor: "pointer",
-              }}
-            >{`Delete`}</div>
-          </div>
-        </div>
       )}
+      {isAdmin && expanded && (
+        <p style={{ margin: "5px" }}>{`Correct Answer: ${question[answer]}`}</p>
+      )}
+      <hr />
     </div>
   );
 };

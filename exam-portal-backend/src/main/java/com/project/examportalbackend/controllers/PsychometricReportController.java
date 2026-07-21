@@ -17,4 +17,12 @@ public class PsychometricReportController {
     public ResponseEntity<?> getReport(@PathVariable Long quizResId) {
         return ResponseEntity.ok(psychometricReportService.getReport(quizResId));
     }
+
+    // On-demand LLM narrative (cached). regenerate=true forces a fresh call.
+    @PostMapping("/{quizResId}/ai-summary")
+    public ResponseEntity<?> generateAiSummary(@PathVariable Long quizResId,
+                                               @RequestParam(defaultValue = "false") boolean regenerate) {
+        String summary = psychometricReportService.getAiSummary(quizResId, regenerate);
+        return ResponseEntity.ok(java.util.Collections.singletonMap("summary", summary));
+    }
 }

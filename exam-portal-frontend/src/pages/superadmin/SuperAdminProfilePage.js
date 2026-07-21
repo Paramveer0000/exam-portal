@@ -8,7 +8,7 @@ const SuperAdminProfilePage = () => {
       <SuperAdminSidebar />
       <div style={{ padding: "1.5rem", flexGrow: 1 }}>
         <h2>Profile</h2>
-        <ProfilePanel showRole />
+        <ProfilePanel showRole showLogo />
       </div>
     </div>
   );

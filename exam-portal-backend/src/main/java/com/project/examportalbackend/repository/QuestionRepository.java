@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByQuiz(Quiz quiz);
+    boolean existsByQuizAndContentIgnoreCase(Quiz quiz, String content);
 }

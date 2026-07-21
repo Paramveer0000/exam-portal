@@ -55,4 +55,8 @@ public class PsychometricReport {
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // Cached LLM-generated narrative; null until first generated.
+    @Column(name = "ai_summary", columnDefinition = "TEXT")
+    private String aiSummary;
 }

@@ -27,6 +27,22 @@ public class QuizServiceImpl implements QuizService {
     @Autowired
     private AuthFacade authFacade;
 
+    @Autowired
+    private com.project.examportalbackend.repository.StudentClassRepository studentClassRepository;
+
+    /** Category ids this student is assigned to. */
+    private java.util.Set<Long> assignedCatIds() {
+        return studentClassRepository.findByUserId(authFacade.getCurrentUserId()).stream()
+                .map(com.project.examportalbackend.models.StudentClass::getCatId)
+                .collect(Collectors.toSet());
+    }
+
+    private boolean studentCanSee(Quiz q) {
+        return q.isIActive()
+                && q.getCategory() != null
+                && assignedCatIds().contains(q.getCategory().getCatId());
+    }
+
     @Override
     public Quiz addQuiz(Quiz quiz) {
         assertTitlePresent(quiz);
@@ -39,16 +55,17 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public List<Quiz> getQuizzes() {
-        // Plain admins see their own subjects; students see only their teacher's;
-        // super admins see all.
-        if (authFacade.hasRole(AuthFacade.ROLE_ADMIN)) {
-            return quizRepository.findByCreatedBy(authFacade.getCurrentUserId());
-        }
+        // Students see published quizzes in the classes assigned to them; admins
+        // and super admins see all (admins read-only).
         if (authFacade.isStudent()) {
-            Long teacherId = authFacade.getTeacherId();
-            return teacherId == null
-                    ? Collections.emptyList()
-                    : quizRepository.findByCreatedBy(teacherId);
+            java.util.Set<Long> assigned = assignedCatIds();
+            if (assigned.isEmpty()) {
+                return Collections.emptyList();
+            }
+            return quizRepository.findAll().stream()
+                    .filter(q -> q.isIActive() && q.getCategory() != null
+                            && assigned.contains(q.getCategory().getCatId()))
+                    .collect(Collectors.toList());
         }
         return quizRepository.findAll();
     }
@@ -87,19 +104,10 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public List<Quiz> getQuizByCategory(Category category) {
         List<Quiz> quizzes = quizRepository.findByCategory(category);
-        if (authFacade.hasRole(AuthFacade.ROLE_ADMIN)) {
-            Long me = authFacade.getCurrentUserId();
-            return quizzes.stream()
-                    .filter(q -> me.equals(q.getCreatedBy()))
-                    .collect(Collectors.toList());
-        }
         if (authFacade.isStudent()) {
-            Long teacherId = authFacade.getTeacherId();
-            return teacherId == null
-                    ? Collections.emptyList()
-                    : quizzes.stream()
-                            .filter(q -> teacherId.equals(q.getCreatedBy()))
-                            .collect(Collectors.toList());
+            return quizzes.stream()
+                    .filter(this::studentCanSee)
+                    .collect(Collectors.toList());
         }
         return quizzes;
     }
@@ -109,12 +117,17 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
 
-        // A student may only take exams that belong to their own teacher.
+        // A student may take an exam only if the quiz's class is assigned to them
+        // and the quiz is published.
         if (authFacade.isStudent()) {
-            Long teacherId = authFacade.getTeacherId();
-            if (teacherId == null || !teacherId.equals(quiz.getCreatedBy())) {
+            if (quiz.getCategory() == null
+                    || !assignedCatIds().contains(quiz.getCategory().getCatId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "This subject is not available for your teacher");
+                        "This class is not assigned to you");
+            }
+            if (!quiz.isIActive()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "This subject has not been published yet");
             }
         }
 

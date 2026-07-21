@@ -9,10 +9,13 @@ import com.project.examportalbackend.services.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,6 +37,9 @@ public class QuestionServiceImpl implements QuestionService {
         Quiz quiz = quizRepository.findById(question.getQuiz().getQuizId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
         authFacade.assertCanManage(quiz.getCreatedBy());
+        if (questionRepository.existsByQuizAndContentIgnoreCase(quiz, question.getContent().trim())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This question already exists in this quiz");
+        }
         quiz.setNumOfQuestions(quiz.getNumOfQuestions() + 1);
         quizRepository.save(quiz);
         return questionRepository.save(question);
@@ -63,17 +69,29 @@ public class QuestionServiceImpl implements QuestionService {
         Question existing = questionRepository.findById(question.getQuesId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
         assertCanManageQuestion(existing);
+        boolean contentChanged = !question.getContent().trim().equalsIgnoreCase(existing.getContent());
+        if (contentChanged
+                && questionRepository.existsByQuizAndContentIgnoreCase(existing.getQuiz(), question.getContent().trim())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This question already exists in this quiz");
+        }
         return questionRepository.save(question);
     }
 
     @Override
+    @Transactional
     public void deleteQuestion(Long questionId) {
         Question existing = questionRepository.findById(questionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
         assertCanManageQuestion(existing);
         Quiz quiz = existing.getQuiz();
-        if (quiz != null && quiz.getNumOfQuestions() > 0) {
-            quiz.setNumOfQuestions(quiz.getNumOfQuestions() - 1);
+        if (quiz != null) {
+            // Quiz.questions is an eagerly-loaded, cascade=ALL bidirectional collection;
+            // deleting the child without first detaching it from the parent's in-memory
+            // Set leaves Hibernate's collection dirty-check re-persisting it on flush.
+            quiz.getQuestions().remove(existing);
+            if (quiz.getNumOfQuestions() > 0) {
+                quiz.setNumOfQuestions(quiz.getNumOfQuestions() - 1);
+            }
             quizRepository.save(quiz);
         }
         questionRepository.delete(existing);
@@ -89,15 +107,17 @@ public class QuestionServiceImpl implements QuestionService {
         if (!StringUtils.hasText(question.getContent())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Question text is required");
         }
-        if (!StringUtils.hasText(question.getOption1())
-                || !StringUtils.hasText(question.getOption2())
-                || !StringUtils.hasText(question.getOption3())
-                || !StringUtils.hasText(question.getOption4())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "All four options are required");
+        // At least 2 options (e.g. Yes/No); option3/option4 may be left blank.
+        if (!StringUtils.hasText(question.getOption1()) || !StringUtils.hasText(question.getOption2())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least two options are required");
         }
-        Set<String> validAnswers = Set.of("option1", "option2", "option3", "option4");
-        if (question.getAnswer() == null || !validAnswers.contains(question.getAnswer())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A correct option must be selected");
+        Map<String, String> filledOptions = new LinkedHashMap<>();
+        if (StringUtils.hasText(question.getOption1())) filledOptions.put("option1", question.getOption1());
+        if (StringUtils.hasText(question.getOption2())) filledOptions.put("option2", question.getOption2());
+        if (StringUtils.hasText(question.getOption3())) filledOptions.put("option3", question.getOption3());
+        if (StringUtils.hasText(question.getOption4())) filledOptions.put("option4", question.getOption4());
+        if (question.getAnswer() == null || !filledOptions.containsKey(question.getAnswer())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The correct option must be one of the filled-in options");
         }
         // Psychometric-only platform: every question measures one dimension.
         Set<String> validDimensions = Set.of(
@@ -110,6 +130,22 @@ public class QuestionServiceImpl implements QuestionService {
                     "A valid psychometric dimension is required (MI name or RIASEC letter)");
         }
         question.setDimension(question.getDimension().toUpperCase());
+
+        // Per-option dimension overrides are optional (most questions don't use them).
+        question.setOption1Dimension(normalizeOptionalDimension(question.getOption1Dimension(), validDimensions));
+        question.setOption2Dimension(normalizeOptionalDimension(question.getOption2Dimension(), validDimensions));
+        question.setOption3Dimension(normalizeOptionalDimension(question.getOption3Dimension(), validDimensions));
+        question.setOption4Dimension(normalizeOptionalDimension(question.getOption4Dimension(), validDimensions));
+    }
+
+    private String normalizeOptionalDimension(String value, Set<String> validDimensions) {
+        if (!StringUtils.hasText(value)) return null;
+        String upper = value.toUpperCase();
+        if (!validDimensions.contains(upper)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Invalid option dimension override: " + value);
+        }
+        return upper;
     }
 
     private void assertCanManageQuestion(Question question) {

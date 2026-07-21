@@ -1,34 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./Sidebar.css";
 import { FaBars, FaUserAlt } from "react-icons/fa";
 import { MdQuiz } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchCategories } from "../actions/categoriesActions";
-import { TbLayoutGrid, TbReport } from "react-icons/tb";
+import { TbReport } from "react-icons/tb";
+
+// Static items only — classes/subjects are browsed from "All Quizzes", not
+// listed individually in the sidebar.
+const MENU_ITEMS = [
+  {
+    path: "/profile",
+    name: "Profile",
+    icon: <FaUserAlt />,
+  },
+  {
+    path: "/quizResults",
+    name: "Report Card",
+    icon: <TbReport />,
+  },
+  {
+    path: "/quizzes",
+    name: "All Quizzes",
+    icon: <MdQuiz />,
+  },
+];
 
 const SidebarUser = ({ children }) => {
-  const categoriesReducer = useSelector((state) => state.categoriesReducer);
-  const [categories, setCategories] = useState(categoriesReducer.categories);
-  const dispatch = useDispatch();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-  const [menuItems, setMenuItems] = useState([
-    {
-      path: "/profile",
-      name: "Profile",
-      icon: <FaUserAlt />,
-    },
-    {
-      path: "/quizResults",
-      name: "Report Card",
-      icon: <TbReport />,
-    },
-    {
-      path: "/quizzes",
-      name: "All Quizzes",
-      icon: <MdQuiz />,
-    },
-  ]);
+  const menuItems = MENU_ITEMS;
 
   // Persist expanded/collapsed state across navigation.
   const [isOpen, setIsOpen] = useState(
@@ -39,23 +37,6 @@ const SidebarUser = ({ children }) => {
     setIsOpen(next);
     localStorage.setItem("sidebarOpen", String(next));
   };
-
-  useEffect(() => {
-    console.log("Fetching Categories because of SidebarUser");
-    fetchCategories(dispatch, token).then((data) => {
-      const tempCategories = data.payload;
-      setCategories(tempCategories);
-
-      const newMenuItems = tempCategories.map((c) => {
-        return {
-          path: `/quiz/cat${c.title}?catId=${c.catId}`,
-          name: c.title,
-          icon: <TbLayoutGrid />,
-        };
-      });
-      setMenuItems([...menuItems, ...newMenuItems]);
-    });
-  }, []);
 
   return (
     <div

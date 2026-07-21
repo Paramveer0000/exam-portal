@@ -1,6 +1,7 @@
 package com.project.examportalbackend.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -29,7 +30,11 @@ public class Quiz {
     @Column(name = "description", length = 5000)
     private String description;
 
+    // Lombok's isIActive()/setIActive() accessors mangle to a "iactive" JSON
+    // property by default (a Jackson quirk on names with two leading capitals),
+    // silently dropping any client that sends the sane "isActive" key. Pin it.
     @Column(name = "is_active")
+    @JsonProperty("isActive")
     private boolean iActive;
 
     @Column(name = "num_of_questions")

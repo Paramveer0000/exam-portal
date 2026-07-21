@@ -32,6 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -311,6 +312,73 @@ public class AdminServiceImpl implements AdminService {
             dto.setPassRate(results.isEmpty() ? 0.0 : (passed * 100.0 / results.size()));
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<com.project.examportalbackend.dto.SchoolResultsDto> getResultsBySchool() {
+        List<QuizResult> all = quizResultRepository.findAll();
+
+        // Cache users so we don't refetch per result.
+        Map<Long, User> userCache = new HashMap<>();
+        java.util.function.Function<Long, User> user = id ->
+                userCache.computeIfAbsent(id, k -> userRepository.findById(k).orElse(null));
+
+        // school id (null = no school) -> student id -> rows
+        Map<Long, Map<Long, List<com.project.examportalbackend.dto.SchoolResultsDto.ResultRow>>> grouped =
+                new LinkedHashMap<>();
+
+        for (QuizResult r : all) {
+            User student = user.apply(r.getUserId());
+            if (student == null) continue;
+            Long schoolId = student.getTeacherId();
+
+            com.project.examportalbackend.dto.SchoolResultsDto.ResultRow row =
+                    new com.project.examportalbackend.dto.SchoolResultsDto.ResultRow();
+            row.setQuizResId(r.getQuizResId());
+            row.setQuizTitle(r.getQuiz() != null ? r.getQuiz().getTitle() : "");
+            row.setClassName(r.getQuiz() != null && r.getQuiz().getCategory() != null
+                    ? r.getQuiz().getCategory().getTitle() : "");
+            row.setObtainedMarks(r.getTotalObtainedMarks());
+            row.setTotalMarks(r.getTotalMarks());
+            row.setPassed(r.isPassed());
+            row.setAttemptDatetime(r.getAttemptDatetime());
+
+            grouped.computeIfAbsent(schoolId, k -> new LinkedHashMap<>())
+                    .computeIfAbsent(r.getUserId(), k -> new ArrayList<>())
+                    .add(row);
+        }
+
+        List<com.project.examportalbackend.dto.SchoolResultsDto> out = new ArrayList<>();
+        for (Map.Entry<Long, Map<Long, List<com.project.examportalbackend.dto.SchoolResultsDto.ResultRow>>> se
+                : grouped.entrySet()) {
+            com.project.examportalbackend.dto.SchoolResultsDto school =
+                    new com.project.examportalbackend.dto.SchoolResultsDto();
+            school.setSchoolId(se.getKey());
+            User schoolUser = se.getKey() != null ? user.apply(se.getKey()) : null;
+            school.setSchoolName(schoolUser != null ? displayName(schoolUser) : "No school");
+
+            List<com.project.examportalbackend.dto.SchoolResultsDto.StudentResults> studentList = new ArrayList<>();
+            for (Map.Entry<Long, List<com.project.examportalbackend.dto.SchoolResultsDto.ResultRow>> ste
+                    : se.getValue().entrySet()) {
+                User stu = user.apply(ste.getKey());
+                com.project.examportalbackend.dto.SchoolResultsDto.StudentResults sr =
+                        new com.project.examportalbackend.dto.SchoolResultsDto.StudentResults();
+                sr.setStudentId(ste.getKey());
+                sr.setStudentName(stu != null ? displayName(stu) : "Unknown");
+                sr.setUsername(stu != null ? stu.getUsername() : "");
+                sr.setResults(ste.getValue());
+                studentList.add(sr);
+            }
+            school.setStudents(studentList);
+            out.add(school);
+        }
+        return out;
+    }
+
+    private String displayName(User u) {
+        String name = ((u.getFirstName() == null ? "" : u.getFirstName()) + " "
+                + (u.getLastName() == null ? "" : u.getLastName())).trim();
+        return name.isEmpty() ? u.getUsername() : name;
     }
 
     private List<String> buildRecentActivity(List<Quiz> quizzes, List<QuizResult> results) {

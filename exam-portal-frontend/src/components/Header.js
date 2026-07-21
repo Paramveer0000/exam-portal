@@ -3,14 +3,34 @@ import { Navbar, Nav, Container } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
+import platformServices from "../services/platformServices";
+import { homePathForRoles } from "./ProtectedRoute";
 
 const Header = () => {
   const navigate = useNavigate();
   const loginReducer = useSelector((state) => state.loginReducer);
   const [isLoggedIn, setIsLoggedIn] = useState(loginReducer.loggedIn);
+  const [companyLogo, setCompanyLogo] = useState(null);
   let profilePageUrl = "";
 
   const isImpersonating = !!localStorage.getItem("impersonatorBackup");
+
+  useEffect(() => {
+    platformServices.getBranding().then(({ companyLogo }) =>
+      setCompanyLogo(companyLogo)
+    );
+  }, []);
+
+  // The brand acts as a dashboard button: go to the user's home, or login.
+  const goHome = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const roles = user && user.roles ? user.roles.map((r) => r.roleName) : [];
+      navigate(localStorage.getItem("jwtToken") ? homePathForRoles(roles) : "/login");
+    } catch (e) {
+      navigate("/login");
+    }
+  };
 
   const logoutHandler = () => {
     setIsLoggedIn(false);
@@ -46,7 +66,21 @@ const Header = () => {
     <header>
       <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
         <Container>
-            <Navbar.Brand>Exam-Portal</Navbar.Brand>
+            <Navbar.Brand
+              onClick={goHome}
+              style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+              title="Go to dashboard"
+            >
+              {companyLogo ? (
+                <img
+                  src={companyLogo}
+                  alt="Home"
+                  style={{ height: "40px", objectFit: "contain" }}
+                />
+              ) : (
+                "Exam-Portal"
+              )}
+            </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">

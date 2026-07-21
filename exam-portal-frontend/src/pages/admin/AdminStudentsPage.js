@@ -3,6 +3,7 @@ import { Button, Form, Table } from "react-bootstrap";
 import swal from "sweetalert";
 import Sidebar from "../../components/Sidebar";
 import studentsServices from "../../services/studentsServices";
+import categoriesServices from "../../services/categoriesServices";
 
 const AdminStudentsPage = () => {
   const token = JSON.parse(localStorage.getItem("jwtToken"));
@@ -10,6 +11,9 @@ const AdminStudentsPage = () => {
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({});
+  const [allClasses, setAllClasses] = useState([]);
+  const [assigningId, setAssigningId] = useState(null);
+  const [assignedIds, setAssignedIds] = useState(new Set());
 
   const load = () => {
     studentsServices.fetchStudents(token).then(({ data, error }) => {
@@ -20,7 +24,39 @@ const AdminStudentsPage = () => {
 
   useEffect(() => {
     load();
+    categoriesServices.fetchCategories(token).then((data) => {
+      if (Array.isArray(data)) setAllClasses(data);
+    });
   }, []);
+
+  const openAssign = (s) => {
+    if (assigningId === s.userId) {
+      setAssigningId(null);
+      return;
+    }
+    setAssigningId(s.userId);
+    studentsServices.getAssignedClasses(s.userId, token).then(({ data }) => {
+      setAssignedIds(new Set((data || []).map((c) => c.id)));
+    });
+  };
+
+  const toggleClass = (studentId, catId, checked) => {
+    const call = checked
+      ? studentsServices.assignClass(studentId, catId, token)
+      : studentsServices.unassignClass(studentId, catId, token);
+    call.then(({ ok, error }) => {
+      if (ok) {
+        setAssignedIds((prev) => {
+          const next = new Set(prev);
+          if (checked) next.add(catId);
+          else next.delete(catId);
+          return next;
+        });
+      } else {
+        swal("Failed", error || "Could not update class", "error");
+      }
+    });
+  };
 
   const startEdit = (s) => {
     setEditingId(s.userId);
@@ -164,6 +200,9 @@ const AdminStudentsPage = () => {
                   <td>{s.phoneNumber}</td>
                   <td>{s.active ? "Active" : "Disabled"}</td>
                   <td style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                    <Button size="sm" variant="info" onClick={() => openAssign(s)}>
+                      Classes
+                    </Button>
                     <Button size="sm" variant="primary" onClick={() => startEdit(s)}>
                       Edit
                     </Button>
@@ -180,6 +219,45 @@ const AdminStudentsPage = () => {
                 </tr>
               )
             )}
+            {assigningId != null &&
+              students.some((s) => s.userId === assigningId) && (
+                <tr>
+                  <td colSpan="6" style={{ background: "#f6f9ff" }}>
+                    <strong>
+                      Assign classes to{" "}
+                      {students.find((s) => s.userId === assigningId)?.username}
+                    </strong>
+                    {allClasses.length === 0 ? (
+                      <p className="mb-0 mt-2 text-muted">
+                        No classes available yet. Ask a platform admin to create
+                        classes.
+                      </p>
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "12px",
+                          marginTop: "8px",
+                        }}
+                      >
+                        {allClasses.map((c) => (
+                          <Form.Check
+                            key={c.catId}
+                            type="checkbox"
+                            id={`cls-${assigningId}-${c.catId}`}
+                            label={c.title}
+                            checked={assignedIds.has(c.catId)}
+                            onChange={(e) =>
+                              toggleClass(assigningId, c.catId, e.target.checked)
+                            }
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              )}
             {students.length === 0 && (
               <tr>
                 <td colSpan="6" className="text-center">

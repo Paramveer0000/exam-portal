@@ -16,40 +16,6 @@ const Sidebar = ({ children }) => {
     setIsOpen(next);
     localStorage.setItem("sidebarOpen", String(next));
   };
-  const menuItem = [
-    {
-      path: "/adminProfile",
-      name: "Profile",
-      icon: <FaUserAlt />,
-    },
-    {
-      path: "/adminCategories",
-      name: "Classes",
-      icon: <TbLayoutGrid />,
-    },
-    {
-      path: "/adminQuizzes",
-      name: "Subjects",
-      icon: <MdQuiz />,
-    },
-    {
-      path: "/adminStudents",
-      name: "Students",
-      icon: <FaUserGraduate />,
-    },
-    {
-      path: "/adminallResult",
-      name: "All Result",
-      icon: <TbReport/>,
-    },
-    {
-      path: "/adminReports",
-      name: "Reports",
-      icon: <FaRegChartBar />,
-    },
-  ];
-
-  // Show a link back to the Super Admin dashboard for super admins.
   const roleNames = (() => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -58,7 +24,25 @@ const Sidebar = ({ children }) => {
       return [];
     }
   })();
-  if (roleNames.includes("SUPER_ADMIN")) {
+  const isSuperAdmin = roleNames.includes("SUPER_ADMIN");
+
+  // Schools (ADMIN) manage students + assign classes only. Content management
+  // (Classes/Subjects) is SUPER_ADMIN-only, matching the backend authorization.
+  const menuItem = [
+    { path: "/adminDashboard", name: "Dashboard", icon: <FaRegChartBar /> },
+    { path: "/adminProfile", name: "Profile", icon: <FaUserAlt /> },
+    ...(isSuperAdmin
+      ? [
+          { path: "/adminCategories", name: "Classes", icon: <TbLayoutGrid /> },
+          { path: "/adminQuizzes", name: "Subjects", icon: <MdQuiz /> },
+        ]
+      : []),
+    { path: "/adminStudents", name: "Students", icon: <FaUserGraduate /> },
+    { path: "/adminallResult", name: "All Result", icon: <TbReport /> },
+    { path: "/adminReports", name: "Reports", icon: <FaRegChartBar /> },
+  ];
+
+  if (isSuperAdmin) {
     menuItem.push({
       path: "/superadmin",
       name: "Super Admin",

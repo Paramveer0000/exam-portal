@@ -3,7 +3,9 @@ package com.project.examportalbackend.controllers;
 import com.project.examportalbackend.dto.CreateAdminRequest;
 import com.project.examportalbackend.dto.ResetPasswordRequest;
 import com.project.examportalbackend.dto.UpdateAdminRequest;
+import com.project.examportalbackend.dto.UpdateAiSettingsRequest;
 import com.project.examportalbackend.services.AdminService;
+import com.project.examportalbackend.services.AiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +23,26 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+    @Autowired
+    private AiService aiService;
+
+    // Platform LLM config (SUPER_ADMIN only, inherits this class's guards).
+    @GetMapping("/ai-settings")
+    public ResponseEntity<?> getAiSettings() {
+        return ResponseEntity.ok(aiService.getSettings());
+    }
+
+    @PutMapping("/ai-settings")
+    public ResponseEntity<?> updateAiSettings(@RequestBody UpdateAiSettingsRequest request) {
+        return ResponseEntity.ok(aiService.updateSettings(request));
+    }
+
+    // Fires one real chat completion against the saved key/provider so the admin can confirm it works.
+    @PostMapping("/ai-settings/test")
+    public ResponseEntity<?> testAiSettings() {
+        String reply = aiService.complete("You are a connectivity check.", "Reply with exactly: OK");
+        return ResponseEntity.ok(java.util.Map.of("reply", reply));
+    }
 
     @GetMapping("/")
     public ResponseEntity<?> getAdmins() {
@@ -72,6 +94,12 @@ public class AdminController {
     @GetMapping("/analytics")
     public ResponseEntity<?> getAnalytics() {
         return ResponseEntity.ok(adminService.getAdminAnalytics());
+    }
+
+    // All quiz results grouped by school (partner) then student.
+    @GetMapping("/results-by-school")
+    public ResponseEntity<?> getResultsBySchool() {
+        return ResponseEntity.ok(adminService.getResultsBySchool());
     }
 
     // Issues a token to act as the given admin (Super Admin only).

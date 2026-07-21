@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Table } from "react-bootstrap";
+import { Button, Spinner, Table } from "react-bootstrap";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import { fetchPsychReport } from "../../actions/psychometricReportActions";
+import aiServices from "../../services/aiServices";
 import "./PsychometricReportPage.css";
 
 // Human names for the MI dimension codes (our own wording throughout).
@@ -35,6 +36,28 @@ const PsychometricReportPage = () => {
   const { loading, report, error } = useSelector(
     (state) => state.psychometricReportReducer
   );
+
+  const [aiSummary, setAiSummary] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  const generateAi = (regenerate = false) => {
+    setAiLoading(true);
+    return aiServices
+      .generateSummary(quizResId, token, regenerate)
+      .then(({ summary, error }) => {
+        setAiLoading(false);
+        if (summary) {
+          setAiSummary(summary);
+          return summary;
+        }
+        setAiSummary(`__error__:${error || "Could not generate report"}`);
+        return null;
+      });
+  };
+
+  // Download only appears once the AI narrative exists, so print always
+  // includes it.
+  const downloadPdf = () => window.print();
 
   useEffect(() => {
     if (!localStorage.getItem("jwtToken")) navigate("/");
@@ -76,13 +99,43 @@ const PsychometricReportPage = () => {
         </div>
       </div>
 
-      <Button
-        className="psychReport__printBtn"
-        variant="success"
-        onClick={() => window.print()}
-      >
-        Download PDF
-      </Button>
+      <div className="psychReport__actions">
+        {aiSummary && !aiSummary.startsWith("__error__:") ? (
+          <Button variant="success" onClick={downloadPdf}>
+            Download PDF
+          </Button>
+        ) : (
+          <Button
+            variant="primary"
+            disabled={aiLoading}
+            onClick={() => generateAi(false)}
+          >
+            {aiLoading ? (
+              <>
+                <Spinner as="span" size="sm" animation="border" /> Generating…
+              </>
+            ) : (
+              "✨ Generate AI Report"
+            )}
+          </Button>
+        )}
+      </div>
+
+      {aiSummary &&
+        (aiSummary.startsWith("__error__:") ? (
+          <div className="psychReport__section">
+            <Message variant="warning">
+              {aiSummary.replace("__error__:", "")}
+            </Message>
+          </div>
+        ) : (
+          <div className="psychReport__section psychReport__ai">
+            <h2>AI Counsellor's Summary</h2>
+            {aiSummary.split(/\n\s*\n/).map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+          </div>
+        ))}
 
       <div className="psychReport__section">
         <h2>Multiple Intelligences</h2>

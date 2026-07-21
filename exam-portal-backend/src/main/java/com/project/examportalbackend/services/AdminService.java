@@ -45,4 +45,7 @@ public interface AdminService {
 
     /** Issues a login token for the target admin so a Super Admin can act as them. */
     LoginResponse impersonate(Long adminId);
+
+    /** All quiz results grouped by school (partner) then student. */
+    List<com.project.examportalbackend.dto.SchoolResultsDto> getResultsBySchool();
 }

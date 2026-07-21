@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { FaBars, FaUsers, FaRegChartBar, FaUserAlt } from "react-icons/fa";
+import { FaBars, FaUsers, FaRegChartBar, FaUserAlt, FaRobot } from "react-icons/fa";
+import { TbLayoutGrid, TbReport } from "react-icons/tb";
+import { MdQuiz } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
@@ -25,6 +27,26 @@ const SuperAdminSidebar = ({ children }) => {
       path: "/superadmin/admins",
       name: "Schools",
       icon: <FaUsers />,
+    },
+    {
+      path: "/adminCategories",
+      name: "Classes",
+      icon: <TbLayoutGrid />,
+    },
+    {
+      path: "/adminQuizzes",
+      name: "Subjects",
+      icon: <MdQuiz />,
+    },
+    {
+      path: "/superadmin/results",
+      name: "All Results",
+      icon: <TbReport />,
+    },
+    {
+      path: "/superadmin/ai-settings",
+      name: "Setting",
+      icon: <FaRobot />,
     },
     {
       path: "/superadmin/profile",

@@ -46,4 +46,22 @@ public class StudentController {
         studentService.deleteStudent(studentId);
         return ResponseEntity.ok(true);
     }
+
+    // Class (category) assignment — a school assigns classes to its own students.
+    @GetMapping("/{studentId}/classes")
+    public ResponseEntity<?> getAssignedClasses(@PathVariable Long studentId) {
+        return ResponseEntity.ok(studentService.getAssignedClasses(studentId));
+    }
+
+    @PostMapping("/{studentId}/classes/{catId}")
+    public ResponseEntity<?> assignClass(@PathVariable Long studentId, @PathVariable Long catId) {
+        studentService.assignClass(studentId, catId);
+        return ResponseEntity.ok(true);
+    }
+
+    @DeleteMapping("/{studentId}/classes/{catId}")
+    public ResponseEntity<?> unassignClass(@PathVariable Long studentId, @PathVariable Long catId) {
+        studentService.unassignClass(studentId, catId);
+        return ResponseEntity.ok(true);
+    }
 }

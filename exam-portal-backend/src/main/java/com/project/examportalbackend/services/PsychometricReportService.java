@@ -15,4 +15,10 @@ public interface PsychometricReportService {
 
     /** Read a report, ownership-scoped: student own, ADMIN their students', SUPER_ADMIN all. */
     PsychometricReportDto getReport(Long quizResId);
+
+    /**
+     * LLM narrative for a report (same ownership scoping). Cached after first
+     * generation; {@code regenerate} forces a fresh call.
+     */
+    String getAiSummary(Long quizResId, boolean regenerate);
 }

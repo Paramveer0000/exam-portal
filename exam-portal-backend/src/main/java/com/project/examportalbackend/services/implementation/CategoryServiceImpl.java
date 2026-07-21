@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -20,6 +21,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private AuthFacade authFacade;
+
+    @Autowired
+    private com.project.examportalbackend.repository.StudentClassRepository studentClassRepository;
 
     @Override
     public Category addCategory(Category category) {
@@ -38,16 +42,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getCategories() {
-        // Plain admins see their own classes; students see only their teacher's;
-        // super admins see all.
-        if (authFacade.hasRole(AuthFacade.ROLE_ADMIN)) {
-            return categoryRepository.findByCreatedBy(authFacade.getCurrentUserId());
-        }
+        // Content is platform-wide (super-admin owned). Students see only the
+        // classes assigned to them; admins and super admins see all classes
+        // (admins read-only, to assign them to students).
         if (authFacade.isStudent()) {
-            Long teacherId = authFacade.getTeacherId();
-            return teacherId == null
+            List<Long> catIds = studentClassRepository
+                    .findByUserId(authFacade.getCurrentUserId()).stream()
+                    .map(com.project.examportalbackend.models.StudentClass::getCatId)
+                    .collect(Collectors.toList());
+            return catIds.isEmpty()
                     ? java.util.Collections.emptyList()
-                    : categoryRepository.findByCreatedBy(teacherId);
+                    : categoryRepository.findAllById(catIds);
         }
         return categoryRepository.findAll();
     }
