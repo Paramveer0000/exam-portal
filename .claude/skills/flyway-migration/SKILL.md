@@ -12,8 +12,11 @@ So any entity change needs a migration in the same commit.
 ## Add one
 
 1. Create `exam-portal-backend/src/main/resources/db/migration/V<N>__<snake_desc>.sql`.
-   `<N>` = next integer after the highest existing (`V1__baseline` … `V7__school_fields`).
-   Double underscore after the version. Example: `V8__quiz_time_limit.sql`.
+   `<N>` = next integer after the highest existing file in `db/migration/` — **check the directory
+   listing, don't trust a number remembered from an old skill run**; this file has already gone
+   stale once (said "highest existing V7" when V17+ existed). As of this writing the newest is
+   `V19__question_option_dimension.sql`, but re-verify with `ls` before picking `<N>`.
+   Double underscore after the version. Example: `V20__quiz_time_limit.sql`.
 
 2. Write plain MySQL DDL. Follow the existing migrations' style:
    - Idempotent seeds use `INSERT IGNORE` (see `V2__seed_roles.sql`).
@@ -31,6 +34,10 @@ So any entity change needs a migration in the same commit.
 
 4. Boot the app (`./mvnw spring-boot:run`). Flyway applies `V<N>` on startup; the log shows
    `Migrating schema ... to version <N>`. Validation passing = entity and column agree.
+   If the app was already running, **kill the process and relaunch** — devtools' auto-restart is
+   not reliable for picking up a plain `mvnw compile`/entity change in this environment (see
+   `run-local`), so a stale process can boot-validate against the OLD schema expectation and mask
+   whether your migration actually applied.
 
 ## Notes
 - `spring.flyway.baseline-on-migrate=true`, `baseline-version=1` — a pre-existing DB from the old

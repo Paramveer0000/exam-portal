@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "exam-portal-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start", "--prefix", "exam-portal-frontend"],
+      "port": 3000
+    }
+  ]
+}

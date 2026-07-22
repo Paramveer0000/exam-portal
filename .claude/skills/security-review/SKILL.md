@@ -13,9 +13,13 @@ some are active bugs. Priority order: leaks and authz first.
   endpoint returning a `User` serializes the hash. Known offenders: `AuthController.registerUser`,
   `registerSchool`, and everything wrapping `LoginResponse`. Do not add more — map to a DTO
   (`AdminDto`/`StudentDto`/`TeacherDto` with `from(entity)`).
-- **Raw `Question` returned to a non-admin?** `Question.answer` isn't `@JsonIgnore`d. Only the
-  `/api/question/**` → ADMIN URL rule protects it. Student-facing quiz data must go through
-  `ExamQuestionDto` (answers stripped). Any new endpoint that returns `Question` to `USER` leaks answers.
+- **Raw `Question` returned to a non-admin?** `Question.answer` isn't `@JsonIgnore`d, and neither
+  are `option{1-4}Dimension` (the per-option scoring override added for 2-4 option questions) —
+  both would tell a student exactly how to game the psychometric scoring. `/api/question/**` is
+  GET→ADMIN, everything else (POST/PUT/DELETE)→SUPER_ADMIN only (see §2 below — this is stricter
+  than it looks, a plain ADMIN can't write questions at all). Student-facing quiz data must go
+  through `ExamQuestionDto` (answers + dimension overrides stripped). Any new endpoint that returns
+  `Question` to `USER` leaks both.
 
 ## 2. Ownership / authz
 - Every update/delete calls `authFacade.assertCanManage(existing.getCreatedBy())` **before** mutating.
@@ -23,6 +27,14 @@ some are active bugs. Priority order: leaks and authz first.
 - Reads are role-scoped (ADMIN→own, student→teacher's, SUPER_ADMIN→all).
 - New endpoint has a matching rule in `SecurityConfig`? Default is `denyAll()`; a missing rule
   blocks the endpoint (fail-safe), but a **too-broad** rule is the risk — GET open to USER, mutations ADMIN-only.
+- **Content ownership moved to SUPER_ADMIN-only** (2026-07-20): category/quiz/question POST/PUT/DELETE
+  are `hasAuthority("SUPER_ADMIN")`, not ADMIN — ADMIN (school) only reads content and manages student
+  class assignment (`student_class` table). This is the opposite of what `CLAUDE.md`'s architecture
+  section literally says ("Admins own categories/quizzes/questions") — that line is stale, trust
+  `SecurityConfig` over the doc. If you're building an ADMIN-facing write feature for content, check
+  whether it's actually supposed to be SUPER_ADMIN-only first — the frontend previously let ADMIN
+  reach question-management UI whose every write silently 403'd; don't repeat that mismatch on a new
+  feature (gate the UI by role, don't just rely on the backend to reject it silently).
 
 ## 3. Config-level (flag if the change reintroduces or worsens)
 - **JWT secret**: `jwt.secret=${JWT_SECRET:exam-portal-dev-secret-change-me}` — silent public fallback.
@@ -34,7 +46,17 @@ some are active bugs. Priority order: leaks and authz first.
 - **NPE → 500**: guard request-body relations (e.g. `question.getQuiz()`) instead of dereferencing —
   an unhandled NPE returns a 500 with a leaked message rather than a clean 400.
 
-## 4. Frontend
+## 4. Data integrity gotchas (JPA, not strictly security, but silent-failure risk)
+- `Quiz.questions` and `Quiz.quizResults` are eager `@OneToMany(cascade = CascadeType.ALL)` Sets/Lists.
+  Deleting a child entity (`Question`, `QuizResult`) via `repository.delete(existing)` **without**
+  first removing it from the loaded parent collection (`quiz.getQuestions().remove(existing)`) returns
+  200 and silently does NOT delete the row — Hibernate's collection dirty-check re-persists it on
+  flush. This bit `QuestionServiceImpl.deleteQuestion` for a long time before being caught; if you add
+  a new delete path that touches an entity reachable from one of these eager cascaded collections,
+  detach it from the collection first or verify the delete with a direct DB query, not just a 200
+  response.
+
+## 5. Frontend
 - `ProtectedRoute` is UI-only; never treat it as an authorization boundary — the server must enforce.
 - Token in `localStorage.jwtToken` (XSS-reachable) — don't widen exposure (e.g. logging tokens,
   putting them in URLs/query strings).

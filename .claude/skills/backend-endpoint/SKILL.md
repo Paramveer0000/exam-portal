@@ -53,9 +53,18 @@ controller. `CategoryServiceImpl` + `CategoryController` are the reference; copy
 
 5. **SecurityConfig** — add a URL/method rule in
    `configurations/SecurityConfig.java`. Default is `anyRequest().denyAll()`, so an endpoint
-   with **no rule is blocked**. Match the existing style: GETs open to `USER`+`ADMIN`,
-   mutations `ADMIN`-only, admin-management under SUPER_ADMIN. `RoleHierarchy` already makes
-   SUPER_ADMIN ⊇ ADMIN, so an `hasAuthority("ADMIN")` rule also admits super admins.
+   with **no rule is blocked**. `RoleHierarchy` makes SUPER_ADMIN ⊇ ADMIN, so an
+   `hasAuthority("ADMIN")` rule also admits super admins — but don't assume that's always the right
+   split. Two different patterns coexist in this codebase, check which one your resource matches:
+   - **Content** (category/quiz/question): GET → `hasAnyAuthority("USER","ADMIN")`, every mutation
+     (POST/PUT/DELETE) → `hasAuthority("SUPER_ADMIN")` only. A plain ADMIN (school) can read but
+     never write content — this changed 2026-07-20; don't copy the older "mutations ADMIN-only"
+     pattern for a content-adjacent resource without checking first.
+   - **School-owned data** (students, quizResult, psychometric-report): mutations `ADMIN`-only,
+     scoped by `assertCanManage`/ownership as usual.
+   If you're not sure which bucket a new resource falls into, ask rather than guess — a UI that lets
+   ADMIN reach a write action the backend actually 403s is a real, previously-shipped bug here
+   (silent failure, no error shown) — gate the frontend to match, don't just add the backend rule.
 
 ## Do NOT
 - Return a raw `User` (leaks BCrypt `password`) or a raw `Question` to a non-admin (leaks `answer`).
@@ -69,7 +78,9 @@ controller. `CategoryServiceImpl` + `CategoryController` are the reference; copy
 ## Verify
 `./mvnw test`, then drive the route with `curl` using a real Bearer token (log in via `/api/login`).
 Confirm a second admin gets **403** on the first admin's resource — that's the ownership check working.
-Remember: **restart the backend** after any code change (`mvnw spring-boot:run` doesn't auto-recompile).
+Remember: **kill the backend process and relaunch it** after any code change — devtools'
+auto-restart is not reliable here (a plain `mvnw compile` does not reliably trigger it), so
+"restart" means kill-port-8081-and-relaunch, not trusting the running process to pick up the diff.
 
 ## Log
 After every backend change or live test, **append an entry to `.claude/testing-log.md`** (newest at
