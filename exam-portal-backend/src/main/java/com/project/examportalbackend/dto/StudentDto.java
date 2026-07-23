@@ -19,6 +19,7 @@ public class StudentDto {
     private String phoneNumber;
     private boolean active;
     private Long classId;
+    private Long teacherId;
 
     public static StudentDto from(User user) {
         StudentDto dto = new StudentDto();
@@ -29,6 +30,7 @@ public class StudentDto {
         dto.phoneNumber = user.getPhoneNumber();
         dto.active = user.isEnabled();
         dto.classId = user.getClassId();
+        dto.teacherId = user.getTeacherId();
         return dto;
     }
 }

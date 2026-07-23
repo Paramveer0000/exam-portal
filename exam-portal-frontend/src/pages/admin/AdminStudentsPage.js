@@ -4,6 +4,7 @@ import swal from "sweetalert";
 import Sidebar from "../../components/Sidebar";
 import studentsServices from "../../services/studentsServices";
 import categoriesServices from "../../services/categoriesServices";
+import authServices from "../../services/authServices";
 
 const emptyNew = {
   username: "",
@@ -23,6 +24,13 @@ const AdminStudentsPage = () => {
   const [allClasses, setAllClasses] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
   const [newStudent, setNewStudent] = useState(emptyNew);
+  const [schoolsById, setSchoolsById] = useState({});
+
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const isSuperAdmin =
+    currentUser &&
+    currentUser.roles &&
+    currentUser.roles.some((r) => r.roleName === "SUPER_ADMIN");
 
   const load = () => {
     studentsServices.fetchStudents(token).then(({ data, error }) => {
@@ -36,6 +44,15 @@ const AdminStudentsPage = () => {
     categoriesServices.fetchCategories(token).then((data) => {
       if (Array.isArray(data)) setAllClasses(data);
     });
+    if (isSuperAdmin) {
+      authServices.getTeachers().then((data) => {
+        if (Array.isArray(data)) {
+          const map = {};
+          data.forEach((t) => (map[t.userId] = t.name));
+          setSchoolsById(map);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -43,6 +60,9 @@ const AdminStudentsPage = () => {
     const c = allClasses.find((x) => x.catId === classId);
     return c ? c.title : classId ? `#${classId}` : "—";
   };
+
+  const schoolName = (teacherId) =>
+    teacherId ? schoolsById[teacherId] || `#${teacherId}` : "—";
 
   const setNewField = (e) =>
     setNewStudent((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -189,6 +209,7 @@ const AdminStudentsPage = () => {
               <th>Username</th>
               <th>Name</th>
               <th>Phone</th>
+              {isSuperAdmin && <th>School</th>}
               <th>Class</th>
               <th>Status</th>
               <th>Actions</th>
@@ -205,6 +226,7 @@ const AdminStudentsPage = () => {
                     <Form.Control name="lastName" placeholder="Last" value={form.lastName} onChange={setField} />
                   </td>
                   <td><Form.Control name="phoneNumber" value={form.phoneNumber} onChange={setField} /></td>
+                  {isSuperAdmin && <td>{schoolName(s.teacherId)}</td>}
                   <td>{classTitle(s.classId)}</td>
                   <td>{s.active ? "Active" : "Disabled"}</td>
                   <td style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
@@ -218,6 +240,7 @@ const AdminStudentsPage = () => {
                   <td>{s.username}</td>
                   <td>{`${s.firstName || ""} ${s.lastName || ""}`.trim()}</td>
                   <td>{s.phoneNumber}</td>
+                  {isSuperAdmin && <td>{schoolName(s.teacherId)}</td>}
                   <td style={{ minWidth: 160 }}>
                     <Form.Select
                       size="sm"
@@ -244,7 +267,7 @@ const AdminStudentsPage = () => {
             )}
             {students.length === 0 && (
               <tr>
-                <td colSpan="7" className="text-center">
+                <td colSpan={isSuperAdmin ? 8 : 7} className="text-center">
                   No students yet. Click “+ Add Student” to create one.
                 </td>
               </tr>
