@@ -27,6 +27,6 @@
     display: block;
     width: 20%;
     margin: 20px auto;
-    background-color: rgb(68 177 49);
+    background-color: var(--mt-secondary);
     color: white;
 }

@@ -15,7 +15,7 @@
 }
 
 .adminProfilePage__content--profilePic {
-    border: 2px solid rgb(68 177 49);
+    border: 2px solid var(--mt-secondary);
 }
 
 .adminProfilePage__content--table {

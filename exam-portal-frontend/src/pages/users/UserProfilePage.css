@@ -16,7 +16,7 @@
 }
 
 .userProfilePage__content--profilePic {
-    border: 2px solid rgb(68 177 49);
+    border: 2px solid var(--mt-secondary);
 }
 
 .userProfilePage__content--table {

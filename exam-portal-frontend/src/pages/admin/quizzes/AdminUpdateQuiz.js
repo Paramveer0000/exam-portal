@@ -251,7 +251,7 @@ const AdminUpdateQuiz = () => {
             />
 
             <Form.Check
-            style={{borderColor:"rgb(68 177 49)"}}
+            style={{borderColor:"#1E7A6F"}}
               className="my-3"
               type="switch"
               id="publish-switch"

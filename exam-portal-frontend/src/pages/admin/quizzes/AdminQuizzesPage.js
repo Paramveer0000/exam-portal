@@ -121,7 +121,7 @@ const AdminQuizzesPage = () => {
                 textAlign: "center",
                 borderRadius: "5px",
                 color: "white",
-                backgroundColor: "rgb(68 177 49)",
+                backgroundColor: "#1E7A6F",
                 margin: "0px 4px",
               }}
             >{`Questions`}</div>
@@ -152,7 +152,7 @@ const AdminQuizzesPage = () => {
               style={{
                 border: "1px solid grey",
                 color: "white",
-                backgroundColor: "rgb(68 177 49)",
+                backgroundColor: "#1E7A6F",
                 width: "100px",
                 padding: "1px",
                 textAlign: "center",

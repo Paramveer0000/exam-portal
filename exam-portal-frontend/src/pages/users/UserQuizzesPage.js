@@ -69,7 +69,7 @@ const UserQuizzesPage = () => {
                         minWidth: "0px",
                         wordWrap: "break-word",
                         border: isOpened(q.quizId)
-                          ? "2px solid rgb(68 177 49)"
+                          ? "2px solid #1E7A6F"
                           : undefined,
                         boxShadow: isOpened(q.quizId)
                           ? "0 0 6px rgba(68,177,49,0.5)"
@@ -86,8 +86,8 @@ const UserQuizzesPage = () => {
                                 marginLeft: "8px",
                                 fontSize: "0.7rem",
                                 fontWeight: "600",
-                                color: "rgb(68 177 49)",
-                                border: "1px solid rgb(68 177 49)",
+                                color: "#1E7A6F",
+                                border: "1px solid #1E7A6F",
                                 borderRadius: "4px",
                                 padding: "1px 6px",
                               }}

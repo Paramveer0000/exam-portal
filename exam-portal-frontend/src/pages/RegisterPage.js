@@ -183,7 +183,7 @@ const RegisterPage = () => {
             variant=""
             className="my-3"
             type="submit"
-            style={{ backgroundColor: "rgb(68 177 49)", color: "white" }}
+            style={{ backgroundColor: "#1E7A6F", color: "white" }}
           >
             Register as School
           </Button>
@@ -196,7 +196,7 @@ const RegisterPage = () => {
         <Row className="py-3">
           <Col>
             Have an Account?{" "}
-            <Link to="/" style={{ color: "rgb(68 177 49)" }}>
+            <Link to="/" style={{ color: "#1E7A6F" }}>
               Login
             </Link>
           </Col>

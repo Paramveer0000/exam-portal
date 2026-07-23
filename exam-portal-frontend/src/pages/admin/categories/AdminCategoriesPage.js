@@ -133,7 +133,7 @@ const AdminCategoriesPage = () => {
                         style={{
                           margin: "2px 8px",
                           textAlign: "center",
-                          color: "rgb(68 177 49)",
+                          color: "#1E7A6F",
                           fontWeight: "500",
                           cursor:"pointer"
                         }}

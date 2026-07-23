@@ -26,7 +26,7 @@
     width: 20%;
     height: 2.5em;
     margin: 20px auto;
-    background-color: rgb(68 177 49);
+    background-color: var(--mt-secondary);
     color: white;
     justify-content: flex-start;
 }

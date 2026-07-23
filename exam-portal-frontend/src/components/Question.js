@@ -89,7 +89,7 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
                     e.stopPropagation();
                     updateQuestionHandler(question);
                   }}
-                  style={{ margin: "2px 8px", color: "rgb(68 177 49)", fontWeight: "500", cursor: "pointer" }}
+                  style={{ margin: "2px 8px", color: "#1E7A6F", fontWeight: "500", cursor: "pointer" }}
                 >
                   Update
                 </span>

@@ -28,5 +28,5 @@ hr{
     margin: 30px auto;
     display: block;
     color: white;
-    background-color: rgb(68 177 49);
+    background-color: var(--mt-secondary);
 }

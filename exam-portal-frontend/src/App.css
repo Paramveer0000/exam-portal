@@ -1,0 +1,230 @@
+/* ============================================================
+   The Mentalist — global Bootstrap re-skin
+   Targets existing Bootstrap/react-bootstrap classes only.
+   No JSX/markup changes required to pick this up.
+   ============================================================ */
+
+/* Navbar */
+.navbar.bg-dark {
+  background-color: var(--mt-primary) !important;
+  box-shadow: var(--mt-shadow-sm);
+}
+.navbar .navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Buttons */
+.btn {
+  border-radius: var(--mt-radius-sm);
+  font-weight: 500;
+  padding: 8px 18px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background-color: var(--mt-primary);
+  border-color: var(--mt-primary);
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--mt-primary-light);
+  border-color: var(--mt-primary-light);
+  box-shadow: var(--mt-shadow-sm);
+}
+.btn-secondary {
+  background-color: var(--mt-secondary);
+  border-color: var(--mt-secondary);
+}
+.btn-secondary:hover {
+  background-color: var(--mt-secondary-light);
+  border-color: var(--mt-secondary-light);
+}
+.btn-success {
+  background-color: var(--mt-success);
+  border-color: var(--mt-success);
+}
+.btn-danger {
+  background-color: var(--mt-danger);
+  border-color: var(--mt-danger);
+}
+.btn-warning {
+  background-color: var(--mt-accent);
+  border-color: var(--mt-accent);
+  color: var(--mt-primary);
+}
+.btn-outline-primary {
+  color: var(--mt-primary);
+  border-color: var(--mt-primary);
+}
+.btn-outline-primary:hover {
+  background-color: var(--mt-primary);
+  border-color: var(--mt-primary);
+}
+.btn-link {
+  color: var(--mt-secondary);
+}
+
+/* Cards */
+.card {
+  background: var(--mt-surface);
+  border: 1px solid var(--mt-border);
+  border-radius: var(--mt-radius-md);
+  box-shadow: var(--mt-shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card:hover {
+  box-shadow: var(--mt-shadow-md);
+}
+.card-header {
+  background: var(--mt-bg);
+  border-bottom: 1px solid var(--mt-border);
+  font-weight: 600;
+  color: var(--mt-primary);
+  border-top-left-radius: var(--mt-radius-md);
+  border-top-right-radius: var(--mt-radius-md);
+}
+.card-title {
+  color: var(--mt-primary);
+  font-weight: 600;
+}
+
+/* Tables */
+.table {
+  --bs-table-bg: var(--mt-surface);
+  border-color: var(--mt-border);
+}
+.table thead th {
+  color: var(--mt-primary);
+  font-weight: 600;
+  font-size: var(--mt-fs-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 2px solid var(--mt-border);
+  background: var(--mt-bg);
+}
+.table tbody tr:hover {
+  background-color: rgba(30, 122, 111, 0.05);
+}
+.table-hover tbody tr:hover {
+  --bs-table-accent-bg: rgba(30, 122, 111, 0.06);
+}
+
+/* Forms */
+.form-control,
+.form-select {
+  border-radius: var(--mt-radius-sm);
+  border: 1px solid var(--mt-border);
+  padding: 9px 14px;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--mt-secondary);
+  box-shadow: 0 0 0 3px rgba(30, 122, 111, 0.15);
+}
+.form-label {
+  font-weight: 500;
+  color: var(--mt-primary);
+  margin-bottom: 6px;
+}
+.form-check-input:checked {
+  background-color: var(--mt-secondary);
+  border-color: var(--mt-secondary);
+}
+
+/* Badges */
+.badge.bg-primary { background-color: var(--mt-primary) !important; }
+.badge.bg-secondary { background-color: var(--mt-secondary) !important; }
+.badge.bg-success { background-color: var(--mt-success) !important; }
+.badge.bg-danger { background-color: var(--mt-danger) !important; }
+.badge.bg-warning { background-color: var(--mt-accent) !important; color: var(--mt-primary) !important; }
+.badge.bg-info { background-color: var(--mt-info) !important; }
+.badge {
+  border-radius: 999px;
+  font-weight: 500;
+  padding: 5px 10px;
+}
+
+/* Alerts */
+.alert {
+  border-radius: var(--mt-radius-sm);
+  border: none;
+  box-shadow: var(--mt-shadow-sm);
+}
+.alert-success { background-color: rgba(46, 158, 91, 0.12); color: var(--mt-success); }
+.alert-danger { background-color: rgba(214, 69, 69, 0.12); color: var(--mt-danger); }
+.alert-warning { background-color: rgba(242, 183, 5, 0.15); color: #7a5c02; }
+.alert-info { background-color: rgba(44, 156, 143, 0.12); color: var(--mt-secondary); }
+
+/* Pagination */
+.page-link {
+  color: var(--mt-primary);
+  border-color: var(--mt-border);
+}
+.page-item.active .page-link {
+  background-color: var(--mt-primary);
+  border-color: var(--mt-primary);
+}
+
+/* Tabs */
+.nav-tabs .nav-link {
+  color: var(--mt-text-muted);
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+}
+.nav-tabs .nav-link.active {
+  color: var(--mt-primary);
+  border-bottom-color: var(--mt-accent);
+  background: transparent;
+}
+
+/* Modals */
+.modal-content {
+  border-radius: var(--mt-radius-lg);
+  border: none;
+  box-shadow: var(--mt-shadow-lg);
+}
+.modal-header {
+  border-bottom: 1px solid var(--mt-border);
+}
+.modal-header .modal-title {
+  color: var(--mt-primary);
+  font-weight: 600;
+}
+
+/* Progress bars */
+.progress {
+  border-radius: 999px;
+  background-color: var(--mt-border);
+  height: 10px;
+}
+.progress-bar {
+  background-color: var(--mt-secondary);
+}
+
+/* Links */
+a {
+  color: var(--mt-secondary);
+}
+a:hover {
+  color: var(--mt-secondary-light);
+}
+
+/* Scrollbar (subtle, premium touch) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--mt-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--mt-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mt-text-muted);
+}
