@@ -571,3 +571,36 @@ gotchas, and open issues that are NOT in the source code or git history.
 - notes: limit is per-school (ADMIN role only); SUPER_ADMIN accounts show "—" for
   the limit column (exempt, no cap). Blank/null limit = unlimited (unchanged
   default behavior for existing schools, all NULL after migration).
+
+### 2026-07-23 13:15 — Session end: stack shut down  [type: run]
+- what: stopped all three tiers cleanly. Backend :8081 and frontend :3000 killed
+  via taskkill on their listening PIDs; MySQL (XAMPP mysqld) stopped via
+  `mysqladmin -u root shutdown` (graceful, not a forced kill) — confirmed down
+  (connection refused).
+- files: none.
+- result: PASS. No test data left behind (all created during this session's
+  verification passes were deleted immediately after each check).
+
+### 2026-07-23 18:07 — Class->Subject->Quiz relabel, student-limit validation, session shutdown  [type: change]
+- what: (1) student-limit save now rejects a limit below the school's active-student count
+  (AdminServiceImpl.updateAdmin); (2) Schools/Students pages got name search boxes; (3) Students
+  page groups by class; (4) removed the standalone /adminSubjects super-admin page and sidebar
+  link (redundant — Subject entity has no dedicated top-level CRUD in this UI anymore, only used
+  internally); (5) Add/Update Quiz forms ("Add Subject"/"Update Subject" headings — intentional,
+  this form is the real subject-creation UX in the product's naming) now pick a **Class** instead
+  of a Subject; the matching Subject row (by classId) is resolved automatically on submit; (6)
+  AdminQuizzesPage list now groups by Class instead of Subject, and the per-group count label
+  reads "quiz"/"quizzes" (was mislabeled "subject"/"subjects").
+- files: exam-portal-backend/.../AdminServiceImpl.java; exam-portal-frontend/src/pages/superadmin/
+  SuperAdminAdminsPage.js; exam-portal-frontend/src/pages/admin/AdminStudentsPage.js;
+  exam-portal-frontend/src/pages/admin/quizzes/{AdminAddQuiz,AdminUpdateQuiz,AdminQuizzesPage}.js;
+  exam-portal-frontend/src/components/SuperAdminSidebar.js; exam-portal-frontend/src/App.js;
+  deleted exam-portal-frontend/src/pages/superadmin/SuperAdminSubjectsPage.js.
+- result: PASS. All verified live in-browser (dalveer/super123): limit-below-active rejected with
+  correct message; search boxes filter correctly; class grouping renders; /adminSubjects route and
+  sidebar link gone, no console errors; Add-Quiz form's class dropdown resolves the right subject
+  (test quiz created under Class 6-8 → General, confirmed in list, then deleted); Quizzes list now
+  groups by class with correct quiz/quizzes counts.
+- notes / follow-ups: backend, frontend (:3000), and MySQL (XAMPP mysqld) all stopped at end of
+  session per user request ("kill all"). Ports 8081/3000/3306 confirmed down. Uncommitted changes
+  remain in the working tree (not committed this session — user hasn't asked for a commit).

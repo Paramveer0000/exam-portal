@@ -8,6 +8,7 @@ import RoleSidebar from "../../../components/RoleSidebar";
 import Loader from "../../../components/Loader";
 import { deleteQuiz, fetchQuizzes } from "../../../actions/quizzesActions";
 import * as quizzesConstants from "../../../constants/quizzesConstants";
+import categoriesServices from "../../../services/categoriesServices";
 import swal from "sweetalert";
 
 const AdminQuizzesPage = () => {
@@ -19,6 +20,7 @@ const AdminQuizzesPage = () => {
 
   const quizzesReducer = useSelector((state) => state.quizzesReducer);
   const [quizzes, setQuizzes] = useState(quizzesReducer.quizzes);
+  const [classesById, setClassesById] = useState({});
 
   const addNewQuizHandler = () => {
     navigate("/adminAddQuiz");
@@ -66,9 +68,17 @@ const AdminQuizzesPage = () => {
 
   useEffect(() => {
     if (!localStorage.getItem("jwtToken")) navigate("/");
+    categoriesServices.fetchCategories(token).then((data) => {
+      if (Array.isArray(data)) {
+        const map = {};
+        data.forEach((c) => (map[c.catId] = c.title));
+        setClassesById(map);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Group quizzes by their subject; optionally filter to one class (catId param).
+  // Group quizzes by their class; optionally filter to one class (catId param).
   const buildClassGroups = () => {
     const visible = (quizzes || []).filter(
       (q) => catId == null || (q.subject && q.subject.classId == catId)
@@ -76,16 +86,16 @@ const AdminQuizzesPage = () => {
     const groups = [];
     const byId = {};
     visible.forEach((quiz) => {
-      const sid = quiz.subject ? quiz.subject.subjectId : "unassigned";
-      if (!byId[sid]) {
-        byId[sid] = {
-          catId: sid,
-          title: quiz.subject ? quiz.subject.title : "Unassigned",
+      const cid = quiz.subject ? quiz.subject.classId : "unassigned";
+      if (!byId[cid]) {
+        byId[cid] = {
+          catId: cid,
+          title: quiz.subject ? classesById[cid] || `Class #${cid}` : "Unassigned",
           quizzes: [],
         };
-        groups.push(byId[sid]);
+        groups.push(byId[cid]);
       }
-      byId[sid].quizzes.push(quiz);
+      byId[cid].quizzes.push(quiz);
     });
     return groups;
   };
@@ -218,7 +228,7 @@ const AdminQuizzesPage = () => {
                     }}
                   >
                     ({group.quizzes.length}{" "}
-                    {group.quizzes.length === 1 ? "subject" : "subjects"})
+                    {group.quizzes.length === 1 ? "quiz" : "quizzes"})
                   </span>
                 </h4>
                 {group.quizzes.map((quiz) => renderSubjectCard(quiz))}

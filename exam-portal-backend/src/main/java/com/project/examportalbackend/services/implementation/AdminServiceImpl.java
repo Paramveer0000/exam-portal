@@ -129,10 +129,19 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public AdminDto updateAdmin(Long adminId, UpdateAdminRequest request) {
         User admin = loadAdmin(adminId);
+        Integer newLimit = validatedLimit(request.getStudentLimit());
+        if (newLimit != null) {
+            int active = (int) userRepository.findByTeacherId(adminId).stream()
+                    .filter(User::isEnabled).count();
+            if (newLimit < active) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Student limit cannot be less than the " + active + " active student(s) for this school");
+            }
+        }
         admin.setFirstName(request.getFirstName());
         admin.setLastName(request.getLastName());
         admin.setPhoneNumber(request.getPhoneNumber());
-        admin.setStudentLimit(validatedLimit(request.getStudentLimit()));
+        admin.setStudentLimit(newLimit);
         return adminDtoWithCounts(userRepository.save(admin));
     }
 

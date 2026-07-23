@@ -25,6 +25,7 @@ const AdminStudentsPage = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [newStudent, setNewStudent] = useState(emptyNew);
   const [schoolsById, setSchoolsById] = useState({});
+  const [search, setSearch] = useState("");
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const isSuperAdmin =
@@ -147,6 +148,25 @@ const AdminStudentsPage = () => {
     }
   };
 
+  const filtered = students.filter((s) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    const name = `${s.firstName || ""} ${s.lastName || ""} ${s.username || ""}`.toLowerCase();
+    return name.includes(q);
+  });
+
+  const groups = [];
+  const groupIndex = {};
+  filtered.forEach((s) => {
+    const key = s.classId || "unassigned";
+    if (!(key in groupIndex)) {
+      groupIndex[key] = groups.length;
+      groups.push({ key, classId: s.classId, students: [] });
+    }
+    groups[groupIndex[key]].students.push(s);
+  });
+  groups.sort((a, b) => classTitle(a.classId).localeCompare(classTitle(b.classId)));
+
   const deleteHandler = (s) => {
     swal({
       title: "Delete this student?",
@@ -182,6 +202,14 @@ const AdminStudentsPage = () => {
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
 
+        <Form.Control
+          placeholder="Search by student name"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="mt-3"
+          style={{ maxWidth: 300 }}
+        />
+
         {showCreate && (
           <Form onSubmit={createHandler} className="p-3 mt-2" style={{ background: "#f6f9ff", borderRadius: 8 }}>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
@@ -204,7 +232,10 @@ const AdminStudentsPage = () => {
           </Form>
         )}
 
-        <Table striped bordered hover responsive className="mt-3">
+        {groups.map((g) => (
+        <div key={g.key} className="mt-4">
+          <h5>{classTitle(g.classId)} <span className="text-muted">({g.students.length})</span></h5>
+          <Table striped bordered hover responsive>
           <thead>
             <tr>
               <th>ID</th>
@@ -218,7 +249,7 @@ const AdminStudentsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {students.map((s) =>
+            {g.students.map((s) =>
               editingId === s.userId ? (
                 <tr key={s.userId}>
                   <td>{s.userId}</td>
@@ -267,15 +298,17 @@ const AdminStudentsPage = () => {
                 </tr>
               )
             )}
-            {students.length === 0 && (
-              <tr>
-                <td colSpan={isSuperAdmin ? 8 : 7} className="text-center">
-                  No students yet. Click “+ Add Student” to create one.
-                </td>
-              </tr>
-            )}
           </tbody>
-        </Table>
+          </Table>
+        </div>
+        ))}
+        {groups.length === 0 && (
+          <p className="text-center text-muted mt-4">
+            {students.length === 0
+              ? 'No students yet. Click "+ Add Student" to create one.'
+              : "No students match your search."}
+          </p>
+        )}
       </div>
     </div>
   );

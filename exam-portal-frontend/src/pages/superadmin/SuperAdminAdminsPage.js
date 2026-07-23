@@ -32,6 +32,7 @@ const SuperAdminAdminsPage = () => {
   const [form, setForm] = useState(emptyForm);
   const [showCreate, setShowCreate] = useState(false);
   const [limitDraft, setLimitDraft] = useState({});
+  const [search, setSearch] = useState("");
 
   // Open the create form pre-set to a role (from the top-right buttons).
   const openCreate = (role) => {
@@ -151,6 +152,13 @@ const SuperAdminAdminsPage = () => {
   const viewActivity = (admin) => {
     fetchActivity(dispatch, admin.userId, token);
   };
+
+  const filteredAdmins = admins.filter((a) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    const name = `${a.firstName || ""} ${a.lastName || ""} ${a.username || ""}`.toLowerCase();
+    return name.includes(q);
+  });
 
   const currentUserId = (() => {
     try {
@@ -313,6 +321,13 @@ const SuperAdminAdminsPage = () => {
 
         <Card body className="my-3">
           <h4>All Schools</h4>
+          <Form.Control
+            placeholder="Search by school name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="mb-3"
+            style={{ maxWidth: 300 }}
+          />
           <Table striped bordered hover responsive>
             <thead>
               <tr>
@@ -327,7 +342,7 @@ const SuperAdminAdminsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {admins.map((a) => (
+              {filteredAdmins.map((a) => (
                 <tr key={a.userId}>
                   <td>{a.userId}</td>
                   <td>{a.username}</td>
@@ -340,7 +355,7 @@ const SuperAdminAdminsPage = () => {
                     ) : (
                       <div style={{ display: "flex", gap: "4px", alignItems: "center", minWidth: 200 }}>
                         <span className="text-muted" style={{ whiteSpace: "nowrap" }}>
-                          {a.activeStudentCount} active / {a.studentCount} total /
+                          {a.activeStudentCount} active / allowed:
                         </span>
                         <Form.Control
                           size="sm"
@@ -386,10 +401,10 @@ const SuperAdminAdminsPage = () => {
                   </td>
                 </tr>
               ))}
-              {admins.length === 0 && (
+              {filteredAdmins.length === 0 && (
                 <tr>
                   <td colSpan="8" className="text-center">
-                    No schools yet.
+                    {admins.length === 0 ? "No schools yet." : "No schools match your search."}
                   </td>
                 </tr>
               )}

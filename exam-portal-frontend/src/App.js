@@ -32,7 +32,6 @@ import SuperAdminAdminsPage from "./pages/superadmin/SuperAdminAdminsPage";
 import SuperAdminProfilePage from "./pages/superadmin/SuperAdminProfilePage";
 import SuperAdminAiSettingsPage from "./pages/superadmin/SuperAdminAiSettingsPage";
 import SuperAdminResultsPage from "./pages/superadmin/SuperAdminResultsPage";
-import SuperAdminSubjectsPage from "./pages/superadmin/SuperAdminSubjectsPage";
 
 const ADMIN_ROLES = ["ADMIN", "SUPER_ADMIN"];
 const USER_ROLES = ["USER"];
@@ -75,10 +74,6 @@ const App = () => {
         <Route
           path="/superadmin/results"
           element={superAdminRoute(<SuperAdminResultsPage />)}
-        />
-        <Route
-          path="/adminSubjects"
-          element={superAdminRoute(<SuperAdminSubjectsPage />)}
         />
         <Route
           path="/superadmin/ai-settings"

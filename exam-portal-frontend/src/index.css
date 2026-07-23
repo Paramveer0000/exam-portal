@@ -1,0 +1,73 @@
+/* ============================================================
+   The Mentalist — design tokens
+   CSS variables only. No component styles here.
+   ============================================================ */
+:root {
+  /* Brand colors */
+  --mt-primary: #0B2A4A;
+  --mt-primary-light: #123A63;
+  --mt-secondary: #1E7A6F;
+  --mt-secondary-light: #2C9C8F;
+  --mt-accent: #F2B705;
+  --mt-accent-dark: #C99A04;
+
+  /* Semantic */
+  --mt-success: #2E9E5B;
+  --mt-warning: #F2B705;
+  --mt-danger: #D64545;
+  --mt-info: #2C9C8F;
+
+  /* Surfaces */
+  --mt-bg: #FAFAF7;
+  --mt-surface: #FFFFFF;
+  --mt-border: #E4E4DD;
+
+  /* Text */
+  --mt-text: #0B2A4A;
+  --mt-text-muted: #6B7280;
+  --mt-text-on-primary: #FFFFFF;
+
+  /* Radius */
+  --mt-radius-sm: 8px;
+  --mt-radius-md: 14px;
+  --mt-radius-lg: 20px;
+
+  /* Shadow */
+  --mt-shadow-sm: 0 1px 2px rgba(11, 42, 74, 0.06);
+  --mt-shadow-md: 0 4px 16px rgba(11, 42, 74, 0.08);
+  --mt-shadow-lg: 0 12px 32px rgba(11, 42, 74, 0.12);
+
+  /* Spacing scale */
+  --mt-space-1: 4px;
+  --mt-space-2: 8px;
+  --mt-space-3: 12px;
+  --mt-space-4: 16px;
+  --mt-space-5: 24px;
+  --mt-space-6: 32px;
+  --mt-space-8: 48px;
+
+  /* Typography */
+  --mt-font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mt-fs-xs: 0.75rem;
+  --mt-fs-sm: 0.875rem;
+  --mt-fs-base: 1rem;
+  --mt-fs-lg: 1.125rem;
+  --mt-fs-xl: 1.5rem;
+  --mt-fs-2xl: 2rem;
+  --mt-lh-tight: 1.25;
+  --mt-lh-normal: 1.5;
+  --mt-lh-relaxed: 1.7;
+}
+
+body {
+  font-family: var(--mt-font);
+  background: var(--mt-bg);
+  color: var(--mt-text);
+  line-height: var(--mt-lh-normal);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--mt-primary);
+  line-height: var(--mt-lh-tight);
+  font-weight: 600;
+}

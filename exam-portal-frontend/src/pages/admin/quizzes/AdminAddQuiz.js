@@ -17,7 +17,7 @@ const AdminAddQuiz = () => {
   const [maxMarks, setMaxMarks] = useState(0);
   const [numberOfQuestions, setNumberOfQuestions] = useState(0);
   const [isActive, setIsActive] = useState(false);
-  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+  const [selectedClassId, setSelectedClassId] = useState(null);
   const [questionsPerExam, setQuestionsPerExam] = useState("");
   const [randomizeQuestions, setRandomizeQuestions] = useState(false);
   const [randomizeOptions, setRandomizeOptions] = useState(false);
@@ -26,7 +26,7 @@ const AdminAddQuiz = () => {
   const [allQuestionsMandatory, setAllQuestionsMandatory] = useState(false);
 
   const [subjects, setSubjects] = useState([]);
-  const [classesById, setClassesById] = useState({});
+  const [classes, setClasses] = useState([]);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -35,43 +35,49 @@ const AdminAddQuiz = () => {
     setIsActive(!isActive);
   };
 
-  const onSelectSubjectHandler = (e) => {
-    setSelectedSubjectId(e.target.value);
+  const onSelectClassHandler = (e) => {
+    setSelectedClassId(e.target.value);
   };
 
   const token = JSON.parse(localStorage.getItem("jwtToken"));
 
-  const subjectLabel = (s) =>
-    `${classesById[s.classId] || "Class #" + s.classId} → ${s.title}`;
-
   const submitHandler = (e) => {
     e.preventDefault();
-    if (selectedSubjectId !== null && selectedSubjectId !== "n/a") {
-      const quiz = {
-        title: title,
-        description: description,
-        isActive: isActive,
-        questionsPerExam:
-          questionsPerExam === "" ? null : Number(questionsPerExam),
-        randomizeQuestions: randomizeQuestions,
-        randomizeOptions: randomizeOptions,
-        timerEnabled: timerEnabled,
-        timerMinutes:
-          timerEnabled && timerMinutes !== "" ? Number(timerMinutes) : null,
-        allQuestionsMandatory: allQuestionsMandatory,
-        subject: { subjectId: Number(selectedSubjectId) },
-      };
-      addQuiz(dispatch, quiz, token).then((data) => {
-        if (data.type === quizzesConstants.ADD_QUIZ_SUCCESS) {
-          swal("Quiz Added!", `${quiz.title} succesfully added`, "success");
-          navigate("/adminQuizzes");
-        } else {
-          swal("Quiz Not Added!", data.payload || `${quiz.title} not added`, "error");
-        }
-      });
-    } else {
-      alert("Select a valid subject!");
+    if (selectedClassId === null || selectedClassId === "n/a") {
+      alert("Select a valid class!");
+      return;
     }
+    const subject = subjects.find((s) => s.classId === Number(selectedClassId));
+    if (!subject) {
+      swal(
+        "No subject for this class",
+        "This class has no subject set up yet. Ask a platform admin to add one.",
+        "warning"
+      );
+      return;
+    }
+    const quiz = {
+      title: title,
+      description: description,
+      isActive: isActive,
+      questionsPerExam:
+        questionsPerExam === "" ? null : Number(questionsPerExam),
+      randomizeQuestions: randomizeQuestions,
+      randomizeOptions: randomizeOptions,
+      timerEnabled: timerEnabled,
+      timerMinutes:
+        timerEnabled && timerMinutes !== "" ? Number(timerMinutes) : null,
+      allQuestionsMandatory: allQuestionsMandatory,
+      subject: { subjectId: subject.subjectId },
+    };
+    addQuiz(dispatch, quiz, token).then((data) => {
+      if (data.type === quizzesConstants.ADD_QUIZ_SUCCESS) {
+        swal("Quiz Added!", `${quiz.title} succesfully added`, "success");
+        navigate("/adminQuizzes");
+      } else {
+        swal("Quiz Not Added!", data.payload || `${quiz.title} not added`, "error");
+      }
+    });
   };
 
   useEffect(() => {
@@ -80,11 +86,7 @@ const AdminAddQuiz = () => {
       if (Array.isArray(data)) setSubjects(data);
     });
     categoriesServices.fetchCategories(token).then((data) => {
-      if (Array.isArray(data)) {
-        const map = {};
-        data.forEach((c) => (map[c.catId] = c.title));
-        setClassesById(map);
-      }
+      if (Array.isArray(data)) setClasses(data);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -234,16 +236,16 @@ const AdminAddQuiz = () => {
             />
 
             <div className="my-3">
-              <label htmlFor="subject-select">Choose a Subject (Class → Subject):</label>
+              <label htmlFor="class-select">Choose a Class:</label>
               <Form.Select
-                aria-label="Choose Subject"
-                id="subject-select"
-                onChange={onSelectSubjectHandler}
+                aria-label="Choose Class"
+                id="class-select"
+                onChange={onSelectClassHandler}
               >
-                <option value="n/a">Choose Subject</option>
-                {subjects.map((s) => (
-                  <option key={s.subjectId} value={s.subjectId}>
-                    {subjectLabel(s)}
+                <option value="n/a">Choose Class</option>
+                {classes.map((c) => (
+                  <option key={c.catId} value={c.catId}>
+                    {c.title}
                   </option>
                 ))}
               </Form.Select>
