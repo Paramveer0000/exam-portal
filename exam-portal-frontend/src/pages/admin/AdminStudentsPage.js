@@ -174,9 +174,11 @@ const AdminStudentsPage = () => {
       <div style={{ padding: "1.5rem", flexGrow: 1 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h2>My Students</h2>
-          <Button variant="success" onClick={() => setShowCreate((v) => !v)}>
-            {showCreate ? "Close" : "+ Add Student"}
-          </Button>
+          {!isSuperAdmin && (
+            <Button variant="success" onClick={() => setShowCreate((v) => !v)}>
+              {showCreate ? "Close" : "+ Add Student"}
+            </Button>
+          )}
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
 
