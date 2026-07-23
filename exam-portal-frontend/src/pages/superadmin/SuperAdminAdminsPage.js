@@ -12,6 +12,7 @@ import {
   fetchMetrics,
   resetAdminPassword,
   setAdminStatus,
+  updateAdmin,
 } from "../../actions/adminActions";
 
 const emptyForm = {
@@ -21,6 +22,7 @@ const emptyForm = {
   lastName: "",
   phoneNumber: "",
   role: "ADMIN",
+  studentLimit: "",
 };
 
 const SuperAdminAdminsPage = () => {
@@ -29,6 +31,7 @@ const SuperAdminAdminsPage = () => {
   const { admins, activity, error } = useSelector((state) => state.adminReducer);
   const [form, setForm] = useState(emptyForm);
   const [showCreate, setShowCreate] = useState(false);
+  const [limitDraft, setLimitDraft] = useState({});
 
   // Open the create form pre-set to a role (from the top-right buttons).
   const openCreate = (role) => {
@@ -49,7 +52,11 @@ const SuperAdminAdminsPage = () => {
       swal("Phone required", "Phone number is required", "info");
       return;
     }
-    createAdmin(dispatch, form, token).then((data) => {
+    const payload = {
+      ...form,
+      studentLimit: form.studentLimit === "" ? null : Number(form.studentLimit),
+    };
+    createAdmin(dispatch, payload, token).then((data) => {
       if (data.type === "CREATE_ADMIN_SUCCESS") {
         swal("Created", `${form.username} was added`, "success");
         setForm(emptyForm);
@@ -57,6 +64,44 @@ const SuperAdminAdminsPage = () => {
         fetchMetrics(dispatch, token);
       } else {
         swal("Not created", data.payload || "Failed to create admin", "error");
+      }
+    });
+  };
+
+  const limitValue = (admin) =>
+    limitDraft[admin.userId] !== undefined
+      ? limitDraft[admin.userId]
+      : admin.studentLimit == null
+      ? ""
+      : String(admin.studentLimit);
+
+  const saveLimit = (admin) => {
+    const raw = limitValue(admin);
+    const studentLimit = raw === "" ? null : Number(raw);
+    if (studentLimit != null && (!Number.isInteger(studentLimit) || studentLimit < 0)) {
+      swal("Invalid limit", "Enter a whole number 0 or greater, or leave blank for unlimited", "warning");
+      return;
+    }
+    updateAdmin(
+      dispatch,
+      admin.userId,
+      {
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        phoneNumber: admin.phoneNumber,
+        studentLimit,
+      },
+      token
+    ).then((data) => {
+      if (data.type === "UPDATE_ADMIN_SUCCESS") {
+        swal("Saved", "Student limit updated", "success");
+        setLimitDraft((prev) => {
+          const next = { ...prev };
+          delete next[admin.userId];
+          return next;
+        });
+      } else {
+        swal("Not saved", data.payload || "Could not update limit", "error");
       }
     });
   };
@@ -241,6 +286,18 @@ const SuperAdminAdminsPage = () => {
                   <option value="SUPER_ADMIN">Role: Super Admin</option>
                 </Form.Select>
               </Col>
+              {form.role === "ADMIN" && (
+                <Col md={4} className="mb-2">
+                  <Form.Control
+                    name="studentLimit"
+                    type="number"
+                    min="0"
+                    placeholder="Student limit (blank = unlimited)"
+                    value={form.studentLimit}
+                    onChange={onFormChange}
+                  />
+                </Col>
+              )}
               <Col md={4} className="mb-2">
                 <Button type="submit" variant="primary">
                   {form.role === "SUPER_ADMIN"
@@ -264,6 +321,7 @@ const SuperAdminAdminsPage = () => {
                 <th>Name</th>
                 <th>Phone</th>
                 <th>Role</th>
+                <th>Students</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -276,6 +334,31 @@ const SuperAdminAdminsPage = () => {
                   <td>{`${a.firstName || ""} ${a.lastName || ""}`.trim()}</td>
                   <td>{a.phoneNumber}</td>
                   <td>{a.role === "SUPER_ADMIN" ? "Super Admin" : "School"}</td>
+                  <td>
+                    {a.role === "SUPER_ADMIN" ? (
+                      "—"
+                    ) : (
+                      <div style={{ display: "flex", gap: "4px", alignItems: "center", minWidth: 200 }}>
+                        <span className="text-muted" style={{ whiteSpace: "nowrap" }}>
+                          {a.activeStudentCount} active / {a.studentCount} total /
+                        </span>
+                        <Form.Control
+                          size="sm"
+                          type="number"
+                          min="0"
+                          placeholder="∞"
+                          style={{ width: 80 }}
+                          value={limitValue(a)}
+                          onChange={(e) =>
+                            setLimitDraft((prev) => ({ ...prev, [a.userId]: e.target.value }))
+                          }
+                        />
+                        <Button size="sm" variant="outline-primary" onClick={() => saveLimit(a)}>
+                          Save
+                        </Button>
+                      </div>
+                    )}
+                  </td>
                   <td>{a.active ? "Active" : "Disabled"}</td>
                   <td style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                     {a.userId !== currentUserId && a.role !== "SUPER_ADMIN" && (
@@ -305,7 +388,7 @@ const SuperAdminAdminsPage = () => {
               ))}
               {admins.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="text-center">
+                  <td colSpan="8" className="text-center">
                     No schools yet.
                   </td>
                 </tr>

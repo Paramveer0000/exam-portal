@@ -15,4 +15,6 @@ public class CreateAdminRequest {
     private String phoneNumber;
     // "ADMIN" (default) or "SUPER_ADMIN". Only a SUPER_ADMIN reaches this endpoint.
     private String role;
+    // Max students this school may create. Null/absent = unlimited.
+    private Integer studentLimit;
 }

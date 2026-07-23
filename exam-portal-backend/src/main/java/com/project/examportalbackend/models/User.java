@@ -49,6 +49,11 @@ public class User implements UserDetails {
     @Column(name = "class_id")
     private Long classId;
 
+    // For schools (ADMIN role): max students they may create. Null = unlimited.
+    // Set by SUPER_ADMIN at creation, editable later.
+    @Column(name = "student_limit")
+    private Integer studentLimit;
+
     // For schools (ADMIN role).
     @Column(name = "address")
     private String address;

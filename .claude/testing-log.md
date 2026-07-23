@@ -546,3 +546,28 @@ gotchas, and open issues that are NOT in the source code or git history.
   UI for students is minimal (All Quizzes lists their class's published quizzes with subject subtitle) —
   a dedicated subject-picker screen for students could be added later if wanted. (d) DB backup from the
   migration session at scratchpad/db-backup-pre-V20.sql.
+
+### 2026-07-23 13:10 — Feature: super-admin student-signup limit per school  [type: change]
+- what: SUPER_ADMIN sets (and later edits) a max-students cap per school at account
+  creation. Enforced when the school creates a student. Super admin also sees each
+  school's active/total student counts.
+- files: V21__admin_student_limit.sql (users.student_limit INT NULL = unlimited);
+  User.studentLimit; CreateAdminRequest/UpdateAdminRequest +studentLimit;
+  AdminDto +studentLimit/studentCount/activeStudentCount, from(user, total, active)
+  overload; AdminServiceImpl (adminDtoWithCounts helper computes both counts from
+  findByTeacherId; createAdmin/updateAdmin validate+set studentLimit, non-negative);
+  UserRepository +countByTeacherId (used by the limit check); StudentServiceImpl
+  .createStudent (403 "Student limit reached" when count>=limit, super admins
+  exempt); frontend: SuperAdminAdminsPage (student-limit field on create form when
+  role=ADMIN; new "Students" column with inline editable limit input + Save,
+  showing "N active / M total / [limit]"), adminServices.fetchResultsByClass
+  unaffected, updateAdmin action reused as-is.
+- result: PASS end-to-end (curl, dalveer SUPER_ADMIN): created school with
+  studentLimit=1 -> list shows limit=1, counts 0/0; that school created 1 student
+  -> 200, count 1/1; 2nd student -> blocked (limit enforced, count stayed 1);
+  super admin raised limit to 5 -> counts reflected (1/1), then 2nd student -> 200.
+  V21 applied, backend restarted clean, frontend compiles clean. Test admin +
+  2 test students deleted after.
+- notes: limit is per-school (ADMIN role only); SUPER_ADMIN accounts show "—" for
+  the limit column (exempt, no cap). Blank/null limit = unlimited (unchanged
+  default behavior for existing schools, all NULL after migration).

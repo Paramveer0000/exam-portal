@@ -20,8 +20,15 @@ public class AdminDto {
     private String phoneNumber;
     private boolean active;
     private String role; // "SUPER_ADMIN" or "ADMIN"
+    private Integer studentLimit; // null = unlimited
+    private int studentCount;       // total students created
+    private int activeStudentCount; // of those, currently active (enabled)
 
     public static AdminDto from(User user) {
+        return from(user, 0, 0);
+    }
+
+    public static AdminDto from(User user, int studentCount, int activeStudentCount) {
         AdminDto dto = new AdminDto();
         dto.userId = user.getUserId();
         dto.username = user.getUsername();
@@ -32,6 +39,9 @@ public class AdminDto {
         dto.role = user.getRoles().stream()
                 .map(Role::getRoleName)
                 .anyMatch("SUPER_ADMIN"::equals) ? "SUPER_ADMIN" : "ADMIN";
+        dto.studentLimit = user.getStudentLimit();
+        dto.studentCount = studentCount;
+        dto.activeStudentCount = activeStudentCount;
         return dto;
     }
 }

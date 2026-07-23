@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countByRoles_RoleName(String roleName);
 
     List<User> findByTeacherId(Long teacherId);
+
+    long countByTeacherId(Long teacherId); // used by the student-creation limit check
 }

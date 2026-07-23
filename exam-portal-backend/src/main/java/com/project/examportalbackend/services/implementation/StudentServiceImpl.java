@@ -62,6 +62,15 @@ public class StudentServiceImpl implements StudentService {
         if (userRepository.findByUsername(request.getUsername()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
+        // Enforce the school's student cap (super admins are exempt; they have no limit).
+        if (!authFacade.isSuperAdmin()) {
+            Long teacherId = authFacade.getCurrentUserId();
+            Integer limit = authFacade.getCurrentUser().getStudentLimit();
+            if (limit != null && userRepository.countByTeacherId(teacherId) >= limit) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Student limit reached (" + limit + "). Contact the platform admin to raise it.");
+            }
+        }
         Role userRole = roleRepository.findById(AuthFacade.ROLE_USER)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "USER role missing"));
 

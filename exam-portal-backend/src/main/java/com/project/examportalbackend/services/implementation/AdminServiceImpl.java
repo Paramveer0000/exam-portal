@@ -70,13 +70,20 @@ public class AdminServiceImpl implements AdminService {
                 .forEach(u -> byId.put(u.getUserId(), u));
         return byId.values().stream()
                 .filter(this::isManageable)
-                .map(AdminDto::from)
+                .map(u -> adminDtoWithCounts(u))
                 .collect(Collectors.toList());
     }
 
     @Override
     public AdminDto getAdmin(Long adminId) {
-        return AdminDto.from(loadAdmin(adminId));
+        return adminDtoWithCounts(loadAdmin(adminId));
+    }
+
+    /** Total + active student counts for a school, from its own student roster. */
+    private AdminDto adminDtoWithCounts(User admin) {
+        List<User> students = userRepository.findByTeacherId(admin.getUserId());
+        int active = (int) students.stream().filter(User::isEnabled).count();
+        return AdminDto.from(admin, students.size(), active);
     }
 
     @Override
@@ -111,6 +118,7 @@ public class AdminServiceImpl implements AdminService {
         user.setLastName(request.getLastName());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setActive(true);
+        user.setStudentLimit(validatedLimit(request.getStudentLimit()));
         Set<Role> roles = new HashSet<>();
         roles.add(role);
         user.setRoles(roles);
@@ -124,7 +132,19 @@ public class AdminServiceImpl implements AdminService {
         admin.setFirstName(request.getFirstName());
         admin.setLastName(request.getLastName());
         admin.setPhoneNumber(request.getPhoneNumber());
-        return AdminDto.from(userRepository.save(admin));
+        admin.setStudentLimit(validatedLimit(request.getStudentLimit()));
+        return adminDtoWithCounts(userRepository.save(admin));
+    }
+
+    /** Null/blank = unlimited; otherwise must be a non-negative count. */
+    private Integer validatedLimit(Integer limit) {
+        if (limit == null) {
+            return null;
+        }
+        if (limit < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Student limit cannot be negative");
+        }
+        return limit;
     }
 
     @Override
