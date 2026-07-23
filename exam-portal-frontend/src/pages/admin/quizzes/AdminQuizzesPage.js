@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, ListGroup } from "react-bootstrap";
 import Message from "../../../components/Message";
-import Sidebar from "../../../components/Sidebar";
+import RoleSidebar from "../../../components/RoleSidebar";
 import Loader from "../../../components/Loader";
 import { deleteQuiz, fetchQuizzes } from "../../../actions/quizzesActions";
 import * as quizzesConstants from "../../../constants/quizzesConstants";
@@ -174,7 +174,7 @@ const AdminQuizzesPage = () => {
   return (
     <div className="adminQuizzesPage__container">
       <div className="adminQuizzesPage__sidebar">
-        <Sidebar />
+        <RoleSidebar />
       </div>
       <div className="adminQuizzesPage__content">
         <div

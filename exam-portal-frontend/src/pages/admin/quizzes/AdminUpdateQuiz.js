@@ -4,7 +4,7 @@ import { Button, Form } from "react-bootstrap";
 import "./AdminUpdateQuiz.css";
 import swal from "sweetalert";
 import { useDispatch, useSelector } from "react-redux";
-import Sidebar from "../../../components/Sidebar";
+import RoleSidebar from "../../../components/RoleSidebar";
 import FormContainer from "../../../components/FormContainer";
 import * as quizzesConstants from "../../../constants/quizzesConstants";
 import subjectsServices from "../../../services/subjectsServices";
@@ -116,7 +116,7 @@ const AdminUpdateQuiz = () => {
   return (
     <div className="adminUpdateQuizPage__container">
       <div className="adminUpdateQuizPage__sidebar">
-        <Sidebar />
+        <RoleSidebar />
       </div>
       <div className="adminUpdateQuizPage__content">
         <FormContainer>

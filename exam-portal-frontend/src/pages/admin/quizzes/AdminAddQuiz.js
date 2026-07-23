@@ -4,7 +4,7 @@ import { Button, Form } from "react-bootstrap";
 import "./AdminAddQuiz.css";
 import { useDispatch, useSelector } from "react-redux";
 import swal from "sweetalert";
-import Sidebar from "../../../components/Sidebar";
+import RoleSidebar from "../../../components/RoleSidebar";
 import FormContainer from "../../../components/FormContainer";
 import * as quizzesConstants from "../../../constants/quizzesConstants";
 import { addQuiz } from "../../../actions/quizzesActions";
@@ -92,7 +92,7 @@ const AdminAddQuiz = () => {
   return (
     <div className="adminAddQuizPage__container">
       <div className="adminAddQuizPage__sidebar">
-        <Sidebar />
+        <RoleSidebar />
       </div>
       <div className="adminAddQuizPage__content">
         <FormContainer>

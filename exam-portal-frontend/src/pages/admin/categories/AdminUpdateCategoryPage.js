@@ -6,7 +6,7 @@ import swal from "sweetalert";
 import { useParams } from "react-router-dom";
 import * as categoriesConstants from "../../../constants/categoriesConstants";
 import FormContainer from "../../../components/FormContainer";
-import Sidebar from "../../../components/Sidebar";
+import RoleSidebar from "../../../components/RoleSidebar";
 import { updateCategory } from "../../../actions/categoriesActions";
 import { useNavigate } from "react-router-dom";
 
@@ -41,7 +41,7 @@ const AdminUpdateCategoryPage = () => {
   return (
     <div className="adminUpdateCategoryPage__container">
       <div className="adminUpdateCategoryPage__sidebar">
-        <Sidebar />
+        <RoleSidebar />
       </div>
       <div className="adminUpdateCategoryPage__content">
         <FormContainer>

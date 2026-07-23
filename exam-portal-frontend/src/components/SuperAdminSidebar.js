@@ -44,6 +44,11 @@ const SuperAdminSidebar = ({ children }) => {
       icon: <MdQuiz />,
     },
     {
+      path: "/adminStudents",
+      name: "Students",
+      icon: <FaUserAlt />,
+    },
+    {
       path: "/superadmin/results",
       name: "All Results",
       icon: <TbReport />,

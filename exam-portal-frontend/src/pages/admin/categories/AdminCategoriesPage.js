@@ -6,7 +6,7 @@ import { Button, ListGroup } from "react-bootstrap";
 import * as categoriesConstants from "../../../constants/categoriesConstants";
 import Loader from "../../../components/Loader";
 import Message from "../../../components/Message";
-import Sidebar from "../../../components/Sidebar";
+import RoleSidebar from "../../../components/RoleSidebar";
 import {
   deleteCategory,
   fetchCategories,
@@ -80,7 +80,7 @@ const AdminCategoriesPage = () => {
   return (
     <div className="adminCategoriesPage__container">
       <div className="adminCategoriesPage__sidebar">
-        <Sidebar />
+        <RoleSidebar />
       </div>
       <div className="adminCategoriesPage__content">
         <div

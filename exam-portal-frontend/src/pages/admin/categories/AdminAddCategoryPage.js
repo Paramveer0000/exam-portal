@@ -4,7 +4,7 @@ import { Button, Form } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import * as categoriesConstants from "../../../constants/categoriesConstants";
 import FormContainer from "../../../components/FormContainer";
-import Sidebar from "../../../components/Sidebar";
+import RoleSidebar from "../../../components/RoleSidebar";
 import {
   addCategory,
   fetchCategories,
@@ -37,7 +37,7 @@ const AdminAddCategoryPage = () => {
   return (
     <div className="adminAddCategoryPage__container">
       <div className="adminAddCategoryPage__sidebar">
-        <Sidebar />
+        <RoleSidebar />
       </div>
       <div className="adminAddCategoryPage__content">
         <FormContainer>

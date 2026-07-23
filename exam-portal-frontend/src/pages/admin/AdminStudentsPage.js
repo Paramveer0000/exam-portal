@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 import swal from "sweetalert";
-import Sidebar from "../../components/Sidebar";
+import RoleSidebar from "../../components/RoleSidebar";
 import studentsServices from "../../services/studentsServices";
 import categoriesServices from "../../services/categoriesServices";
 import authServices from "../../services/authServices";
@@ -170,7 +170,7 @@ const AdminStudentsPage = () => {
 
   return (
     <div style={{ display: "flex" }}>
-      <Sidebar />
+      <RoleSidebar />
       <div style={{ padding: "1.5rem", flexGrow: 1 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h2>My Students</h2>
