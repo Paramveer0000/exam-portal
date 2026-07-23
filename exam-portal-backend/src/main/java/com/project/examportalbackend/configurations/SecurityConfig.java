@@ -112,6 +112,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.POST, "/api/quizResult/**").hasAuthority("USER")
                 .antMatchers(HttpMethod.GET, "/api/quizResult/all/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/quizResult/by-class/**").hasAuthority("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/quizResult/**").hasAnyAuthority("USER", "ADMIN")
 
                 // Psychometric report: students read their own, teachers their

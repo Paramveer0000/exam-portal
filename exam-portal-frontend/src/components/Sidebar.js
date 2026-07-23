@@ -39,7 +39,6 @@ const Sidebar = ({ children }) => {
       : []),
     { path: "/adminStudents", name: "Students", icon: <FaUserGraduate /> },
     { path: "/adminallResult", name: "All Result", icon: <TbReport /> },
-    { path: "/adminReports", name: "Reports", icon: <FaRegChartBar /> },
   ];
 
   if (isSuperAdmin) {

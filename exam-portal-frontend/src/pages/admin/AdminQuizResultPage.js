@@ -1,93 +1,113 @@
 import React, { useEffect, useState } from "react";
-import SidebarUser from "../../components/SidebarUser";
-import "../users/UserQuizResultPage.css";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchQuizResult } from "../../actions/quizResultActions";
-import * as quizResultConstants from "../../constants/quizResultConstants";
+import { Accordion, Badge, Table } from "react-bootstrap";
+import RoleSidebar from "../../components/RoleSidebar";
+import Loader from "../../components/Loader";
 import Message from "../../components/Message";
-import { Link } from "react-router-dom";
-import { Table } from "react-bootstrap";
-import Sidebar from "../../components/Sidebar";
-
-// Groups quiz results by their class (category) so results render class-wise.
-const groupResultsByClass = (results) => {
-  const groups = {};
-  const order = [];
-  results.forEach((r) => {
-    const cname =
-      r.quiz && r.quiz.subject ? r.quiz.subject.title : "Uncategorized";
-    if (!groups[cname]) {
-      groups[cname] = [];
-      order.push(cname);
-    }
-    groups[cname].push(r);
-  });
-  return order.map((cname) => ({ className: cname, results: groups[cname] }));
-};
+import adminServices from "../../services/adminServices";
 
 const AdminQuizResultPage = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const quizResultReducer = useSelector((state) => state.quizResultReducer);
-  const [quizResults, setQuizResults] = useState(null);
   const token = JSON.parse(localStorage.getItem("jwtToken"));
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user ? user.userId : null;
+
+  const [classes, setClasses] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (quizResults == null)
-      fetchQuizResult(dispatch, null, token).then((data) => {
-        if (data.type === quizResultConstants.FETCH_QUIZ_RESULT_SUCCESS) {
-          setQuizResults(data.payload);
-        }
-      });
+    if (!token) {
+      navigate("/");
+      return;
+    }
+    adminServices.fetchResultsByClass(token).then(({ data, error }) => {
+      if (data) setClasses(data);
+      else setError(error || "Could not load results");
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
-  }, []);
+  const classAttempts = (c) =>
+    (c.students || []).reduce((n, st) => n + (st.results || []).length, 0);
 
   return (
-    <div className="userQuizResultPage__container">
-      <div className="userQuizResultPage__sidebar">
-        <Sidebar />
-      </div>
+    <div style={{ display: "flex" }}>
+      <RoleSidebar />
+      <div style={{ padding: "1.5rem", flexGrow: 1, maxWidth: "1000px" }}>
+        <h2>All Results by Class</h2>
+        <p className="text-muted">
+          Your students' attempts, grouped by class and then by student.
+        </p>
 
-      <div className="userQuizResultPage__content">
-        {quizResults && quizResults.length !== 0 ? (
-          groupResultsByClass(quizResults).map((group) => (
-            <div key={group.className} style={{ marginBottom: "28px" }}>
-              <h4 style={{ marginBottom: "12px" }}>{group.className}</h4>
-              <Table bordered className="userQuizResultPage__content--table">
-                <thead>
-                  <tr>
-                    <th>Quiz Id</th>
-                    <th>Subject</th>
-                    <th>Obtained Marks</th>
-                    <th>Total Marks</th>
-                    <th>Result</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {group.results.map((r, index) => (
-                    <tr key={index}>
-                      <td>{r.quiz.quizId}</td>
-                      <td>{r.quiz.title}</td>
-                      <td>{r.totalObtainedMarks}</td>
-                      <td>{r.totalMarks}</td>
-                      <td>{r.passed ? "Pass" : "Fail"}</td>
-                      <td>{r.attemptDatetime}</td>
-                    </tr>
+        {error && <Message variant="danger">{error}</Message>}
+        {!classes && !error && <Loader />}
+
+        {classes && classes.length === 0 && <Message>No results yet.</Message>}
+
+        {classes && classes.length > 0 && (
+          <Accordion alwaysOpen>
+            {classes.map((c, ci) => (
+              <Accordion.Item eventKey={String(ci)} key={ci}>
+                <Accordion.Header>
+                  {c.className}{" "}
+                  <Badge bg="secondary" className="ms-2">
+                    {(c.students || []).length} student
+                    {(c.students || []).length === 1 ? "" : "s"}
+                  </Badge>
+                  <Badge bg="info" className="ms-2">
+                    {classAttempts(c)} attempt
+                    {classAttempts(c) === 1 ? "" : "s"}
+                  </Badge>
+                </Accordion.Header>
+                <Accordion.Body>
+                  {(c.students || []).map((st) => (
+                    <div key={st.studentId} className="mb-4">
+                      <h6>
+                        {st.studentName}{" "}
+                        <span className="text-muted">({st.username})</span>
+                      </h6>
+                      <Table striped bordered size="sm" responsive>
+                        <thead>
+                          <tr>
+                            <th>Subject</th>
+                            <th>Marks</th>
+                            <th>Result</th>
+                            <th>Date</th>
+                            <th>Report</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(st.results || []).map((r) => (
+                            <tr key={r.quizResId}>
+                              <td>{r.quizTitle}</td>
+                              <td>
+                                {r.obtainedMarks} / {r.totalMarks}
+                              </td>
+                              <td>
+                                <Badge bg={r.passed ? "success" : "danger"}>
+                                  {r.passed ? "Passed" : "Failed"}
+                                </Badge>
+                              </td>
+                              <td>{r.attemptDatetime}</td>
+                              <td>
+                                <a
+                                  href={`/psychometricReport/${r.quizResId}`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    navigate(`/psychometricReport/${r.quizResId}`);
+                                  }}
+                                >
+                                  View
+                                </a>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </div>
                   ))}
-                </tbody>
-              </Table>
-            </div>
-          ))
-        ) : (
-          <Message>No results to display.</Message>
+                </Accordion.Body>
+              </Accordion.Item>
+            ))}
+          </Accordion>
         )}
       </div>
     </div>

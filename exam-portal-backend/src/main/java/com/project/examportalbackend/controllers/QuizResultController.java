@@ -35,6 +35,8 @@ public class QuizResultController {
     private AuthFacade authFacade;
     @Autowired
     private PsychometricReportService psychometricReportService;
+    @Autowired
+    private com.project.examportalbackend.services.AdminService adminService;
 
     @PostMapping(value = "/submit", params = "quizId")
     public ResponseEntity<?> submitQuiz(@RequestParam Long quizId,
@@ -137,6 +139,12 @@ public class QuizResultController {
         List<QuizResult> quizResultsList = quizResultService.getQuizResultsByUser(userId);
         Collections.reverse(quizResultsList);
         return ResponseEntity.ok(quizResultsList);
+    }
+
+    // A school's own students' results grouped by class -> student -> attempts.
+    @GetMapping(value = "/by-class")
+    public ResponseEntity<?> getResultsByClass() {
+        return ResponseEntity.ok(adminService.getResultsByClass(authFacade.getCurrentUserId()));
     }
 
     @GetMapping(value = "/all")

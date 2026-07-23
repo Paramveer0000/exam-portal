@@ -48,4 +48,7 @@ public interface AdminService {
 
     /** All quiz results grouped by school (partner) then student. */
     List<com.project.examportalbackend.dto.SchoolResultsDto> getResultsBySchool();
+
+    /** A school's own students' results grouped by class, then student, then attempts. */
+    List<com.project.examportalbackend.dto.ClassResultsDto> getResultsByClass(Long teacherId);
 }

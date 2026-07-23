@@ -139,6 +139,16 @@ const fetchResultsBySchool = async (token) => {
   }
 };
 
+// A school's own students' results grouped by class.
+const fetchResultsByClass = async (token) => {
+  try {
+    const { data } = await axios.get("/api/quizResult/by-class", authConfig(token));
+    return { data, error: null };
+  } catch (error) {
+    return { data: null, error: errText(error) };
+  }
+};
+
 // Mints a token to act as the given admin (returns { user, jwtToken }).
 const impersonate = async (adminId, token) => {
   try {
@@ -166,6 +176,7 @@ const adminServices = {
   fetchUnowned,
   reassignUnowned,
   fetchResultsBySchool,
+  fetchResultsByClass,
   impersonate,
 };
 

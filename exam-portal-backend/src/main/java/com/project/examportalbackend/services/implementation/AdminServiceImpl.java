@@ -374,6 +374,68 @@ public class AdminServiceImpl implements AdminService {
         return out;
     }
 
+    @Override
+    public List<com.project.examportalbackend.dto.ClassResultsDto> getResultsByClass(Long teacherId) {
+        Map<Long, User> userCache = new HashMap<>();
+        java.util.function.Function<Long, User> user = id ->
+                userCache.computeIfAbsent(id, k -> userRepository.findById(k).orElse(null));
+
+        // class id (null = quiz has no class) -> student id -> rows
+        Map<Long, Map<Long, List<com.project.examportalbackend.dto.SchoolResultsDto.ResultRow>>> grouped =
+                new LinkedHashMap<>();
+
+        for (QuizResult r : quizResultRepository.findAll()) {
+            User student = user.apply(r.getUserId());
+            // Only this school's own students.
+            if (student == null || !teacherId.equals(student.getTeacherId())) {
+                continue;
+            }
+            Long classId = r.getQuiz() != null && r.getQuiz().getSubject() != null
+                    ? r.getQuiz().getSubject().getClassId() : null;
+
+            com.project.examportalbackend.dto.SchoolResultsDto.ResultRow row =
+                    new com.project.examportalbackend.dto.SchoolResultsDto.ResultRow();
+            row.setQuizResId(r.getQuizResId());
+            row.setQuizTitle(r.getQuiz() != null ? r.getQuiz().getTitle() : "");
+            row.setClassName(className(r.getQuiz()));
+            row.setObtainedMarks(r.getTotalObtainedMarks());
+            row.setTotalMarks(r.getTotalMarks());
+            row.setPassed(r.isPassed());
+            row.setAttemptDatetime(r.getAttemptDatetime());
+
+            grouped.computeIfAbsent(classId, k -> new LinkedHashMap<>())
+                    .computeIfAbsent(r.getUserId(), k -> new ArrayList<>())
+                    .add(row);
+        }
+
+        List<com.project.examportalbackend.dto.ClassResultsDto> out = new ArrayList<>();
+        for (Map.Entry<Long, Map<Long, List<com.project.examportalbackend.dto.SchoolResultsDto.ResultRow>>> ce
+                : grouped.entrySet()) {
+            com.project.examportalbackend.dto.ClassResultsDto cls =
+                    new com.project.examportalbackend.dto.ClassResultsDto();
+            cls.setClassId(ce.getKey());
+            cls.setClassName(ce.getKey() != null
+                    ? categoryRepository.findById(ce.getKey()).map(Category::getTitle).orElse("Class #" + ce.getKey())
+                    : "No class");
+
+            List<com.project.examportalbackend.dto.SchoolResultsDto.StudentResults> studentList = new ArrayList<>();
+            for (Map.Entry<Long, List<com.project.examportalbackend.dto.SchoolResultsDto.ResultRow>> ste
+                    : ce.getValue().entrySet()) {
+                User stu = user.apply(ste.getKey());
+                com.project.examportalbackend.dto.SchoolResultsDto.StudentResults sr =
+                        new com.project.examportalbackend.dto.SchoolResultsDto.StudentResults();
+                sr.setStudentId(ste.getKey());
+                sr.setStudentName(stu != null ? displayName(stu) : "Unknown");
+                sr.setUsername(stu != null ? stu.getUsername() : "");
+                sr.setResults(ste.getValue());
+                studentList.add(sr);
+            }
+            cls.setStudents(studentList);
+            out.add(cls);
+        }
+        return out;
+    }
+
     /** The class (category) title a quiz belongs to, via its subject. */
     private String className(Quiz quiz) {
         if (quiz == null || quiz.getSubject() == null || quiz.getSubject().getClassId() == null) {
