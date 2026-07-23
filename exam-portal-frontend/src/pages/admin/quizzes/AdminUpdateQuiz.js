@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Sidebar from "../../../components/Sidebar";
 import FormContainer from "../../../components/FormContainer";
 import * as quizzesConstants from "../../../constants/quizzesConstants";
-import { fetchCategories } from "../../../actions/categoriesActions";
+import subjectsServices from "../../../services/subjectsServices";
+import categoriesServices from "../../../services/categoriesServices";
 import "./AdminUpdateQuiz.css";
 import { fetchQuizzes, updateQuiz } from "../../../actions/quizzesActions";
 
@@ -28,7 +29,9 @@ const AdminUpdateQuiz = () => {
     oldQuiz.numberOfQuestions
   );
   const [isActive, setIsActive] = useState(oldQuiz.isActive);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [selectedSubjectId, setSelectedSubjectId] = useState(
+    oldQuiz.subject ? oldQuiz.subject.subjectId : null
+  );
   const [questionsPerExam, setQuestionsPerExam] = useState(
     oldQuiz.questionsPerExam == null ? "" : oldQuiz.questionsPerExam
   );
@@ -48,24 +51,27 @@ const AdminUpdateQuiz = () => {
     oldQuiz.allQuestionsMandatory || false
   );
 
-  const categoriesReducer = useSelector((state) => state.categoriesReducer);
-  const [categories, setCategories] = useState(categoriesReducer.categories);
+  const [subjects, setSubjects] = useState([]);
+  const [classesById, setClassesById] = useState({});
 
   const onClickPublishedHandler = () => {
     setIsActive(!isActive);
   };
 
-  const onSelectCategoryHandler = (e) => {
-    setSelectedCategoryId(e.target.value);
+  const onSelectSubjectHandler = (e) => {
+    setSelectedSubjectId(e.target.value);
   };
 
   const token = JSON.parse(localStorage.getItem("jwtToken"));
 
+  const subjectLabel = (s) =>
+    `${classesById[s.classId] || "Class #" + s.classId} → ${s.title}`;
+
   const submitHandler = (e) => {
     e.preventDefault();
-    if (selectedCategoryId !== null && selectedCategoryId !== "n/a") {
+    if (selectedSubjectId !== null && selectedSubjectId !== "n/a") {
       const quiz = {
-        quizId:quizId,
+        quizId: quizId,
         title: title,
         description: description,
         isActive: isActive,
@@ -77,41 +83,35 @@ const AdminUpdateQuiz = () => {
         timerMinutes:
           timerEnabled && timerMinutes !== "" ? Number(timerMinutes) : null,
         allQuestionsMandatory: allQuestionsMandatory,
-        category: {
-          catId: selectedCategoryId,
-          title: categories.filter((cat) => cat.catId == selectedCategoryId)[0][
-            "title"
-          ],
-          description: categories.filter(
-            (cat) => cat.catId == selectedCategoryId
-          )[0]["description"],
-        },
+        subject: { subjectId: Number(selectedSubjectId) },
       };
       updateQuiz(dispatch, quiz, token).then((data) => {
-        if (data.type === quizzesConstants.UPDATE_QUIZ_SUCCESS){
+        if (data.type === quizzesConstants.UPDATE_QUIZ_SUCCESS) {
           swal("Quiz Updated!", `${quiz.title} succesfully updated`, "success");
           fetchQuizzes(dispatch, token);
-        }
-        else {
+        } else {
           swal("Quiz Not Updated!", `${quiz.title} not updated`, "error");
         }
       });
     } else {
-      alert("Select valid category!");
+      alert("Select a valid subject!");
     }
   };
 
   useEffect(() => {
     if (!localStorage.getItem("jwtToken")) navigate("/");
+    subjectsServices.fetchSubjects(token).then(({ data }) => {
+      if (Array.isArray(data)) setSubjects(data);
+    });
+    categoriesServices.fetchCategories(token).then((data) => {
+      if (Array.isArray(data)) {
+        const map = {};
+        data.forEach((c) => (map[c.catId] = c.title));
+        setClassesById(map);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategories(dispatch, token).then((data) => {
-        setCategories(data.payload);
-      });
-    }
-  }, [categories]);
 
   return (
     <div className="adminUpdateQuizPage__container">
@@ -259,25 +259,19 @@ const AdminUpdateQuiz = () => {
             />
 
             <div className="my-3">
-              <label htmlFor="category-select">Choose a Class:</label>
+              <label htmlFor="subject-select">Choose a Subject (Class → Subject):</label>
               <Form.Select
-                aria-label="Choose Category"
-                id="category-select"
-                onChange={onSelectCategoryHandler}
+                aria-label="Choose Subject"
+                id="subject-select"
+                value={selectedSubjectId || "n/a"}
+                onChange={onSelectSubjectHandler}
               >
-                <option value="n/a">Choose Category</option>
-                {categories ? (
-                  categories.map((cat, index) => (
-                    <option key={index} value={cat.catId}>
-                      {cat.title}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">Choose one from below</option>
-                )}
-                {/* <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option> */}
+                <option value="n/a">Choose Subject</option>
+                {subjects.map((s) => (
+                  <option key={s.subjectId} value={s.subjectId}>
+                    {subjectLabel(s)}
+                  </option>
+                ))}
               </Form.Select>
             </div>
             <Button

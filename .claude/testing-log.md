@@ -485,3 +485,64 @@ gotchas, and open issues that are NOT in the source code or git history.
   for this box is genuinely empty — pass `--spring.datasource.password=` every backend launch (see
   Runtime facts above); this was re-discovered/re-applied ~9 times this session, worth double-checking
   it's still accurate next session.
+
+### 2026-07-23 11:48 — MAJOR: Class -> Subject -> Quiz hierarchy + admin-created students  [type: change]
+- what: inserted a Subject tier between Class(categories) and Quiz; quizzes now belong to a
+  Subject (was: directly to a class). Each student now belongs to ONE class (users.class_id),
+  replacing the many-class student_class join. Students are created by their school (POST
+  /api/students) — public student self-registration removed. SUPER_ADMIN owns class/subject/quiz.
+- files (backend): V20__class_subject_quiz_hierarchy.sql (new subjects table; 1 "General" subject
+  per existing class; quizzes.subject_id backfilled from old category; users.class_id backfilled
+  from student_class min; drop student_class + quizzes.category_cat_id via dynamic FK-name lookup);
+  models Subject.java (new), Quiz.java (category->subject @ManyToOne), User.java (+classId),
+  Category.java (dropped quizzes back-ref); deleted StudentClass.java + StudentClassRepository.java;
+  SubjectRepository (new), QuizRepository (findBySubject + subject dup-guards); Subject
+  Service/Impl/Controller (new, CRUD, student-scoped to own class); CategoryServiceImpl (student
+  sees only own class); QuizServiceImpl (subject/class-based scoping, getQuizBySubject);
+  StudentServiceImpl (createStudent + setClass, dropped assign/unassign); StudentController
+  (POST /students, PUT /students/{id}/class/{classId}); QuizController (getQuizBySubject, param
+  subjectId); QuizResultController (submit gate by subject.classId); AdminServiceImpl (className via
+  subject); AuthController/AuthService/Impl (removed student self-register); SecurityConfig (dropped
+  /api/register permitAll, added /api/subject rules); StudentDto (+classId); CreateStudentRequest (new).
+- result: PASS end-to-end (live, dalveer SUPER_ADMIN). Backed up DB first (scratchpad/
+  db-backup-pre-V20.sql, 15 users). First V20 attempt FAILED (Error 1091: hardcoded FK name
+  fk_quizzes_category wrong — actual was Hibernate-generated FKi0mytbs01...); restored from backup,
+  rewrote drop to look up CONSTRAINT_NAME dynamically -> V20 applied clean. Second boot failed on
+  stale Category.quizzes mappedBy="category"; removed it -> boots clean, Hibernate validate passes.
+  Data migrated: 3 subjects (1 General/class), 6 quizzes mapped to subjects, 1 student got class_id.
+  API verified: GET /subject (SA all, student only own class), POST /subject OK, POST /register ->
+  403 (student self-signup gone), POST /students create (classId stamped), PUT /students/{id}/class/16
+  moves student, student login sees only class-16 subjects. Test student+subject deleted (200), DB
+  back to 15 users.
+- notes/follow-ups: (a) FRONTEND NOT YET DONE — no UI for subject CRUD, student-create form, or the
+  new class->subject->quiz student browsing; login/register page still shows student self-signup;
+  admin students page still has the old multi-class assign panel (its assign/unassign endpoints are
+  now 404). Next session: wire frontend. (b) Existing quizzes all live under an auto-created "General"
+  subject per class — SUPER_ADMIN can rename/reorganize. (c) backend left RUNNING on :8081, MySQL
+  (XAMPP mysqld) running. (d) dalveer/super123 still valid.
+
+### 2026-07-23 12:10 — Frontend for Class->Subject->Quiz + admin-created students  [type: change]
+- what: wired the frontend to the V20 backend restructure.
+- files: services/subjectsServices.js (new: subject CRUD, raw axios); services/studentsServices.js
+  (createStudent + setClass, dropped assign/unassign); pages/admin/AdminStudentsPage.js (rewrote:
+  "+ Add Student" form with username/password/name/phone/class dropdown; per-row single Class
+  dropdown to reassign; Class column; removed old multi-class checkbox panel); pages/RegisterPage.js
+  (removed Student self-signup mode — school-only signup now); pages/users/UserQuizzesPage.js
+  (q.category -> q.subject, subjectId URL param); AdminAddQuiz.js + AdminUpdateQuiz.js (choose a
+  Subject "Class -> Subject" instead of a Class; payload sends {subject:{subjectId}}); Update preselects
+  current subject; pages/superadmin/SuperAdminSubjectsPage.js (new: subject CRUD under a class);
+  App.js (+/adminSubjects route, superAdminRoute); SuperAdminSidebar.js (added "Subjects" ->
+  /adminSubjects, renamed old "Subjects" quizzes link to "Quizzes"); AdminQuizzesPage.js (group by
+  subject, filter by class via subject.classId); AdminQuizResultPage/AdminReportsPage/UserQuizResultPage
+  (quiz.category.title -> quiz.subject.title; fixed an unguarded crash in UserQuizResultPage).
+- result: PASS. Frontend compiles clean (1 pre-existing array-callback-return warning in
+  UserQuizzesPage, not from this change). Browser-verified live (dalveer/super123): /register shows
+  school-only signup (no student mode), no console errors; logged in and /adminSubjects renders the 3
+  auto-created "General" subjects (one per class) with the class dropdown populated (Class 6-8/9-10/
+  11-12), no console errors.
+- notes/follow-ups: (a) both dev servers left running: backend :8081, frontend :3000, MySQL (XAMPP).
+  (b) minor unused-import warnings remain in RegisterPage/AdminAddQuiz (removed-flow leftovers) — harmless.
+  (c) student-side browsing is class-scoped by the backend already; the class->subject->quiz drill-down
+  UI for students is minimal (All Quizzes lists their class's published quizzes with subject subtitle) —
+  a dedicated subject-picker screen for students could be added later if wanted. (d) DB backup from the
+  migration session at scratchpad/db-backup-pre-V20.sql.

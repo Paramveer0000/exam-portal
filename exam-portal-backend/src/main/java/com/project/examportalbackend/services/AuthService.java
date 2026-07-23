@@ -8,7 +8,6 @@ import com.project.examportalbackend.models.User;
 import java.util.List;
 
 public interface AuthService {
-    User registerUserService(User user) throws Exception;
 
     /** Public self-signup for a School (creates an ADMIN account). */
     User registerSchoolService(User user) throws Exception;

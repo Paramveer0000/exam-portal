@@ -45,6 +45,10 @@ public class User implements UserDetails {
     @Column(name = "teacher_id")
     private Long teacherId;
 
+    // For students (USER role): the single class (category) they belong to. Null otherwise.
+    @Column(name = "class_id")
+    private Long classId;
+
     // For schools (ADMIN role).
     @Column(name = "address")
     private String address;

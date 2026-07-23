@@ -34,8 +34,13 @@ const SuperAdminSidebar = ({ children }) => {
       icon: <TbLayoutGrid />,
     },
     {
-      path: "/adminQuizzes",
+      path: "/adminSubjects",
       name: "Subjects",
+      icon: <TbLayoutGrid />,
+    },
+    {
+      path: "/adminQuizzes",
+      name: "Quizzes",
       icon: <MdQuiz />,
     },
     {

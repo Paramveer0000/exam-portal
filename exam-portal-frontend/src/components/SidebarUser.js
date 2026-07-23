@@ -3,7 +3,7 @@ import "./Sidebar.css";
 import { FaBars, FaUserAlt } from "react-icons/fa";
 import { MdQuiz } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-import { TbReport } from "react-icons/tb";
+import { TbReport, TbLayoutGrid } from "react-icons/tb";
 
 // Static items only — classes/subjects are browsed from "All Quizzes", not
 // listed individually in the sidebar.
@@ -17,6 +17,11 @@ const MENU_ITEMS = [
     path: "/quizResults",
     name: "Report Card",
     icon: <TbReport />,
+  },
+  {
+    path: "/subjects",
+    name: "Subjects",
+    icon: <TbLayoutGrid />,
   },
   {
     path: "/quizzes",

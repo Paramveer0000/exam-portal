@@ -68,24 +68,24 @@ const AdminQuizzesPage = () => {
     if (!localStorage.getItem("jwtToken")) navigate("/");
   }, []);
 
-  // Group subjects by their class so each class renders as its own container.
+  // Group quizzes by their subject; optionally filter to one class (catId param).
   const buildClassGroups = () => {
     const visible = (quizzes || []).filter(
-      (q) => catId == null || (q.category && q.category.catId == catId)
+      (q) => catId == null || (q.subject && q.subject.classId == catId)
     );
     const groups = [];
     const byId = {};
     visible.forEach((quiz) => {
-      const cid = quiz.category ? quiz.category.catId : "uncategorized";
-      if (!byId[cid]) {
-        byId[cid] = {
-          catId: cid,
-          title: quiz.category ? quiz.category.title : "Uncategorized",
+      const sid = quiz.subject ? quiz.subject.subjectId : "unassigned";
+      if (!byId[sid]) {
+        byId[sid] = {
+          catId: sid,
+          title: quiz.subject ? quiz.subject.title : "Unassigned",
           quizzes: [],
         };
-        groups.push(byId[cid]);
+        groups.push(byId[sid]);
       }
-      byId[cid].quizzes.push(quiz);
+      byId[sid].quizzes.push(quiz);
     });
     return groups;
   };

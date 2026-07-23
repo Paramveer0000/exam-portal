@@ -16,7 +16,7 @@ const groupResultsByClass = (results) => {
   const order = [];
   results.forEach((r) => {
     const cname =
-      r.quiz && r.quiz.category ? r.quiz.category.title : "Uncategorized";
+      r.quiz && r.quiz.subject ? r.quiz.subject.title : "Uncategorized";
     if (!groups[cname]) {
       groups[cname] = [];
       order.push(cname);

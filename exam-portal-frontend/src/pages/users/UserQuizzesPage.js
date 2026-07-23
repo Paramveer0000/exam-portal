@@ -10,7 +10,7 @@ const UserQuizzesPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const urlParams = new URLSearchParams(window.location.search);
-  const catId = urlParams.get("catId");
+  const subjectId = urlParams.get("subjectId");
   const token = JSON.parse(localStorage.getItem("jwtToken"));
 
   const quizzesReducer = useSelector((state) => state.quizzesReducer);
@@ -45,7 +45,8 @@ const UserQuizzesPage = () => {
         {quizzes ? (
           <Row>
             {quizzes.map((q, index) => {
-              if ((catId && catId == q.category.catId) || catId == null)
+              // Backend already scopes to the student's class; optional subjectId narrows further.
+              if ((subjectId && q.subject && String(q.subject.subjectId) === subjectId) || subjectId == null)
                 return (
                   <Col
                     key={index}
@@ -96,7 +97,7 @@ const UserQuizzesPage = () => {
                           )}
                         </Card.Title>
                         <Card.Subtitle className="mb-2 text-muted">
-                          {q.category.title}
+                          {q.subject ? q.subject.title : ""}
                         </Card.Subtitle>
                         <Card.Text>{q.description}</Card.Text>
                         <div className="userQuizzesPage__content--ButtonsList">

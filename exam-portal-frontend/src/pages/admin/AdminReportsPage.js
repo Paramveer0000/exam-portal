@@ -42,7 +42,7 @@ const AdminReportsPage = () => {
     const groups = {};
     const order = [];
     quizzesReducer.quizzes.forEach((q) => {
-      const cname = q.category ? q.category.title : "Uncategorized";
+      const cname = q.subject ? q.subject.title : "Uncategorized";
       if (!groups[cname]) {
         groups[cname] = [];
         order.push(cname);

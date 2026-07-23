@@ -1,7 +1,7 @@
 package com.project.examportalbackend.services.implementation;
 
 import com.project.examportalbackend.dto.ExamQuestionDto;
-import com.project.examportalbackend.models.Category;
+import com.project.examportalbackend.models.Subject;
 import com.project.examportalbackend.models.Question;
 import com.project.examportalbackend.models.Quiz;
 import com.project.examportalbackend.repository.QuizRepository;
@@ -27,26 +27,26 @@ public class QuizServiceImpl implements QuizService {
     @Autowired
     private AuthFacade authFacade;
 
-    @Autowired
-    private com.project.examportalbackend.repository.StudentClassRepository studentClassRepository;
+    /** The class (category) id the current student belongs to, or null. */
+    private Long myClassId() {
+        return authFacade.getCurrentUser().getClassId();
+    }
 
-    /** Category ids this student is assigned to. */
-    private java.util.Set<Long> assignedCatIds() {
-        return studentClassRepository.findByUserId(authFacade.getCurrentUserId()).stream()
-                .map(com.project.examportalbackend.models.StudentClass::getCatId)
-                .collect(Collectors.toSet());
+    private boolean inMyClass(Quiz q) {
+        Long myClass = myClassId();
+        return myClass != null
+                && q.getSubject() != null
+                && myClass.equals(q.getSubject().getClassId());
     }
 
     private boolean studentCanSee(Quiz q) {
-        return q.isIActive()
-                && q.getCategory() != null
-                && assignedCatIds().contains(q.getCategory().getCatId());
+        return q.isIActive() && inMyClass(q);
     }
 
     @Override
     public Quiz addQuiz(Quiz quiz) {
         assertTitlePresent(quiz);
-        assertUniqueTitleInCategory(quiz, null);
+        assertUniqueTitleInSubject(quiz, null);
         quiz.setCreatedBy(authFacade.getCurrentUserId());
         validateQuestionsPerExam(quiz.getQuestionsPerExam(), quiz.getNumOfQuestions());
         validateTimer(quiz);
@@ -55,16 +55,14 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public List<Quiz> getQuizzes() {
-        // Students see published quizzes in the classes assigned to them; admins
+        // Students see published quizzes under subjects in their own class; admins
         // and super admins see all (admins read-only).
         if (authFacade.isStudent()) {
-            java.util.Set<Long> assigned = assignedCatIds();
-            if (assigned.isEmpty()) {
+            if (myClassId() == null) {
                 return Collections.emptyList();
             }
             return quizRepository.findAll().stream()
-                    .filter(q -> q.isIActive() && q.getCategory() != null
-                            && assigned.contains(q.getCategory().getCatId()))
+                    .filter(this::studentCanSee)
                     .collect(Collectors.toList());
         }
         return quizRepository.findAll();
@@ -81,7 +79,7 @@ public class QuizServiceImpl implements QuizService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
         authFacade.assertCanManage(existing.getCreatedBy());
         assertTitlePresent(quiz);
-        assertUniqueTitleInCategory(quiz, existing.getQuizId());
+        assertUniqueTitleInSubject(quiz, existing.getQuizId());
         // Preserve server-managed fields the client doesn't send, so an update of
         // quiz settings can't wipe ownership, the pool count, or the pass mark.
         quiz.setCreatedBy(existing.getCreatedBy());
@@ -102,8 +100,8 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<Quiz> getQuizByCategory(Category category) {
-        List<Quiz> quizzes = quizRepository.findByCategory(category);
+    public List<Quiz> getQuizBySubject(Subject subject) {
+        List<Quiz> quizzes = quizRepository.findBySubject(subject);
         if (authFacade.isStudent()) {
             return quizzes.stream()
                     .filter(this::studentCanSee)
@@ -117,17 +115,16 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
 
-        // A student may take an exam only if the quiz's class is assigned to them
+        // A student may take an exam only if the quiz's subject is in their class
         // and the quiz is published.
         if (authFacade.isStudent()) {
-            if (quiz.getCategory() == null
-                    || !assignedCatIds().contains(quiz.getCategory().getCatId())) {
+            if (!inMyClass(quiz)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "This class is not assigned to you");
+                        "This subject is not in your class");
             }
             if (!quiz.isIActive()) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "This subject has not been published yet");
+                        "This quiz has not been published yet");
             }
         }
 
@@ -176,26 +173,26 @@ public class QuizServiceImpl implements QuizService {
 
     private void assertTitlePresent(Quiz quiz) {
         if (!org.springframework.util.StringUtils.hasText(quiz.getTitle())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Subject title is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quiz title is required");
         }
     }
 
     /**
-     * A subject title must be unique within its class. quizIdToExclude is the id
+     * A quiz title must be unique within its subject. quizIdToExclude is the id
      * of the quiz being updated (null on create) so it doesn't clash with itself.
      */
-    private void assertUniqueTitleInCategory(Quiz quiz, Long quizIdToExclude) {
-        if (quiz.getCategory() == null || quiz.getCategory().getCatId() == null) {
+    private void assertUniqueTitleInSubject(Quiz quiz, Long quizIdToExclude) {
+        if (quiz.getSubject() == null || quiz.getSubject().getSubjectId() == null) {
             return;
         }
-        Long catId = quiz.getCategory().getCatId();
+        Long subjectId = quiz.getSubject().getSubjectId();
         boolean duplicate = quizIdToExclude == null
-                ? quizRepository.existsByTitleIgnoreCaseAndCategory_CatId(quiz.getTitle(), catId)
-                : quizRepository.existsByTitleIgnoreCaseAndCategory_CatIdAndQuizIdNot(
-                        quiz.getTitle(), catId, quizIdToExclude);
+                ? quizRepository.existsByTitleIgnoreCaseAndSubject_SubjectId(quiz.getTitle(), subjectId)
+                : quizRepository.existsByTitleIgnoreCaseAndSubject_SubjectIdAndQuizIdNot(
+                        quiz.getTitle(), subjectId, quizIdToExclude);
         if (duplicate) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "A subject named '" + quiz.getTitle() + "' already exists in this class");
+                    "A quiz named '" + quiz.getTitle() + "' already exists in this subject");
         }
     }
 

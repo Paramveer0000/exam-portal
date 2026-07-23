@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -21,9 +21,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private AuthFacade authFacade;
-
-    @Autowired
-    private com.project.examportalbackend.repository.StudentClassRepository studentClassRepository;
 
     @Override
     public Category addCategory(Category category) {
@@ -42,17 +39,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getCategories() {
-        // Content is platform-wide (super-admin owned). Students see only the
-        // classes assigned to them; admins and super admins see all classes
-        // (admins read-only, to assign them to students).
+        // Content is platform-wide (super-admin owned). A student sees only their
+        // own class; admins and super admins see all classes.
         if (authFacade.isStudent()) {
-            List<Long> catIds = studentClassRepository
-                    .findByUserId(authFacade.getCurrentUserId()).stream()
-                    .map(com.project.examportalbackend.models.StudentClass::getCatId)
-                    .collect(Collectors.toList());
-            return catIds.isEmpty()
-                    ? java.util.Collections.emptyList()
-                    : categoryRepository.findAllById(catIds);
+            Long classId = authFacade.getCurrentUser().getClassId();
+            if (classId == null) {
+                return Collections.emptyList();
+            }
+            return categoryRepository.findById(classId)
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList());
         }
         return categoryRepository.findAll();
     }

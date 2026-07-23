@@ -1,5 +1,6 @@
 package com.project.examportalbackend.controllers;
 
+import com.project.examportalbackend.dto.CreateStudentRequest;
 import com.project.examportalbackend.dto.ResetPasswordRequest;
 import com.project.examportalbackend.dto.UpdateProfileRequest;
 import com.project.examportalbackend.services.StudentService;
@@ -21,6 +22,11 @@ public class StudentController {
     @GetMapping("/")
     public ResponseEntity<?> getMyStudents() {
         return ResponseEntity.ok(studentService.getMyStudents());
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<?> createStudent(@RequestBody CreateStudentRequest request) {
+        return ResponseEntity.ok(studentService.createStudent(request));
     }
 
     @PutMapping("/{studentId}")
@@ -47,21 +53,9 @@ public class StudentController {
         return ResponseEntity.ok(true);
     }
 
-    // Class (category) assignment — a school assigns classes to its own students.
-    @GetMapping("/{studentId}/classes")
-    public ResponseEntity<?> getAssignedClasses(@PathVariable Long studentId) {
-        return ResponseEntity.ok(studentService.getAssignedClasses(studentId));
-    }
-
-    @PostMapping("/{studentId}/classes/{catId}")
-    public ResponseEntity<?> assignClass(@PathVariable Long studentId, @PathVariable Long catId) {
-        studentService.assignClass(studentId, catId);
-        return ResponseEntity.ok(true);
-    }
-
-    @DeleteMapping("/{studentId}/classes/{catId}")
-    public ResponseEntity<?> unassignClass(@PathVariable Long studentId, @PathVariable Long catId) {
-        studentService.unassignClass(studentId, catId);
-        return ResponseEntity.ok(true);
+    // A school sets (or changes) its student's single class.
+    @PutMapping("/{studentId}/class/{classId}")
+    public ResponseEntity<?> setClass(@PathVariable Long studentId, @PathVariable Long classId) {
+        return ResponseEntity.ok(studentService.setClass(studentId, classId));
     }
 }

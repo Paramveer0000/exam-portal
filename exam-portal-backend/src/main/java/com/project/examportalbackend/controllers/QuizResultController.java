@@ -35,8 +35,6 @@ public class QuizResultController {
     private AuthFacade authFacade;
     @Autowired
     private PsychometricReportService psychometricReportService;
-    @Autowired
-    private com.project.examportalbackend.repository.StudentClassRepository studentClassRepository;
 
     @PostMapping(value = "/submit", params = "quizId")
     public ResponseEntity<?> submitQuiz(@RequestParam Long quizId,
@@ -48,14 +46,15 @@ public class QuizResultController {
         if (quiz == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found");
         }
-        // A student may submit only exams in a class assigned to them.
+        // A student may submit only exams whose subject is in their class.
         if (authFacade.isStudent()) {
-            boolean assigned = quiz.getCategory() != null
-                    && studentClassRepository.existsByUserIdAndCatId(
-                            userId, quiz.getCategory().getCatId());
-            if (!assigned) {
+            Long myClassId = authFacade.getCurrentUser().getClassId();
+            boolean inMyClass = quiz.getSubject() != null
+                    && myClassId != null
+                    && myClassId.equals(quiz.getSubject().getClassId());
+            if (!inMyClass) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "This class is not assigned to you");
+                        "This subject is not in your class");
             }
         }
 

@@ -336,8 +336,7 @@ public class AdminServiceImpl implements AdminService {
                     new com.project.examportalbackend.dto.SchoolResultsDto.ResultRow();
             row.setQuizResId(r.getQuizResId());
             row.setQuizTitle(r.getQuiz() != null ? r.getQuiz().getTitle() : "");
-            row.setClassName(r.getQuiz() != null && r.getQuiz().getCategory() != null
-                    ? r.getQuiz().getCategory().getTitle() : "");
+            row.setClassName(className(r.getQuiz()));
             row.setObtainedMarks(r.getTotalObtainedMarks());
             row.setTotalMarks(r.getTotalMarks());
             row.setPassed(r.isPassed());
@@ -373,6 +372,15 @@ public class AdminServiceImpl implements AdminService {
             out.add(school);
         }
         return out;
+    }
+
+    /** The class (category) title a quiz belongs to, via its subject. */
+    private String className(Quiz quiz) {
+        if (quiz == null || quiz.getSubject() == null || quiz.getSubject().getClassId() == null) {
+            return "";
+        }
+        return categoryRepository.findById(quiz.getSubject().getClassId())
+                .map(Category::getTitle).orElse("");
     }
 
     private String displayName(User u) {

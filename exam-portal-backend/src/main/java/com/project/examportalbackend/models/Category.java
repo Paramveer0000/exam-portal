@@ -1,14 +1,11 @@
 package com.project.examportalbackend.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -33,8 +30,6 @@ public class Category {
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Quiz> quizzes = new ArrayList<>();
+    // A class (category) owns subjects (Subject.classId); subjects own quizzes.
+    // No JPA back-reference is needed here.
 }

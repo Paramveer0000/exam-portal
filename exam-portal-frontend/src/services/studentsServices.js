@@ -66,11 +66,22 @@ const deleteStudent = async (studentId, token) => {
   }
 };
 
-// Class (category) assignment.
-const getAssignedClasses = async (studentId, token) => {
+// A school creates a student under itself, assigned to one class.
+const createStudent = async (student, token) => {
   try {
-    const { data } = await axios.get(
-      `/api/students/${studentId}/classes`,
+    const { data } = await axios.post("/api/students/", student, authConfig(token));
+    return { data, error: null };
+  } catch (error) {
+    return { data: null, error: errText(error) };
+  }
+};
+
+// Set (or change) the student's single class.
+const setClass = async (studentId, classId, token) => {
+  try {
+    const { data } = await axios.put(
+      `/api/students/${studentId}/class/${classId}`,
+      {},
       authConfig(token)
     );
     return { data, error: null };
@@ -79,39 +90,13 @@ const getAssignedClasses = async (studentId, token) => {
   }
 };
 
-const assignClass = async (studentId, catId, token) => {
-  try {
-    await axios.post(
-      `/api/students/${studentId}/classes/${catId}`,
-      {},
-      authConfig(token)
-    );
-    return { ok: true, error: null };
-  } catch (error) {
-    return { ok: false, error: errText(error) };
-  }
-};
-
-const unassignClass = async (studentId, catId, token) => {
-  try {
-    await axios.delete(
-      `/api/students/${studentId}/classes/${catId}`,
-      authConfig(token)
-    );
-    return { ok: true, error: null };
-  } catch (error) {
-    return { ok: false, error: errText(error) };
-  }
-};
-
 const studentsServices = {
   fetchStudents,
+  createStudent,
   updateStudent,
   setStatus,
   resetPassword,
   deleteStudent,
-  getAssignedClasses,
-  assignClass,
-  unassignClass,
+  setClass,
 };
 export default studentsServices;

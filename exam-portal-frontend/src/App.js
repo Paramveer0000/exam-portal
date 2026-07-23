@@ -18,6 +18,7 @@ import AdminAddQuestionsPage from "./pages/admin/questions/AdminAddQuestionsPage
 import AdminUpdateQuestionPage from "./pages/admin/questions/AdminUpdateQuestionPage";
 import UserProfilePage from "./pages/users/UserProfilePage";
 import UserQuizzesPage from "./pages/users/UserQuizzesPage";
+import UserSubjectsPage from "./pages/users/UserSubjectsPage";
 import UserQuizManualPage from "./pages/users/UserQuizManualPage";
 import UserQuestionsPage from "./pages/users/UserQuestionsPage";
 import UserQuizResultPage from "./pages/users/UserQuizResultPage";
@@ -31,6 +32,7 @@ import SuperAdminAdminsPage from "./pages/superadmin/SuperAdminAdminsPage";
 import SuperAdminProfilePage from "./pages/superadmin/SuperAdminProfilePage";
 import SuperAdminAiSettingsPage from "./pages/superadmin/SuperAdminAiSettingsPage";
 import SuperAdminResultsPage from "./pages/superadmin/SuperAdminResultsPage";
+import SuperAdminSubjectsPage from "./pages/superadmin/SuperAdminSubjectsPage";
 
 const ADMIN_ROLES = ["ADMIN", "SUPER_ADMIN"];
 const USER_ROLES = ["USER"];
@@ -73,6 +75,10 @@ const App = () => {
         <Route
           path="/superadmin/results"
           element={superAdminRoute(<SuperAdminResultsPage />)}
+        />
+        <Route
+          path="/adminSubjects"
+          element={superAdminRoute(<SuperAdminSubjectsPage />)}
         />
         <Route
           path="/superadmin/ai-settings"
@@ -141,6 +147,7 @@ const App = () => {
           }
         />
         <Route path="/profile" element={userRoute(<UserProfilePage />)} />
+        <Route path="/subjects" element={userRoute(<UserSubjectsPage />)} />
         <Route path="/quizzes" element={userRoute(<UserQuizzesPage />)} />
         <Route path="/quiz/*" element={userRoute(<UserQuizzesPage />)} />
         <Route path="/quizManual/" element={userRoute(<UserQuizManualPage />)} />

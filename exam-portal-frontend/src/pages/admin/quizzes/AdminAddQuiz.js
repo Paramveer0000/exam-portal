@@ -8,7 +8,8 @@ import Sidebar from "../../../components/Sidebar";
 import FormContainer from "../../../components/FormContainer";
 import * as quizzesConstants from "../../../constants/quizzesConstants";
 import { addQuiz } from "../../../actions/quizzesActions";
-import { fetchCategories } from "../../../actions/categoriesActions";
+import subjectsServices from "../../../services/subjectsServices";
+import categoriesServices from "../../../services/categoriesServices";
 
 const AdminAddQuiz = () => {
   const [title, setTitle] = useState("");
@@ -16,7 +17,7 @@ const AdminAddQuiz = () => {
   const [maxMarks, setMaxMarks] = useState(0);
   const [numberOfQuestions, setNumberOfQuestions] = useState(0);
   const [isActive, setIsActive] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
   const [questionsPerExam, setQuestionsPerExam] = useState("");
   const [randomizeQuestions, setRandomizeQuestions] = useState(false);
   const [randomizeOptions, setRandomizeOptions] = useState(false);
@@ -24,8 +25,8 @@ const AdminAddQuiz = () => {
   const [timerMinutes, setTimerMinutes] = useState("");
   const [allQuestionsMandatory, setAllQuestionsMandatory] = useState(false);
 
-  const categoriesReducer = useSelector((state) => state.categoriesReducer);
-  const [categories, setCategories] = useState(categoriesReducer.categories);
+  const [subjects, setSubjects] = useState([]);
+  const [classesById, setClassesById] = useState({});
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -34,15 +35,18 @@ const AdminAddQuiz = () => {
     setIsActive(!isActive);
   };
 
-  const onSelectCategoryHandler = (e) => {
-    setSelectedCategoryId(e.target.value);
+  const onSelectSubjectHandler = (e) => {
+    setSelectedSubjectId(e.target.value);
   };
 
   const token = JSON.parse(localStorage.getItem("jwtToken"));
 
+  const subjectLabel = (s) =>
+    `${classesById[s.classId] || "Class #" + s.classId} → ${s.title}`;
+
   const submitHandler = (e) => {
     e.preventDefault();
-    if (selectedCategoryId !== null && selectedCategoryId !== "n/a") {
+    if (selectedSubjectId !== null && selectedSubjectId !== "n/a") {
       const quiz = {
         title: title,
         description: description,
@@ -55,39 +59,34 @@ const AdminAddQuiz = () => {
         timerMinutes:
           timerEnabled && timerMinutes !== "" ? Number(timerMinutes) : null,
         allQuestionsMandatory: allQuestionsMandatory,
-        category: {
-          catId: selectedCategoryId,
-          title: categories.filter((cat) => cat.catId == selectedCategoryId)[0][
-            "title"
-          ],
-          description: categories.filter(
-            (cat) => cat.catId == selectedCategoryId
-          )[0]["description"],
-        },
+        subject: { subjectId: Number(selectedSubjectId) },
       };
       addQuiz(dispatch, quiz, token).then((data) => {
         if (data.type === quizzesConstants.ADD_QUIZ_SUCCESS) {
-          swal("Subject Added!", `${quiz.title} succesfully added`, "success");
+          swal("Quiz Added!", `${quiz.title} succesfully added`, "success");
           navigate("/adminQuizzes");
         } else {
-          swal("Subject Not Added!", data.payload || `${quiz.title} not added`, "error");
+          swal("Quiz Not Added!", data.payload || `${quiz.title} not added`, "error");
         }
       });
     } else {
-      alert("Select valid class!");
+      alert("Select a valid subject!");
     }
   };
 
   useEffect(() => {
     if (!localStorage.getItem("jwtToken")) navigate("/");
-  }, []);
-
-  useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategories(dispatch, token).then((data) => {
-        setCategories(data.payload);
-      });
-    }
+    subjectsServices.fetchSubjects(token).then(({ data }) => {
+      if (Array.isArray(data)) setSubjects(data);
+    });
+    categoriesServices.fetchCategories(token).then((data) => {
+      if (Array.isArray(data)) {
+        const map = {};
+        data.forEach((c) => (map[c.catId] = c.title));
+        setClassesById(map);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -235,25 +234,18 @@ const AdminAddQuiz = () => {
             />
 
             <div className="my-3">
-              <label htmlFor="category-select">Choose a Class:</label>
+              <label htmlFor="subject-select">Choose a Subject (Class → Subject):</label>
               <Form.Select
-                aria-label="Choose Category"
-                id="category-select"
-                onChange={onSelectCategoryHandler}
+                aria-label="Choose Subject"
+                id="subject-select"
+                onChange={onSelectSubjectHandler}
               >
-                <option value="n/a">Choose Category</option>
-                {categories ? (
-                  categories.map((cat, index) => (
-                    <option key={index} value={cat.catId}>
-                      {cat.title}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">Choose one from below</option>
-                )}
-                {/* <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option> */}
+                <option value="n/a">Choose Subject</option>
+                {subjects.map((s) => (
+                  <option key={s.subjectId} value={s.subjectId}>
+                    {subjectLabel(s)}
+                  </option>
+                ))}
               </Form.Select>
             </div>
             <Button

@@ -1,14 +1,13 @@
 package com.project.examportalbackend.services.implementation;
 
-import com.project.examportalbackend.dto.OwnableItemDto;
+import com.project.examportalbackend.dto.CreateStudentRequest;
 import com.project.examportalbackend.dto.StudentDto;
 import com.project.examportalbackend.dto.UpdateProfileRequest;
-import com.project.examportalbackend.models.Category;
-import com.project.examportalbackend.models.StudentClass;
+import com.project.examportalbackend.models.Role;
 import com.project.examportalbackend.models.User;
 import com.project.examportalbackend.repository.CategoryRepository;
 import com.project.examportalbackend.repository.QuizResultRepository;
-import com.project.examportalbackend.repository.StudentClassRepository;
+import com.project.examportalbackend.repository.RoleRepository;
 import com.project.examportalbackend.repository.UserRepository;
 import com.project.examportalbackend.security.AuthFacade;
 import com.project.examportalbackend.services.StudentService;
@@ -20,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,9 +36,9 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     private AuthFacade authFacade;
     @Autowired
-    private StudentClassRepository studentClassRepository;
-    @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Override
     public List<StudentDto> getMyStudents() {
@@ -45,6 +46,39 @@ public class StudentServiceImpl implements StudentService {
                 ? userRepository.findByRoles_RoleName(AuthFacade.ROLE_USER)
                 : userRepository.findByTeacherId(authFacade.getCurrentUserId());
         return students.stream().map(StudentDto::from).collect(Collectors.toList());
+    }
+
+    @Override
+    public StudentDto createStudent(CreateStudentRequest request) {
+        if (!StringUtils.hasText(request.getUsername()) || !StringUtils.hasText(request.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username and password are required");
+        }
+        if (request.getClassId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A class is required");
+        }
+        if (!categoryRepository.existsById(request.getClassId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected class does not exist");
+        }
+        if (userRepository.findByUsername(request.getUsername()) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
+        }
+        Role userRole = roleRepository.findById(AuthFacade.ROLE_USER)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "USER role missing"));
+
+        User student = new User();
+        student.setUsername(request.getUsername());
+        student.setPassword(passwordEncoder.encode(request.getPassword()));
+        student.setFirstName(request.getFirstName());
+        student.setLastName(request.getLastName());
+        student.setPhoneNumber(request.getPhoneNumber());
+        student.setActive(true);
+        // Stamp the creating school and the chosen class; never trust the body for these.
+        student.setTeacherId(authFacade.getCurrentUserId());
+        student.setClassId(request.getClassId());
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        student.setRoles(roles);
+        return StudentDto.from(userRepository.save(student));
     }
 
     @Override
@@ -94,33 +128,13 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<OwnableItemDto> getAssignedClasses(Long studentId) {
-        loadStudent(studentId); // ownership check
-        List<Long> catIds = studentClassRepository.findByUserId(studentId).stream()
-                .map(StudentClass::getCatId).collect(Collectors.toList());
-        if (catIds.isEmpty()) {
-            return List.of();
+    public StudentDto setClass(Long studentId, Long classId) {
+        User student = loadStudent(studentId); // ownership check
+        if (!categoryRepository.existsById(classId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found");
         }
-        return categoryRepository.findAllById(catIds).stream()
-                .map(c -> new OwnableItemDto(c.getCatId(), c.getTitle()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void assignClass(Long studentId, Long catId) {
-        loadStudent(studentId); // ownership check
-        Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Class not found"));
-        if (!studentClassRepository.existsByUserIdAndCatId(studentId, category.getCatId())) {
-            studentClassRepository.save(new StudentClass(studentId, category.getCatId()));
-        }
-    }
-
-    @Override
-    @Transactional
-    public void unassignClass(Long studentId, Long catId) {
-        loadStudent(studentId); // ownership check
-        studentClassRepository.deleteByUserIdAndCatId(studentId, catId);
+        student.setClassId(classId);
+        return StudentDto.from(userRepository.save(student));
     }
 
     /**

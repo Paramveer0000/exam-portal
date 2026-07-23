@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import swal from "sweetalert";
 
 const RegisterPage = () => {
-  const [mode, setMode] = useState("STUDENT"); // STUDENT | SCHOOL
+  // Only schools self-sign-up. Students are created by their school.
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -50,27 +50,6 @@ const RegisterPage = () => {
       return false;
     }
     return true;
-  };
-
-  const studentSubmit = (e) => {
-    e.preventDefault();
-    if (!commonChecks()) return;
-    if (!teacherId) {
-      alert("Please select your school");
-      return;
-    }
-    const user = {
-      firstName,
-      lastName,
-      username,
-      password,
-      phoneNumber,
-      teacherId: Number(teacherId),
-    };
-    register(dispatch, user).then((data) => {
-      if (data.type === authConstants.USER_REGISTER_SUCCESS) navigate("/login");
-      else alert(data.payload || "Registration failed");
-    });
   };
 
   const schoolSubmit = (e) => {
@@ -147,78 +126,12 @@ const RegisterPage = () => {
 
   return (
     <FormContainer>
-      <h1>Sign Up</h1>
+      <h1>School Sign Up</h1>
+      <p className="text-muted">
+        Students don’t sign up here — your school creates student accounts after logging in.
+      </p>
 
-      <div className="d-flex gap-2 my-3">
-        <Button
-          variant={mode === "STUDENT" ? "primary" : "outline-primary"}
-          onClick={() => setMode("STUDENT")}
-        >
-          Student Sign Up
-        </Button>
-        <Button
-          variant={mode === "SCHOOL" ? "primary" : "outline-primary"}
-          onClick={() => setMode("SCHOOL")}
-        >
-          School Sign Up
-        </Button>
-      </div>
-
-      {mode === "STUDENT" ? (
-        <Form onSubmit={studentSubmit}>
-          <Form.Group className="my-3" controlId="fname">
-            <Form.Label>First Name</Form.Label>
-            <Form.Control
-              placeholder="Enter First Name"
-              value={firstName}
-              required
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="my-3" controlId="lname">
-            <Form.Label>Last Name</Form.Label>
-            <Form.Control
-              placeholder="Enter Last Name"
-              value={lastName}
-              required
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="my-3" controlId="username">
-            <Form.Label>User Name</Form.Label>
-            <Form.Control
-              placeholder="Enter User Name"
-              value={username}
-              required
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </Form.Group>
-          {passwordFields}
-          <Form.Group className="my-3" controlId="school">
-            <Form.Label>School *</Form.Label>
-            <Form.Select
-              value={teacherId}
-              required
-              onChange={(e) => setTeacherId(e.target.value)}
-            >
-              <option value="">Select your school</option>
-              {schools.map((s) => (
-                <option key={s.userId} value={s.userId}>
-                  {s.name}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          <Button
-            variant=""
-            className="my-3"
-            type="submit"
-            style={{ backgroundColor: "rgb(68 177 49)", color: "white" }}
-          >
-            Register as Student
-          </Button>
-        </Form>
-      ) : (
+      {(
         <Form onSubmit={schoolSubmit}>
           <Form.Group className="my-3" controlId="schoolName">
             <Form.Label>School Name</Form.Label>

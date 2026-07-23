@@ -20,12 +20,8 @@ public class AuthController {
     AuthService authService;
 
 
-    @PostMapping("/register")
-    public User registerUser(@RequestBody User user) throws Exception {
-        return authService.registerUserService(user);
-    }
-
-    // Public School (admin) self-signup.
+    // Public School (admin) self-signup. Students are created by their school
+    // (POST /api/students), never via public self-registration.
     @PostMapping("/register/school")
     public User registerSchool(@RequestBody User user) throws Exception {
         return authService.registerSchoolService(user);

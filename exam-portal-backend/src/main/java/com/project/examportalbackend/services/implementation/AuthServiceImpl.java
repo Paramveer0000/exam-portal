@@ -44,36 +44,6 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Override
-    public User registerUserService(User user) throws Exception {
-        if (!StringUtils.hasText(user.getUsername()) || !StringUtils.hasText(user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username and password are required");
-        }
-        if (!StringUtils.hasText(user.getPhoneNumber())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
-        }
-        // A self-registering student must choose a valid teacher (admin).
-        if (user.getTeacherId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please select a teacher");
-        }
-        User teacher = userRepository.findById(user.getTeacherId()).orElse(null);
-        if (teacher == null || teacher.getRoles().stream()
-                .noneMatch(r -> AuthFacade.ROLE_ADMIN.equals(r.getRoleName()))) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected teacher is invalid");
-        }
-        User temp = userRepository.findByUsername(user.getUsername());
-        if (temp != null) {
-            throw new Exception("User Already Exists");
-        } else {
-            Role role = roleRepository.findById("USER").isPresent() ? roleRepository.findById("USER").get() : null;
-            Set<Role> userRoles = new HashSet<>();
-            userRoles.add(role);
-            user.setRoles(userRoles);
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return userRepository.save(user);
-        }
-    }
-
     public LoginResponse loginUserService(LoginRequest loginRequest) throws Exception {
 
         authenticate(loginRequest.getUsername(), loginRequest.getPassword());
