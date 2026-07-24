@@ -76,6 +76,22 @@ public class User implements UserDetails {
     @Column(name = "logo", columnDefinition = "MEDIUMTEXT")
     private String logo;
 
+    // Student profile fields for The Mentalist PDF report. Optional, self- or admin-editable.
+    @Column(name = "father_name")
+    private String fatherName;
+
+    @Column(name = "mother_name")
+    private String motherName;
+
+    @Column(name = "dob")
+    private java.time.LocalDate dob;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "gender")
+    private String gender;
+
     // No cascade: roles are shared reference data. Deleting a user must remove only
     // its user_role join rows, never the ADMIN/USER/SUPER_ADMIN role entities.
     @ManyToMany(fetch = FetchType.EAGER)

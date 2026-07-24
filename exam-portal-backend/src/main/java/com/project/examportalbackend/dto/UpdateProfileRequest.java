@@ -25,4 +25,11 @@ public class UpdateProfileRequest {
     // Branding logo (base64 PNG data URL) for ADMIN / SUPER_ADMIN. Only applied
     // when non-null, so ordinary profile saves don't wipe it.
     private String logo;
+
+    // Student profile fields for The Mentalist PDF report. All optional.
+    private String fatherName;
+    private String motherName;
+    private String gender;
+    private String dob; // ISO yyyy-MM-dd, or blank/null to leave unset
+    private String city;
 }

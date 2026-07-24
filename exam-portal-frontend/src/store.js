@@ -9,6 +9,7 @@ import { quizzesReducer } from "./reducers/quizzesReducer";
 import { adminReducer } from "./reducers/adminReducer";
 import { reportsReducer } from "./reducers/reportsReducer";
 import { psychometricReportReducer } from "./reducers/psychometricReportReducer";
+import { mentalistReportReducer } from "./reducers/mentalistReportReducer";
 
 const reducer = combineReducers({
   loginReducer: loginReducer,
@@ -20,6 +21,7 @@ const reducer = combineReducers({
   adminReducer: adminReducer,
   reportsReducer: reportsReducer,
   psychometricReportReducer: psychometricReportReducer,
+  mentalistReportReducer: mentalistReportReducer,
 });
 
 const middleware = [thunk];

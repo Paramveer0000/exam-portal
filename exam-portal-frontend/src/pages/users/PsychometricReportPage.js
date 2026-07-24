@@ -6,6 +6,7 @@ import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import { fetchPsychReport } from "../../actions/psychometricReportActions";
 import aiServices from "../../services/aiServices";
+import mentalistReportServices from "../../services/mentalistReportServices";
 import "./PsychometricReportPage.css";
 
 // Human names for the MI dimension codes (our own wording throughout).
@@ -39,6 +40,8 @@ const PsychometricReportPage = () => {
 
   const [aiSummary, setAiSummary] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState(null);
 
   const generateAi = (regenerate = false) => {
     setAiLoading(true);
@@ -55,9 +58,33 @@ const PsychometricReportPage = () => {
       });
   };
 
-  // Download only appears once the AI narrative exists, so print always
-  // includes it.
-  const downloadPdf = () => window.print();
+  // Download only appears once the AI narrative exists. Generates the
+  // 15-page PDF server-side (or reuses the previously generated one) then
+  // saves it via the browser.
+  const downloadPdf = async () => {
+    setPdfLoading(true);
+    setPdfError(null);
+    const gen = await mentalistReportServices.generateReport(quizResId, token, {});
+    if (!gen.data) {
+      setPdfLoading(false);
+      setPdfError(gen.error || "Could not generate the report");
+      return;
+    }
+    const { blob, error } = await mentalistReportServices.downloadReport(quizResId, token);
+    setPdfLoading(false);
+    if (!blob) {
+      setPdfError(error || "Could not download the report");
+      return;
+    }
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mentalist-report-${quizResId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
 
   useEffect(() => {
     if (!localStorage.getItem("jwtToken")) navigate("/");
@@ -101,8 +128,14 @@ const PsychometricReportPage = () => {
 
       <div className="psychReport__actions">
         {aiSummary && !aiSummary.startsWith("__error__:") ? (
-          <Button variant="success" onClick={downloadPdf}>
-            Download PDF
+          <Button variant="success" onClick={downloadPdf} disabled={pdfLoading}>
+            {pdfLoading ? (
+              <>
+                <Spinner as="span" size="sm" animation="border" /> Preparing PDF…
+              </>
+            ) : (
+              "Download The Mentalist Report (PDF)"
+            )}
           </Button>
         ) : (
           <Button
@@ -120,6 +153,12 @@ const PsychometricReportPage = () => {
           </Button>
         )}
       </div>
+
+      {pdfError && (
+        <div className="psychReport__section">
+          <Message variant="warning">{pdfError}</Message>
+        </div>
+      )}
 
       {aiSummary &&
         (aiSummary.startsWith("__error__:") ? (

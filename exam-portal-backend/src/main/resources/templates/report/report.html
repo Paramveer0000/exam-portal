@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>The Mentalist Report</title>
+<style>
+  head, title, style, script, meta { display: none; }
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1f2a37; font-size: 11pt; }
+  .page { width: 210mm; height: 297mm; padding: 16mm 16mm 14mm; position: relative; page-break-after: always; overflow: hidden; }
+  .page:last-child { page-break-after: auto; }
+
+  :root {}
+  .primary { color: #0F4C81; }
+  .secondary { color: #3BAFDA; }
+  .accent { color: #00B4D8; }
+  .bg-primary { background: #0F4C81; }
+  .bg-soft { background: #EAF5FB; }
+
+  h1, h2, h3, h4 { margin: 0; font-weight: 700; color: #0F4C81; }
+  p { margin: 0 0 6px; line-height: 1.5; }
+  .muted { color: #64748b; }
+
+  .footer { position: absolute; bottom: 8mm; left: 16mm; right: 16mm; display: flex; justify-content: space-between;
+            font-size: 8pt; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 3mm; }
+  .footer .brand { color: #0F4C81; font-weight: 700; }
+
+  /* Cover page */
+  .cover { background: linear-gradient(160deg, #0F4C81 0%, #17679f 55%, #00B4D8 100%); color: #fff; text-align: center;
+           display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .cover .logo-badge { width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.15);
+                        border: 2px solid rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center;
+                        font-size: 30px; font-weight: 800; margin-bottom: 18px; }
+  .cover h1 { color: #fff; font-size: 30pt; letter-spacing: 4px; margin-bottom: 4px; }
+  .cover h2 { color: #eaf5fb; font-weight: 400; font-size: 13pt; margin-bottom: 40px; }
+  .cover .tagline { font-size: 11pt; color: #d7ecf7; max-width: 420px; margin-bottom: 50px; }
+  .cover .confidential { margin-top: 60px; font-size: 9pt; letter-spacing: 2px; text-transform: uppercase; color: #d7ecf7; }
+  .cover .meta-row { display: flex; gap: 40px; margin-top: 14px; font-size: 10pt; }
+  .cover .meta-row div span { display: block; font-size: 8pt; text-transform: uppercase; letter-spacing: 1px; color: #bfe3f3; }
+
+  /* Section header used on content pages */
+  .page-head { display: flex; align-items: center; gap: 10px; border-bottom: 3px solid #00B4D8; padding-bottom: 10px; margin-bottom: 16px; }
+  .page-head .num { width: 34px; height: 34px; border-radius: 50%; background: #0F4C81; color: #fff; display: flex;
+                     align-items: center; justify-content: center; font-weight: 700; font-size: 12pt; }
+  .page-head h2 { font-size: 18pt; }
+  .page-head .sub { font-size: 9pt; color: #3BAFDA; text-transform: uppercase; letter-spacing: 1px; }
+
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(15,76,129,0.08); }
+  .grid-2 { display: flex; gap: 12px; flex-wrap: wrap; }
+  .grid-2 > div { flex: 1 1 45%; }
+
+  /* Trait bars */
+  .trait { margin-bottom: 11px; }
+  .trait-top { display: flex; justify-content: space-between; font-size: 9.5pt; margin-bottom: 3px; }
+  .trait-top .name { font-weight: 600; color: #1f2a37; }
+  .trait-top .band { font-size: 8pt; padding: 1px 8px; border-radius: 8px; background: #EAF5FB; color: #0F4C81; font-weight: 600; }
+  .bar-track { height: 8px; background: #eef2f6; border-radius: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, #0F4C81, #00B4D8); border-radius: 5px; }
+
+  .content-block { margin-top: 14px; }
+  .content-block .status { background: #EAF5FB; border-left: 4px solid #0F4C81; padding: 10px 12px; border-radius: 6px; font-size: 9.7pt; margin-bottom: 12px; }
+  .cols3 { display: flex; gap: 10px; }
+  .cols3 .col { flex: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
+  .cols3 .col h4 { font-size: 9.5pt; margin-bottom: 6px; }
+  .cols3 .col.strengths h4 { color: #0F4C81; }
+  .cols3 .col.challenges h4 { color: #b45309; }
+  .cols3 .col.suggestions h4 { color: #0f766e; }
+  ul.tight { margin: 0; padding-left: 14px; font-size: 8.7pt; }
+  ul.tight li { margin-bottom: 4px; line-height: 1.35; }
+
+  .badge-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .pill { background: #EAF5FB; color: #0F4C81; border-radius: 12px; padding: 3px 10px; font-size: 8.3pt; font-weight: 600; }
+
+  table.profile-table { width: 100%; border-collapse: collapse; font-size: 9.7pt; }
+  table.profile-table td { padding: 6px 4px; border-bottom: 1px solid #eef2f6; }
+  table.profile-table td.label { color: #64748b; width: 40%; }
+  table.profile-table td.value { font-weight: 600; }
+
+  .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .swot-grid .box { border-radius: 8px; padding: 12px; }
+  .swot-grid .box h4 { margin-bottom: 6px; font-size: 10pt; }
+  .swot-grid .s { background: #EAF5FB; }
+  .swot-grid .w { background: #fdf2f2; }
+  .swot-grid .o { background: #f0fbf6; }
+  .swot-grid .t { background: #fff7e6; }
+
+  .goal-block { margin-bottom: 12px; }
+  .goal-block h4 { font-size: 10pt; color: #0F4C81; margin-bottom: 5px; }
+
+  .career-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .career-row .field { width: 42%; font-size: 9.3pt; font-weight: 600; }
+  .career-row .bar-track { flex: 1; }
+  .career-row .stars { width: 60px; text-align: right; color: #f59e0b; font-size: 9pt; }
+
+  .signature-row { display: flex; justify-content: space-between; margin-top: 40px; font-size: 9.5pt; }
+  .signature-row .line { border-top: 1px solid #94a3b8; margin-top: 30px; padding-top: 4px; width: 200px; }
+</style>
+</head>
+<body>
+
+<!-- ================================ PAGE 1: COVER ================================ -->
+<div class="page cover">
+  <div class="logo-badge">TM</div>
+  <h1>THE MENTALIST</h1>
+  <h2>Mental Skill Assessment Report</h2>
+  <div class="tagline">Helping Students Build Strong Minds for a Successful Future</div>
+  <div style="font-size:14pt;font-weight:600;" th:text="${profile.studentName}">Student Name</div>
+  <div class="meta-row">
+    <div><span>Report ID</span><span th:text="${reportNumber}">TM-1-20260101</span></div>
+    <div><span>Assessment Date</span><span th:text="${assessmentDate}">01 Jan 2026</span></div>
+    <div><span>Class</span><span th:text="${profile.className} ?: '-'">Class</span></div>
+  </div>
+  <div class="confidential">Confidential Report</div>
+</div>
+
+<!-- ================================ PAGE 2: STUDENT PROFILE ================================ -->
+<div class="page">
+  <div class="page-head"><div class="num">2</div><div><div class="sub">Personal Details</div><h2>Student Profile</h2></div></div>
+  <div class="card">
+    <table class="profile-table">
+      <tr><td class="label">Student Name</td><td class="value" th:text="${profile.studentName} ?: '-'">-</td></tr>
+      <tr><td class="label">Father's Name</td><td class="value" th:text="${profile.fatherName} ?: '-'">-</td></tr>
+      <tr><td class="label">Mother's Name</td><td class="value" th:text="${profile.motherName} ?: '-'">-</td></tr>
+      <tr><td class="label">Gender</td><td class="value" th:text="${profile.gender} ?: '-'">-</td></tr>
+      <tr><td class="label">Age</td><td class="value" th:text="${profile.age} ?: '-'">-</td></tr>
+      <tr><td class="label">Date of Birth</td><td class="value" th:text="${profile.dob} ?: '-'">-</td></tr>
+      <tr><td class="label">Class</td><td class="value" th:text="${profile.className} ?: '-'">-</td></tr>
+      <tr><td class="label">School</td><td class="value" th:text="${profile.school} ?: '-'">-</td></tr>
+      <tr><td class="label">City</td><td class="value" th:text="${profile.city} ?: '-'">-</td></tr>
+      <tr><td class="label">Assessment Date</td><td class="value" th:text="${profile.assessmentDate}">-</td></tr>
+      <tr><td class="label">Report Number</td><td class="value" th:text="${profile.reportNumber}">-</td></tr>
+      <tr><td class="label">Counsellor Name</td><td class="value" th:text="${profile.counsellorName} ?: '-'">-</td></tr>
+    </table>
+  </div>
+  <div class="content-block">
+    <h4 style="margin-bottom:6px;">Purpose of Assessment</h4>
+    <p class="muted" style="font-size:9.7pt;">This report is designed to understand the student's personality, emotional
+      well-being, learning style, career readiness, behavioural traits, and overall mental strengths. The results
+      help parents and educators provide appropriate guidance.</p>
+  </div>
+  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 2 of 15</span></div>
+</div>
+
+<!-- ================================ PAGE 3: MESSAGE TO PARENTS ================================ -->
+<div class="page">
+  <div class="page-head"><div class="num">3</div><div><h2>Message to Parents</h2></div></div>
+  <div class="card" style="font-size:10.3pt;">
+    <p><strong>Dear Parents,</strong></p>
+    <p>Every child is unique.</p>
+    <p>Academic marks tell only a small part of your child's story. Their confidence, emotional strength, personality,
+       decision-making ability, communication skills, learning style, and career interests play an equally important
+       role in future success.</p>
+    <p>This report has been prepared after a scientific psychometric assessment to help you understand your child's
+       strengths and areas requiring support.</p>
+    <p><strong>Please remember:</strong></p>
+    <ul class="tight" style="font-size:9.7pt;">
+      <li>There are no "good" or "bad" personalities.</li>
+      <li>Every child has unique abilities.</li>
+      <li>The purpose of this report is not to judge but to guide.</li>
+      <li>With proper guidance, every child can become successful.</li>
+    </ul>
+    <p>We encourage parents to discuss the report positively with their child and use it as a roadmap for future growth.</p>
+    <p class="muted" style="font-size:8.7pt;">This report is not for medical or diagnostic use.</p>
+    <p style="margin-top:20px;">Warm Regards,<br/><strong class="primary">The Mentalist</strong></p>
+  </div>
+  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 3 of 15</span></div>
+</div>
+
+<!-- ============ PAGES 4-8, 10-11: reuse traitSection fragment ============ -->
+<div th:replace="~{report/fragments :: traitSection(4, 'Personality Analysis', 'Overall Personality: ' + ${personalityType}, ${personality})}"></div>
+<div th:replace="~{report/fragments :: traitSection(5, 'Emotional Intelligence', 'Explain', ${emotionalIntelligence})}"></div>
+<div th:replace="~{report/fragments :: traitSection(6, 'Learning Style Analysis', 'Learning Preference', ${learningStyle})}"></div>
+<div th:replace="~{report/fragments :: traitSection(7, 'Multiple Intelligence Report', 'Explain all', ${multipleIntelligence})}"></div>
+<div th:replace="~{report/fragments :: traitSection(8, 'Communication &amp; Leadership Skills', 'Explain', ${communicationLeadership})}"></div>
+
+<!-- ================================ PAGE 9: CAREER INTEREST ================================ -->
+<div class="page">
+  <div class="page-head"><div class="num">9</div><div><div class="sub">Most Suitable Career Domains</div><h2>Career Interest Assessment</h2></div></div>
+  <div class="card">
+    <div th:each="c : ${careers}" class="career-row">
+      <div class="field" th:text="${c.field}">Field</div>
+      <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${c.score} + '%'"></div></div>
+      <div class="stars"><span th:each="i : ${#numbers.sequence(1, c.stars)}">*</span><span th:text="'/5'">/5</span></div>
+    </div>
+  </div>
+  <div class="content-block">
+    <div class="status" th:text="${careerInterest.content.status}">Status</div>
+  </div>
+  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 9 of 15</span></div>
+</div>
+
+<div th:replace="~{report/fragments :: traitSection(10, 'Behavioural Analysis', 'Explain', ${behaviourAnalysis})}"></div>
+<div th:replace="~{report/fragments :: traitSection(11, 'Mental Wellness Report', 'Explain', ${mentalWellness})}"></div>
+
+<!-- ================================ PAGE 12: SWOT ================================ -->
+<div class="page">
+  <div class="page-head"><div class="num">12</div><div><h2>SWOT Analysis</h2></div></div>
+  <div class="swot-grid">
+    <div class="box s"><h4 class="primary">Strengths</h4><ul class="tight"><li th:each="s : ${swot.strengths}" th:text="${s}">-</li></ul></div>
+    <div class="box w"><h4 style="color:#b91c1c;">Weaknesses</h4><ul class="tight"><li th:each="w : ${swot.weaknesses}" th:text="${w}">-</li></ul></div>
+    <div class="box o"><h4 style="color:#0f766e;">Opportunities</h4><ul class="tight"><li th:each="o : ${swot.opportunities}" th:text="${o}">-</li></ul></div>
+    <div class="box t"><h4 style="color:#b45309;">Areas for Development</h4><ul class="tight"><li th:each="d : ${swot.development}" th:text="${d}">-</li></ul></div>
+  </div>
+  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 12 of 15</span></div>
+</div>
+
+<!-- ================================ PAGE 13: DEVELOPMENT PLAN ================================ -->
+<div class="page">
+  <div class="page-head"><div class="num">13</div><div><h2>Overall Development Plan</h2></div></div>
+  <div class="goal-block"><h4>Short-Term Goals (30 Days)</h4><ul class="tight"><li th:each="g : ${developmentPlan.shortTerm}" th:text="${g}">-</li></ul></div>
+  <div class="goal-block"><h4>Medium-Term Goals (90 Days)</h4><ul class="tight"><li th:each="g : ${developmentPlan.mediumTerm}" th:text="${g}">-</li></ul></div>
+  <div class="goal-block"><h4>Long-Term Goals (1 Year)</h4><ul class="tight"><li th:each="g : ${developmentPlan.longTerm}" th:text="${g}">-</li></ul></div>
+  <div class="grid-2">
+    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Parent Action Plan</h4><ul class="tight"><li th:each="p : ${developmentPlan.parentActionPlan}" th:text="${p}">-</li></ul></div>
+    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Teacher Action Plan</h4><ul class="tight"><li th:each="t : ${developmentPlan.teacherActionPlan}" th:text="${t}">-</li></ul></div>
+  </div>
+  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 13 of 15</span></div>
+</div>
+
+<!-- ================================ PAGE 14: CAREER & ACADEMIC GUIDANCE ================================ -->
+<div class="page">
+  <div class="page-head"><div class="num">14</div><div><h2>Career &amp; Academic Guidance</h2></div></div>
+  <div class="card">
+    <h4 style="font-size:9.5pt;margin-bottom:6px;">Recommended Streams</h4>
+    <div class="badge-list"><span th:each="s : ${careerGuidance.recommendedStreams}" class="pill" th:text="${s}">Stream</span></div>
+  </div>
+  <div class="grid-2" style="margin-top:12px;">
+    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Books</h4><ul class="tight"><li th:each="b : ${careerGuidance.books}" th:text="${b}">-</li></ul></div>
+    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Competitions</h4><ul class="tight"><li th:each="c : ${careerGuidance.competitions}" th:text="${c}">-</li></ul></div>
+    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Skill Courses</h4><ul class="tight"><li th:each="c : ${careerGuidance.skillCourses}" th:text="${c}">-</li></ul></div>
+    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Online Learning</h4><ul class="tight"><li th:each="o : ${careerGuidance.onlineLearning}" th:text="${o}">-</li></ul></div>
+  </div>
+  <div class="content-block"><div class="status" th:text="${careerGuidance.roadmap}">Roadmap</div></div>
+  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 14 of 15</span></div>
+</div>
+
+<!-- ================================ PAGE 15: COUNSELLOR SUMMARY ================================ -->
+<div class="page">
+  <div class="page-head"><div class="num">15</div><div><h2>Counsellor's Remarks</h2></div></div>
+  <div class="card">
+    <h4 style="font-size:9.5pt;margin-bottom:6px;">Overall Observation</h4>
+    <p style="font-size:9.5pt;" th:text="${counsellorSummary.overallObservation}">Auto-generated summary.</p>
+  </div>
+  <div class="cols3" style="margin-top:12px;">
+    <div class="col strengths"><h4>Key Strengths</h4><ul class="tight"><li th:each="s : ${counsellorSummary.keyStrengths}" th:text="${s}">-</li></ul></div>
+    <div class="col challenges"><h4>Areas to Improve</h4><ul class="tight"><li th:each="a : ${counsellorSummary.areasToImprove}" th:text="${a}">-</li></ul></div>
+    <div class="col suggestions"><h4>Final Recommendations</h4><ul class="tight"><li th:each="r : ${counsellorSummary.finalRecommendations}" th:text="${r}">-</li></ul></div>
+  </div>
+  <div class="grid-2" style="margin-top:12px;">
+    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Parent Recommendations</h4><ul class="tight"><li th:each="p : ${counsellorSummary.parentRecommendations}" th:text="${p}">-</li></ul></div>
+    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Teacher Recommendations</h4><ul class="tight"><li th:each="t : ${counsellorSummary.teacherRecommendations}" th:text="${t}">-</li></ul></div>
+  </div>
+  <div class="signature-row">
+    <div><div class="line" th:text="${counsellorSummary.counsellorName} ?: 'The Mentalist Team'">Name</div>Counsellor Name / Designation</div>
+    <div><div class="line" th:text="${counsellorSummary.date}">Date</div>Date</div>
+  </div>
+  <p class="muted" style="font-size:7.5pt;margin-top:24px;">Disclaimer: This report is generated from a psychometric
+    assessment for educational guidance purposes only. It is not a medical or clinical diagnosis and should not be
+    used as the sole basis for major life decisions. All information is confidential.</p>
+  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 15 of 15</span></div>
+</div>
+
+</body>
+</html>

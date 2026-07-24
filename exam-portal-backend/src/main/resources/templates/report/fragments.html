@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Trait-based section page, reused for pages 4-8, 10-11 (personality, EI,
+     learning style, multiple intelligence, communication/leadership,
+     behaviour, mental wellness). Lives in its own file (never rendered
+     standalone) so ${section} isn't null when this template top-to-bottom
+     evaluates - Thymeleaf still walks fragment-definition nodes in place
+     when they sit inside the template actually being processed. -->
+<div th:fragment="traitSection(pageNum, title, subtitle, section)" class="page">
+  <div class="page-head">
+    <div class="num" th:text="${pageNum}">4</div>
+    <div>
+      <div class="sub" th:text="${subtitle}">Explain</div>
+      <h2 th:text="${title}">Personality Analysis</h2>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="grid-2">
+      <div th:each="t : ${section.traits}" class="trait">
+        <div class="trait-top">
+          <span class="name" th:text="${t.name}">Trait</span>
+          <span class="band" th:text="${t.band}">Good</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${t.score} + '%'"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <div class="status" th:text="${section.content.status}">Status text.</div>
+    <div class="cols3">
+      <div class="col strengths">
+        <h4>Strengths</h4>
+        <ul class="tight"><li th:each="s : ${section.content.strengths}" th:text="${s}">Strength</li></ul>
+      </div>
+      <div class="col challenges">
+        <h4>Challenges</h4>
+        <ul class="tight"><li th:each="c : ${section.content.challenges}" th:text="${c}">Challenge</li></ul>
+      </div>
+      <div class="col suggestions">
+        <h4>Suggestions</h4>
+        <ul class="tight"><li th:each="s : ${section.content.suggestions}" th:text="${s}">Suggestion</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="brand">THE MENTALIST</span>
+    <span th:text="${reportNumber} + ' - ' + ${assessmentDate}">Report</span>
+    <span th:text="'Page ' + ${pageNum} + ' of 15'">Page 4 of 15</span>
+  </div>
+</div>
+
+</body>
+</html>

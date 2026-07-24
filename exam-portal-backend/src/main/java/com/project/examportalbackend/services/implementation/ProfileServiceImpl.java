@@ -66,6 +66,11 @@ public class ProfileServiceImpl implements ProfileService {
         user.setGrade(request.getGrade());
         user.setBoard(request.getBoard());
         user.setSchoolName(request.getSchoolName());
+        user.setFatherName(request.getFatherName());
+        user.setMotherName(request.getMotherName());
+        user.setGender(request.getGender());
+        user.setCity(request.getCity());
+        user.setDob(StringUtils.hasText(request.getDob()) ? java.time.LocalDate.parse(request.getDob()) : null);
         // Logo is only touched when supplied, so a plain profile save keeps it.
         if (request.getLogo() != null) {
             user.setLogo(request.getLogo());

@@ -2,3 +2,4 @@ node_modules/
 target/
 exam-portal-frontend/build/
 *.log
+exam-portal-backend/data/

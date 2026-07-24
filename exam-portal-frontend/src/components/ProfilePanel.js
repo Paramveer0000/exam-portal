@@ -38,6 +38,11 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
   const [schoolName, setSchoolName] = useState(
     user ? user.schoolName || "" : ""
   );
+  const [fatherName, setFatherName] = useState(user ? user.fatherName || "" : "");
+  const [motherName, setMotherName] = useState(user ? user.motherName || "" : "");
+  const [gender, setGender] = useState(user ? user.gender || "" : "");
+  const [dob, setDob] = useState(user ? user.dob || "" : "");
+  const [city, setCity] = useState(user ? user.city || "" : "");
 
   useEffect(() => {
     if (showSchool) {
@@ -62,6 +67,11 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
       payload.grade = grade;
       payload.board = board;
       payload.schoolName = schoolName;
+      payload.fatherName = fatherName;
+      payload.motherName = motherName;
+      payload.gender = gender;
+      payload.dob = dob;
+      payload.city = city;
     }
     profileServices
       .updateProfile(payload, token)
@@ -337,6 +347,54 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
                       value={schoolName}
                       placeholder="Your actual school's name"
                       onChange={(e) => setSchoolName(e.target.value)}
+                    />
+                  </Col>
+                </Row>
+
+                <hr />
+                <h6 className="text-muted">
+                  For The Mentalist report (optional)
+                </h6>
+                <Row>
+                  <Col md={6} className="mb-2">
+                    <Form.Label>Father's name</Form.Label>
+                    <Form.Control
+                      value={fatherName}
+                      onChange={(e) => setFatherName(e.target.value)}
+                    />
+                  </Col>
+                  <Col md={6} className="mb-2">
+                    <Form.Label>Mother's name</Form.Label>
+                    <Form.Control
+                      value={motherName}
+                      onChange={(e) => setMotherName(e.target.value)}
+                    />
+                  </Col>
+                  <Col md={4} className="mb-2">
+                    <Form.Label>Gender</Form.Label>
+                    <Form.Select
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                    >
+                      <option value="">Choose</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </Form.Select>
+                  </Col>
+                  <Col md={4} className="mb-2">
+                    <Form.Label>Date of birth</Form.Label>
+                    <Form.Control
+                      type="date"
+                      value={dob}
+                      onChange={(e) => setDob(e.target.value)}
+                    />
+                  </Col>
+                  <Col md={4} className="mb-2">
+                    <Form.Label>City</Form.Label>
+                    <Form.Control
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
                     />
                   </Col>
                 </Row>
