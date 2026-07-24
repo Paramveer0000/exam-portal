@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Card, Form } from "react-bootstrap";
+import { Badge, Button, Card, Form } from "react-bootstrap";
 import swal from "sweetalert";
 import SuperAdminSidebar from "../../components/SuperAdminSidebar";
 import Loader from "../../components/Loader";
@@ -163,10 +163,10 @@ const SuperAdminAiSettingsPage = () => {
   return (
     <div style={{ display: "flex" }}>
       <SuperAdminSidebar />
-      <div style={{ padding: "1.5rem", flexGrow: 1, maxWidth: "640px" }}>
-        <h2>Platform Settings</h2>
+      <div className="mt-page" style={{ maxWidth: "640px" }}>
+        <h2 style={{ color: "var(--mt-primary)" }}>Platform Settings</h2>
 
-        <Card body className="mb-4">
+        <Card body className="mb-4 mt-card">
           <h4>Company Logo</h4>
           <p className="text-muted">
             Shown in the top-left header on every page for all users. Clicking it
@@ -238,7 +238,7 @@ const SuperAdminAiSettingsPage = () => {
         {!loaded ? (
           <Loader />
         ) : (
-          <Card body>
+          <Card body className="mt-card">
             <Form onSubmit={save}>
               <Form.Group className="mb-3">
                 <Form.Label>Provider</Form.Label>
@@ -331,15 +331,9 @@ const SuperAdminAiSettingsPage = () => {
                   {testing ? "Testing..." : "Test connection"}
                 </Button>
                 {testStatus && (
-                  <span
-                    style={{
-                      fontSize: "0.85rem",
-                      fontWeight: 600,
-                      color: testStatus === "live" ? "#198754" : "#dc3545",
-                    }}
-                  >
-                    ● {testStatus === "live" ? "Live" : "Down"}
-                  </span>
+                  <Badge bg={testStatus === "live" ? "success" : "danger"}>
+                    {testStatus === "live" ? "Live" : "Down"}
+                  </Badge>
                 )}
               </div>
             </Form>

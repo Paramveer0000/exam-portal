@@ -1,6 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Card, Col, Form, Row, Table } from "react-bootstrap";
+import {
+  BsBuilding,
+  BsPeopleFill,
+  BsCollection,
+  BsJournalBookmark,
+  BsLightningCharge,
+  BsSearch,
+  BsSortDown,
+  BsSortUp,
+  BsTrophy,
+} from "react-icons/bs";
 import swal from "sweetalert";
 import SuperAdminSidebar from "../../components/SuperAdminSidebar";
 import {
@@ -18,6 +29,8 @@ const SuperAdminDashboardPage = () => {
     (state) => state.adminReducer
   );
   const [reassignTarget, setReassignTarget] = useState("");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState({ key: "students", dir: -1 });
 
   useEffect(() => {
     fetchAdmins(dispatch, token);
@@ -46,66 +59,224 @@ const SuperAdminDashboardPage = () => {
   };
 
   const metricCards = [
-    { label: "Schools", value: metrics?.totalAdmins },
-    { label: "Students", value: metrics?.totalStudents },
-    { label: "Classes", value: metrics?.totalCategories },
-    { label: "Subjects", value: metrics?.totalQuizzes },
-    { label: "Attempts", value: metrics?.totalAttempts },
     {
-      label: "Pass rate",
-      value: metrics ? `${metrics.passRate.toFixed(1)}%` : undefined,
+      label: "Schools",
+      value: metrics?.totalAdmins,
+      icon: <BsBuilding />,
+      color: "var(--mt-primary)",
+    },
+    {
+      label: "Students",
+      value: metrics?.totalStudents,
+      icon: <BsPeopleFill />,
+      color: "var(--mt-secondary)",
+    },
+    {
+      label: "Classes",
+      value: metrics?.totalCategories,
+      icon: <BsCollection />,
+      color: "var(--mt-accent-dark)",
+    },
+    {
+      label: "Subjects",
+      value: metrics?.totalQuizzes,
+      icon: <BsJournalBookmark />,
+      color: "var(--mt-info)",
+    },
+    {
+      label: "Attempts",
+      value: metrics?.totalAttempts,
+      icon: <BsLightningCharge />,
+      color: "var(--mt-danger)",
     },
   ];
+
+  const toggleSort = (key) =>
+    setSort((prev) => (prev.key === key ? { key, dir: -prev.dir } : { key, dir: -1 }));
+
+  const sortIcon = (key) =>
+    sort.key !== key ? null : sort.dir === 1 ? (
+      <BsSortUp className="ms-1" />
+    ) : (
+      <BsSortDown className="ms-1" />
+    );
+
+  const maxStudents = Math.max(1, ...analytics.map((a) => a.students || 0));
+
+  const rows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const list = analytics.filter((a) => {
+      if (!q) return true;
+      return `${a.name || ""} ${a.username}`.toLowerCase().includes(q);
+    });
+    const dir = sort.dir;
+    return [...list].sort((a, b) => {
+      if (sort.key === "name") {
+        const an = a.name || a.username;
+        const bn = b.name || b.username;
+        return dir * an.localeCompare(bn);
+      }
+      return dir * ((a[sort.key] || 0) - (b[sort.key] || 0));
+    });
+  }, [analytics, search, sort]);
 
   return (
     <div style={{ display: "flex" }}>
       <SuperAdminSidebar />
-      <div style={{ padding: "1.5rem", flexGrow: 1, maxWidth: "1100px" }}>
-        <h2>Super Admin Dashboard</h2>
+      <div style={{ padding: "1.5rem", flexGrow: 1, minWidth: 0 }}>
+        <h2 style={{ color: "var(--mt-primary)" }}>Super Admin Dashboard</h2>
 
         <Row className="my-3">
           {metricCards.map((m) => (
             <Col key={m.label} xs={6} md={2} className="mb-3">
-              <Card body className="text-center">
-                <div style={{ fontSize: "1.4rem", fontWeight: 600 }}>
+              <Card
+                body
+                style={{
+                  borderRadius: "var(--mt-radius-md)",
+                  border: "1px solid var(--mt-border)",
+                  boxShadow: "var(--mt-shadow-sm)",
+                  transition: "transform .15s ease, box-shadow .15s ease",
+                  cursor: "default",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.boxShadow = "var(--mt-shadow-lg)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "var(--mt-shadow-sm)";
+                }}
+              >
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: m.color,
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "1.1rem",
+                    marginBottom: 10,
+                  }}
+                >
+                  {m.icon}
+                </div>
+                <div style={{ fontSize: "var(--mt-fs-2xl)", fontWeight: 700, color: "var(--mt-primary)" }}>
                   {m.value ?? "-"}
                 </div>
-                <div style={{ color: "#666" }}>{m.label}</div>
+                <div style={{ color: "var(--mt-text-muted)", fontSize: "var(--mt-fs-sm)" }}>
+                  {m.label}
+                </div>
               </Card>
             </Col>
           ))}
         </Row>
 
-        <Card body className="my-3">
-          <h4>School performance</h4>
-          <Table striped bordered hover responsive className="mt-2">
+        <Card
+          body
+          className="my-3"
+          style={{
+            borderRadius: "var(--mt-radius-md)",
+            border: "1px solid var(--mt-border)",
+            boxShadow: "var(--mt-shadow-sm)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 8,
+            }}
+          >
+            <h4 className="mb-0">School performance</h4>
+            <div style={{ position: "relative", maxWidth: 260, width: "100%" }}>
+              <BsSearch
+                style={{
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "var(--mt-text-muted)",
+                }}
+              />
+              <Form.Control
+                placeholder="Search schools"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ paddingLeft: 34 }}
+              />
+            </div>
+          </div>
+          <Table striped bordered hover responsive className="mt-3">
             <thead>
               <tr>
-                <th>School</th>
-                <th>Students</th>
-                <th>Classes</th>
-                <th>Subjects</th>
-                <th>Exams conducted</th>
-                <th>Attempts</th>
-                <th>Pass rate</th>
+                <th role="button" onClick={() => toggleSort("name")}>
+                  School {sortIcon("name")}
+                </th>
+                <th role="button" onClick={() => toggleSort("students")}>
+                  Students {sortIcon("students")}
+                </th>
+                <th role="button" onClick={() => toggleSort("classes")}>
+                  Classes {sortIcon("classes")}
+                </th>
+                <th role="button" onClick={() => toggleSort("subjects")}>
+                  Subjects {sortIcon("subjects")}
+                </th>
+                <th role="button" onClick={() => toggleSort("examsConducted")}>
+                  Exams conducted {sortIcon("examsConducted")}
+                </th>
+                <th role="button" onClick={() => toggleSort("attempts")}>
+                  Attempts {sortIcon("attempts")}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {analytics.map((a) => (
+              {rows.map((a, i) => (
                 <tr key={a.adminId}>
-                  <td>{a.name ? `${a.name} (${a.username})` : a.username}</td>
-                  <td>{a.students}</td>
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      {i === 0 && a.students > 0 && (
+                        <BsTrophy style={{ color: "var(--mt-accent-dark)" }} title="Top school" />
+                      )}
+                      {a.name ? `${a.name} (${a.username})` : a.username}
+                    </div>
+                  </td>
+                  <td style={{ minWidth: 160 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ minWidth: 18 }}>{a.students}</span>
+                      <div
+                        style={{
+                          flexGrow: 1,
+                          height: 6,
+                          borderRadius: 3,
+                          background: "var(--mt-border)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${((a.students || 0) / maxStudents) * 100}%`,
+                            height: "100%",
+                            background: "var(--mt-secondary)",
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </td>
                   <td>{a.classes}</td>
                   <td>{a.subjects}</td>
                   <td>{a.examsConducted}</td>
                   <td>{a.attempts}</td>
-                  <td>{a.passRate.toFixed(1)}%</td>
                 </tr>
               ))}
-              {analytics.length === 0 && (
+              {rows.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="text-center">
-                    No schools yet.
+                  <td colSpan="6" className="text-center">
+                    {analytics.length === 0 ? "No schools yet." : "No schools match your search."}
                   </td>
                 </tr>
               )}
@@ -113,7 +284,15 @@ const SuperAdminDashboardPage = () => {
           </Table>
         </Card>
 
-        <Card body className="my-3">
+        <Card
+          body
+          className="my-3"
+          style={{
+            borderRadius: "var(--mt-radius-md)",
+            border: "1px solid var(--mt-border)",
+            boxShadow: "var(--mt-shadow-sm)",
+          }}
+        >
           <h4>Unassigned (legacy) content</h4>
           {unowned &&
           unowned.categories.length === 0 &&

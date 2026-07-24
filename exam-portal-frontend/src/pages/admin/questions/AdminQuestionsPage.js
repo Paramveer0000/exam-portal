@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./AdminQuestionsPage.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
+import { BsSearch } from "react-icons/bs";
 import swal from "sweetalert";
 import { Form } from "react-bootstrap";
 import { deleteQuestion, fetchQuestionsByQuiz } from "../../../actions/questionsActions";
@@ -105,7 +106,7 @@ const AdminQuestionsPage = () => {
       <div className="adminQuestionsPage__sidebar">
         <Sidebar />
       </div>
-      <div className="adminQuestionsPage__content">
+      <div className="mt-page">
         <Button
           variant="secondary"
           className="mb-3"
@@ -113,7 +114,7 @@ const AdminQuestionsPage = () => {
         >
           ← Back to Subjects
         </Button>
-        <h2>{`Questions : ${quizTitle}`}</h2>
+        <h2 style={{ color: "var(--mt-primary)" }}>{`Questions : ${quizTitle}`}</h2>
         {!canEdit && (
           <p className="text-muted">
             Viewing only — question content is managed by the platform admin.
@@ -121,7 +122,8 @@ const AdminQuestionsPage = () => {
         )}
         {canEdit && (
           <Button
-            className="adminQuestionsPage__content--button"
+            className="mb-3"
+            variant="primary"
             onClick={addNewQuestionHandler}
           >
             Add Question
@@ -129,13 +131,15 @@ const AdminQuestionsPage = () => {
         )}
         {questions ? (
           <>
-            <Form.Control
-              type="search"
-              placeholder="Search questions..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="mb-2"
-            />
+            <div className="mt-search mb-2">
+              <BsSearch />
+              <Form.Control
+                type="search"
+                placeholder="Search questions..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
             {canEdit && (
               <div
                 style={{
@@ -162,6 +166,7 @@ const AdminQuestionsPage = () => {
                 )}
               </div>
             )}
+            <Card className="mt-card p-3">
             {filtered.map((q, index) => (
               <div key={q.quesId} style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
                 {canEdit && (
@@ -183,6 +188,7 @@ const AdminQuestionsPage = () => {
                 </div>
               </div>
             ))}
+            </Card>
           </>
         ) : (
           <Loader />

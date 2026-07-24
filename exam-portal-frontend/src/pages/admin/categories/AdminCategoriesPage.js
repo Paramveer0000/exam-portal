@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./AdminCategoriesPage.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, ListGroup } from "react-bootstrap";
+import { Button, Card, ListGroup } from "react-bootstrap";
+import { BsCollection } from "react-icons/bs";
 import * as categoriesConstants from "../../../constants/categoriesConstants";
 import Loader from "../../../components/Loader";
 import Message from "../../../components/Message";
@@ -82,7 +83,7 @@ const AdminCategoriesPage = () => {
       <div className="adminCategoriesPage__sidebar">
         <RoleSidebar />
       </div>
-      <div className="adminCategoriesPage__content">
+      <div className="mt-page">
         <div
           style={{
             display: "flex",
@@ -90,12 +91,8 @@ const AdminCategoriesPage = () => {
             alignItems: "center",
           }}
         >
-          <h2>Classes</h2>
-          <Button
-            variant=""
-            className="adminCategoriesPage__content--button"
-            onClick={addNewCategoryHandler}
-          >
+          <h2 style={{ color: "var(--mt-primary)" }}>Classes</h2>
+          <Button variant="primary" onClick={addNewCategoryHandler}>
             Add Class
           </Button>
         </div>
@@ -105,20 +102,24 @@ const AdminCategoriesPage = () => {
               No categories are present. Try adding some categories.
             </Message>
           ) : (
-            categories.map((cat, index) => {
-              return (
-                <ListGroup
-                  className="adminCategoriesPage__content--categoriesList"
-                  key={index}
-                >
+            <Card className="mt-card mt-3">
+              <ListGroup variant="flush">
+                {categories.map((cat, index) => (
                   <ListGroup.Item
-                    style={{ borderWidth: "0px" }}
+                    key={index}
                     className="d-flex"
+                    action
                     onClick={() => categoryClickHandler(cat.catId)}
                   >
-                    <div className="ms-2 me-auto">
-                      <div className="fw-bold">{cat.title}</div>
-                      {cat.description}
+                    <div className="ms-2 me-auto d-flex align-items-start">
+                      <BsCollection
+                        className="mt-1 me-2 flex-shrink-0"
+                        style={{ color: "var(--mt-secondary)" }}
+                      />
+                      <div>
+                        <div className="fw-bold">{cat.title}</div>
+                        {cat.description}
+                      </div>
                     </div>
 
                     <div
@@ -151,9 +152,9 @@ const AdminCategoriesPage = () => {
                       >{`Delete`}</div>
                     </div>
                   </ListGroup.Item>
-                </ListGroup>
-              );
-            })
+                ))}
+              </ListGroup>
+            </Card>
           )
         ) : (
           <Loader />

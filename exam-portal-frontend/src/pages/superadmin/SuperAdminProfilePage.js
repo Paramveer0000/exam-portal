@@ -6,8 +6,8 @@ const SuperAdminProfilePage = () => {
   return (
     <div style={{ display: "flex" }}>
       <SuperAdminSidebar />
-      <div style={{ padding: "1.5rem", flexGrow: 1 }}>
-        <h2>Profile</h2>
+      <div className="mt-page">
+        <h2 style={{ color: "var(--mt-primary)" }}>Profile</h2>
         <ProfilePanel showRole showLogo />
       </div>
     </div>

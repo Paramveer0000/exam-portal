@@ -112,8 +112,8 @@ const OnboardingPage = () => {
 
   return (
     <div className="onboardingPage__container">
-      <Card className="onboardingPage__card">
-        <h2>Welcome, {user.firstName || user.username}!</h2>
+      <Card className="onboardingPage__card mt-card">
+        <h2 style={{ color: "var(--mt-primary)" }}>Welcome, {user.firstName || user.username}!</h2>
         <p className="text-muted">
           Just a couple of quick steps before you start your first test.
         </p>

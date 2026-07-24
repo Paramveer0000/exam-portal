@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, Button, Row, Col, InputGroup } from "react-bootstrap";
+import { Form, Button, InputGroup } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { login } from "../actions/authActions";
@@ -105,18 +105,7 @@ const LoginPage = () => {
         </Button>
       </Form>
 
-      {loginReducer.loading ? (
-        <Loader />
-      ) : (
-        <Row className="py-3">
-          <Col>
-            New Customer?{" "}
-            <Link to="/register" style={{ color: "#1E7A6F" }}>
-              Register
-            </Link>
-          </Col>
-        </Row>
-      )}
+      {loginReducer.loading && <Loader />}
     </FormContainer>
   );
 };

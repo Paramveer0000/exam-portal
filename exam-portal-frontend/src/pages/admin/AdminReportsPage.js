@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Col, Form, Row, Table } from "react-bootstrap";
+import { BsSortDown, BsSortUp } from "react-icons/bs";
 import Sidebar from "../../components/Sidebar";
 import { fetchQuizzes } from "../../actions/quizzesActions";
 import { fetchQuizReport, exportQuizReport } from "../../actions/reportsActions";
@@ -15,6 +16,7 @@ const AdminReportsPage = () => {
   const [passed, setPassed] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [sort, setSort] = useState({ key: "studentName", dir: 1 });
 
   useEffect(() => {
     if (quizzesReducer.quizzes.length === 0) {
@@ -52,11 +54,31 @@ const AdminReportsPage = () => {
     return order.map((cname) => ({ className: cname, subjects: groups[cname] }));
   })();
 
+  const toggleSort = (key) =>
+    setSort((prev) => (prev.key === key ? { key, dir: -prev.dir } : { key, dir: 1 }));
+
+  const sortIcon = (key) =>
+    sort.key !== key ? null : sort.dir === 1 ? (
+      <BsSortUp className="ms-1" />
+    ) : (
+      <BsSortDown className="ms-1" />
+    );
+
+  const sortedRows = useMemo(() => {
+    const dir = sort.dir;
+    return [...reportsReducer.rows].sort((a, b) => {
+      if (sort.key === "attemptNumber")
+        return dir * ((a.attemptNumber || 0) - (b.attemptNumber || 0));
+      return dir * `${a[sort.key] || ""}`.localeCompare(`${b[sort.key] || ""}`);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportsReducer.rows, sort]);
+
   return (
     <div style={{ display: "flex" }}>
       <Sidebar />
-      <div style={{ padding: "1.5rem", flexGrow: 1 }}>
-        <h2>Reports</h2>
+      <div className="mt-page">
+        <h2 style={{ color: "var(--mt-primary)" }}>Reports</h2>
         <Form onSubmit={runReport}>
           <Row className="align-items-end">
             <Col md={4} className="mb-2">
@@ -122,30 +144,30 @@ const AdminReportsPage = () => {
         <Table striped bordered hover responsive className="mt-3">
           <thead>
             <tr>
-              <th>Student</th>
-              <th>Subject</th>
-              <th>Score</th>
-              <th>Total</th>
-              <th>Result</th>
-              <th>Attempt</th>
+              <th className="mt-sort-th" onClick={() => toggleSort("studentName")}>
+                Student {sortIcon("studentName")}
+              </th>
+              <th className="mt-sort-th" onClick={() => toggleSort("quizTitle")}>
+                Subject {sortIcon("quizTitle")}
+              </th>
+              <th className="mt-sort-th" onClick={() => toggleSort("attemptNumber")}>
+                Attempt {sortIcon("attemptNumber")}
+              </th>
               <th>Date</th>
             </tr>
           </thead>
           <tbody>
-            {reportsReducer.rows.map((r) => (
+            {sortedRows.map((r) => (
               <tr key={r.resultId}>
                 <td>{r.studentName}</td>
                 <td>{r.quizTitle}</td>
-                <td>{r.totalObtainedMarks}</td>
-                <td>{r.totalMarks}</td>
-                <td>{r.passed ? "Pass" : "Fail"}</td>
                 <td>{r.attemptNumber}</td>
                 <td>{r.attemptDatetime}</td>
               </tr>
             ))}
             {reportsReducer.rows.length === 0 && (
               <tr>
-                <td colSpan="7" className="text-center">
+                <td colSpan="4" className="text-center">
                   No results. Choose a quiz and click Run.
                 </td>
               </tr>

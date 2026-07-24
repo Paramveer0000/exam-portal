@@ -604,3 +604,94 @@ gotchas, and open issues that are NOT in the source code or git history.
 - notes / follow-ups: backend, frontend (:3000), and MySQL (XAMPP mysqld) all stopped at end of
   session per user request ("kill all"). Ports 8081/3000/3306 confirmed down. Uncommitted changes
   remain in the working tree (not committed this session — user hasn't asked for a commit).
+
+### 2026-07-24 11:36 — Feature: The Mentalist 15-page PDF report generation  [type: change]
+- what: built the full report-generation system on top of existing psychometric scoring (never
+  recalculated): V22 migration (users.father_name/mother_name/dob/city/gender +
+  mentalist_reports table); InterpretationEngine (score-band rule engine); ReportContentAiService
+  (AI Content Engine, reuses existing AiService, falls back to InterpretationEngine when no AI key
+  configured); ReportDataAssembler (regroups existing MI/RIASEC/quotient scores into the 15 named
+  pages — documented fixed-formula derivations, same pattern as the existing MI-domain sums);
+  PdfReportServiceImpl (Thymeleaf template -> openhtmltopdf, Java-native, no headless browser);
+  MentalistReportController (generate/download, ownership-scoped via existing
+  psychometricReportService.getReport); frontend profile fields + Redux resource + Download button
+  on PsychometricReportPage (replaces window.print()).
+- files: backend — V22__mentalist_report.sql; models/{User,MentalistReport}.java;
+  repository/MentalistReportRepository.java; services/{InterpretationEngine,ReportContentAiService,
+  ReportDataAssembler,PdfReportService,MentalistReportService}.java + implementation/*;
+  dto/{MentalistReportDto,ReportSectionContent}.java; controllers/MentalistReportController.java;
+  configurations/SecurityConfig.java (+2 rules); dto/UpdateProfileRequest.java +
+  ProfileServiceImpl.java (+5 fields); resources/templates/report/{report,fragments}.html;
+  pom.xml (+thymeleaf, +openhtmltopdf-pdfbox). frontend — components/ProfilePanel.js;
+  constants/services/actions/reducers/mentalistReportConstants.js (new resource); store.js;
+  pages/users/PsychometricReportPage.js.
+- result: PASS end-to-end. Generated a real report for quizResId 30 (Bank Student, real existing
+  attempt) as SUPER_ADMIN dalveer: POST .../generate -> 200, GET .../download -> 200, 95KB PDF,
+  verified via pypdf: exactly 15 pages, all A4 (210x297mm), correct content per page, no missing/
+  tofu glyphs after fixes below. mentalist_reports row (report_id=1) and its PDF file left in place
+  (real attempt, not throwaway test data — demonstrates the working feature).
+- bugs found & fixed during this session's testing (not present in final code):
+  1. Thymeleaf fragment defined inline in the main template got double-evaluated (its own
+     `${section}` param was null at the top-level pass) -> moved to a separate
+     `templates/report/fragments.html`, referenced via `~{report/fragments :: traitSection(...)}`.
+  2. `report.html` had picked up a UTF-8 BOM from an earlier PowerShell `Set-Content -Encoding
+     UTF8` edit (defaults to BOM on Windows PowerShell 5.1) — the leading U+FEFF corrupted both
+     jsoup's HTML5 parse (head content leaked into body as visible text) and strict XML parsing
+     ("Content is not allowed in prolog"). Stripped the BOM from the file and added a defensive
+     strip in PdfReportServiceImpl.render() in case it recurs. Switched PDF rendering to
+     `PdfRendererBuilder.withHtmlContent()` (strict XHTML parse) instead of the jsoup+W3CDom
+     round-trip, once the BOM was no longer masking the real structure — one less moving part.
+  3. Default PDF font (WinAnsi/Arial-class) doesn't cover em-dash/star glyphs -> replaced literal
+     "—"/"★" in templates with ASCII ("-", repeated "*"), and added a `sanitize()` step
+     (ReportContentAiServiceImpl) that flattens smart quotes/em-dashes/ellipsis from any LLM output
+     before it reaches the PDF.
+- notes / follow-ups: `mentalist.reports.dir` (application.properties) defaults to
+  `./data/mentalist-reports` — a real deployment should point this at persistent storage.
+  Backend (:8081) and frontend (:3000) both left running for the user to continue testing.
+- follow-up UI click-through (same session): frontend started clean (no compile errors, no
+  console errors). Logged in as dalveer (SUPER_ADMIN) via localStorage token injection, opened
+  /psychometricReport/30, clicked "Generate AI Report" then "Download The Mentalist Report (PDF)"
+  — POST .../generate?regenerate=false -> used the already-generated report (fast path, no
+  re-render), GET .../download -> 200, button returned to normal state, no console errors.
+  Confirms the full click path (not just curl) works.
+
+### 2026-07-24 12:40 — UI redesign: "The Mentalist" brand theme applied app-wide  [type: change]
+- what: (1) redesigned Super Admin Schools page (stat cards, sortable/searchable table, avatars,
+  role/status Badges, icon action buttons, removed fixed maxWidth so table fills/shrinks with
+  viewport); (2) redesigned Super Admin Dashboard the same way (icon stat tiles, sortable/
+  searchable School performance table, per-row student progress bar, top-school trophy); (3) added
+  shared CSS helper classes to index.css (`.mt-card`, `.mt-card-hover`, `.mt-stat-icon`,
+  `.mt-avatar`, `.mt-search`, `.mt-sort-th`, `.mt-progress-track/.mt-progress-fill`, `.mt-page`) so
+  every page reuses the same tokens/pattern instead of hand-rolled inline styles; (4) ran 4 parallel
+  agents to apply the same treatment to all 26 remaining pages (super admin Results/Profile/AI
+  Settings; admin Dashboard/QuizResult/Reports/Students/Profile; admin categories/quizzes/questions
+  CRUD forms+lists; all student-facing pages except the live exam-taking screen which only got a
+  color-only title touch, logic untouched); (5) removed the "New Customer? Register" self-signup
+  link from LoginPage.js (dead end since student self-registration was removed in the V20 migration
+  session — POST /api/register already 403s).
+- files: exam-portal-frontend/src/index.css (+shared helper classes); pages/superadmin/
+  {SuperAdminAdminsPage,SuperAdminDashboardPage,SuperAdminResultsPage,SuperAdminProfilePage,
+  SuperAdminAiSettingsPage}.js; pages/admin/{AdminDashboardPage,AdminQuizResultPage,
+  AdminReportsPage,AdminStudentsPage,AdminProfilePage}.js; pages/admin/categories/
+  {AdminCategoriesPage,AdminAddCategoryPage,AdminUpdateCategoryPage}.js; pages/admin/quizzes/
+  {AdminQuizzesPage,AdminAddQuiz,AdminUpdateQuiz}.js; pages/admin/questions/
+  {AdminQuestionsPage,AdminAddQuestionsPage,AdminUpdateQuestionPage}.js; pages/users/
+  {UserSubjectsPage,UserQuizzesPage,UserQuizManualPage,UserQuestionsPage,UserQuizResultPage,
+  OnboardingPage}.js; pages/LoginPage.js.
+- result: PASS. `CI=true npx react-scripts build` exits 0 (full production build compiles). Caught
+  and fixed one real bug introduced by the batch: AdminDashboardPage.js had a new `useMemo` placed
+  after the existing early `if (!students || !results) return <Loader />` — a rules-of-hooks
+  violation (hook not called on every render). Moved the memo + its dependent data prep above the
+  guard. Remaining ESLint warnings after the full pass are pre-existing (`==` vs `===` in untouched
+  reducers, missing-deps on `useEffect`s that predate this session) — not introduced here. Live
+  browser spot-checks (dalveer/super123, no console errors on any): /superadmin/admins (Schools),
+  /superadmin (Dashboard), /adminDashboard, /adminStudents, /adminQuizzes.
+- notes / follow-ups: (a) `UserDashboardPage.js` exists on disk but is empty and unreferenced
+  anywhere (checked via grep) — dead file, left alone (out of scope, nobody asked to delete it).
+  (b) `UserProfilePage.js` and `AdminProfilePage.js` have no page-level chrome of their own (all
+  content delegated to the shared `ProfilePanel.js` component) — not restyled, out of scope for a
+  page-by-page pass. (c) `PsychometricReportPage.js` already had its own `.css` fully using `mt-*`
+  tokens from an earlier session — left untouched, already matches. (d) session ended with
+  frontend :3000, backend :8081, and MySQL :3306 all killed per user request ("kill and log");
+  confirmed via netstat that all three ports are down. Uncommitted changes remain in the working
+  tree (not committed this session).

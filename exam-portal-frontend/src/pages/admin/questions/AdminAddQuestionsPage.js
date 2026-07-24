@@ -84,7 +84,7 @@ const AdminAddQuestionsPage = () => {
       <div className="adminAddQuestionPage__sidebar">
         <Sidebar />
       </div>
-      <div className="adminAddQuestionPage__content">
+      <div className="mt-page">
         <FormContainer>
           <Button
             variant="secondary"
@@ -93,7 +93,8 @@ const AdminAddQuestionsPage = () => {
           >
             ← Back to Questions
           </Button>
-          <h2>Add Question</h2>
+          <h2 style={{ color: "var(--mt-primary)" }}>Add Question</h2>
+          <div className="mt-card p-4">
           <Form onSubmit={submitHandler}>
             <Form.Group className="my-3" controlId="content">
               <Form.Label>Question</Form.Label>
@@ -265,6 +266,7 @@ const AdminAddQuestionsPage = () => {
               Add
             </Button>
           </Form>
+          </div>
         </FormContainer>
       </div>
     </div>

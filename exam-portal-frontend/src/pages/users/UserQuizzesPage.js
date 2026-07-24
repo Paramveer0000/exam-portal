@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import SidebarUser from "../../components/SidebarUser";
 import "./UserQuizzesPage.css";
 import { fetchQuizzes } from "../../actions/quizzesActions";
-import { Card, Col, Row } from "react-bootstrap";
+import { Badge, Card, Col, Row } from "react-bootstrap";
 
 const UserQuizzesPage = () => {
   const navigate = useNavigate();
@@ -75,25 +75,15 @@ const UserQuizzesPage = () => {
                           ? "0 0 6px rgba(68,177,49,0.5)"
                           : undefined,
                       }}
-                      className="mb-2"
+                      className="mb-2 mt-card mt-card-hover"
                     >
                       <Card.Body>
                         <Card.Title>
                           {q.title}
                           {isOpened(q.quizId) && (
-                            <span
-                              style={{
-                                marginLeft: "8px",
-                                fontSize: "0.7rem",
-                                fontWeight: "600",
-                                color: "#1E7A6F",
-                                border: "1px solid #1E7A6F",
-                                borderRadius: "4px",
-                                padding: "1px 6px",
-                              }}
-                            >
+                            <Badge bg="info" className="ms-2">
                               Opened
-                            </span>
+                            </Badge>
                           )}
                         </Card.Title>
                         <Card.Subtitle className="mb-2 text-muted">

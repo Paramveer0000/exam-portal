@@ -1,10 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Accordion, Badge, Table } from "react-bootstrap";
+import { Accordion, Badge, Form, Table } from "react-bootstrap";
+import { BsSearch } from "react-icons/bs";
 import SuperAdminSidebar from "../../components/SuperAdminSidebar";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import adminServices from "../../services/adminServices";
+
+const initials = (name) =>
+  (name || "?")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0].toUpperCase())
+    .join("");
 
 const SuperAdminResultsPage = () => {
   const navigate = useNavigate();
@@ -12,6 +21,7 @@ const SuperAdminResultsPage = () => {
 
   const [schools, setSchools] = useState(null);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (!token) navigate("/");
@@ -27,11 +37,18 @@ const SuperAdminResultsPage = () => {
   const schoolAttempts = (s) =>
     (s.students || []).reduce((n, st) => n + (st.results || []).length, 0);
 
+  const filteredSchools = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!schools) return schools;
+    if (!q) return schools;
+    return schools.filter((s) => (s.schoolName || "").toLowerCase().includes(q));
+  }, [schools, search]);
+
   return (
     <div style={{ display: "flex" }}>
       <SuperAdminSidebar />
-      <div style={{ padding: "1.5rem", flexGrow: 1, maxWidth: "1000px" }}>
-        <h2>All Results by School</h2>
+      <div className="mt-page">
+        <h2 style={{ color: "var(--mt-primary)" }}>All Results by School</h2>
         <p className="text-muted">
           Every attempt, grouped by partner school and then by student.
         </p>
@@ -44,8 +61,17 @@ const SuperAdminResultsPage = () => {
         )}
 
         {schools && schools.length > 0 && (
-          <Accordion alwaysOpen>
-            {schools.map((s, si) => (
+          <>
+            <div className="mt-search mb-3" style={{ maxWidth: 320 }}>
+              <BsSearch />
+              <Form.Control
+                placeholder="Search schools"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <Accordion alwaysOpen className="mt-card">
+            {filteredSchools.map((s, si) => (
               <Accordion.Item eventKey={String(si)} key={si}>
                 <Accordion.Header>
                   {s.schoolName}{" "}
@@ -61,7 +87,8 @@ const SuperAdminResultsPage = () => {
                 <Accordion.Body>
                   {(s.students || []).map((st) => (
                     <div key={st.studentId} className="mb-4">
-                      <h6>
+                      <h6 className="d-flex align-items-center gap-2">
+                        <span className="mt-avatar">{initials(st.studentName || st.username)}</span>
                         {st.studentName}{" "}
                         <span className="text-muted">({st.username})</span>
                       </h6>
@@ -70,8 +97,6 @@ const SuperAdminResultsPage = () => {
                           <tr>
                             <th>Class</th>
                             <th>Subject</th>
-                            <th>Marks</th>
-                            <th>Result</th>
                             <th>Date</th>
                             <th>Report</th>
                           </tr>
@@ -81,14 +106,6 @@ const SuperAdminResultsPage = () => {
                             <tr key={r.quizResId}>
                               <td>{r.className}</td>
                               <td>{r.quizTitle}</td>
-                              <td>
-                                {r.obtainedMarks} / {r.totalMarks}
-                              </td>
-                              <td>
-                                <Badge bg={r.passed ? "success" : "danger"}>
-                                  {r.passed ? "Passed" : "Failed"}
-                                </Badge>
-                              </td>
                               <td>{r.attemptDatetime}</td>
                               <td>
                                 <a
@@ -112,7 +129,8 @@ const SuperAdminResultsPage = () => {
                 </Accordion.Body>
               </Accordion.Item>
             ))}
-          </Accordion>
+            </Accordion>
+          </>
         )}
       </div>
     </div>

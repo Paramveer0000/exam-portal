@@ -31,8 +31,8 @@ const AdminQuizResultPage = () => {
   return (
     <div style={{ display: "flex" }}>
       <RoleSidebar />
-      <div style={{ padding: "1.5rem", flexGrow: 1, maxWidth: "1000px" }}>
-        <h2>All Results by Class</h2>
+      <div className="mt-page">
+        <h2 style={{ color: "var(--mt-primary)" }}>All Results by Class</h2>
         <p className="text-muted">
           Your students' attempts, grouped by class and then by student.
         </p>
@@ -43,7 +43,7 @@ const AdminQuizResultPage = () => {
         {classes && classes.length === 0 && <Message>No results yet.</Message>}
 
         {classes && classes.length > 0 && (
-          <Accordion alwaysOpen>
+          <Accordion alwaysOpen className="mt-card">
             {classes.map((c, ci) => (
               <Accordion.Item eventKey={String(ci)} key={ci}>
                 <Accordion.Header>
@@ -60,7 +60,10 @@ const AdminQuizResultPage = () => {
                 <Accordion.Body>
                   {(c.students || []).map((st) => (
                     <div key={st.studentId} className="mb-4">
-                      <h6>
+                      <h6 style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div className="mt-avatar">
+                          {(st.studentName?.[0] || st.username?.[0] || "?").toUpperCase()}
+                        </div>
                         {st.studentName}{" "}
                         <span className="text-muted">({st.username})</span>
                       </h6>
@@ -68,8 +71,6 @@ const AdminQuizResultPage = () => {
                         <thead>
                           <tr>
                             <th>Subject</th>
-                            <th>Marks</th>
-                            <th>Result</th>
                             <th>Date</th>
                             <th>Report</th>
                           </tr>
@@ -78,14 +79,6 @@ const AdminQuizResultPage = () => {
                           {(st.results || []).map((r) => (
                             <tr key={r.quizResId}>
                               <td>{r.quizTitle}</td>
-                              <td>
-                                {r.obtainedMarks} / {r.totalMarks}
-                              </td>
-                              <td>
-                                <Badge bg={r.passed ? "success" : "danger"}>
-                                  {r.passed ? "Passed" : "Failed"}
-                                </Badge>
-                              </td>
                               <td>{r.attemptDatetime}</td>
                               <td>
                                 <a

@@ -7,7 +7,7 @@ import { fetchQuizResult } from "../../actions/quizResultActions";
 import * as quizResultConstants from "../../constants/quizResultConstants";
 import Message from "../../components/Message";
 import { Link } from "react-router-dom";
-import { Button, Table } from "react-bootstrap";
+import { Button, Card, Table } from "react-bootstrap";
 
 const UserQuizResultPage = () => {
   const dispatch = useDispatch();
@@ -39,8 +39,10 @@ const UserQuizResultPage = () => {
       </div>
 
       <div className="userQuizResultPage__content">
-        { 
+        <h2 style={{ color: "var(--mt-primary)" }}>My Results</h2>
+        {
         quizResults && quizResults.length !== 0 ? (
+          <Card className="mt-card" body>
           <Table bordered className="userQuizResultPage__content--table">
             <thead>
               <tr>
@@ -79,6 +81,7 @@ const UserQuizResultPage = () => {
               );
             })}
           </Table>
+          </Card>
         ) : (
           <Message>
             No results to display. Attemp any <Link to="/quizzes">Quiz.</Link>

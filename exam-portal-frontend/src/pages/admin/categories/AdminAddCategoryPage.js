@@ -39,7 +39,7 @@ const AdminAddCategoryPage = () => {
       <div className="adminAddCategoryPage__sidebar">
         <RoleSidebar />
       </div>
-      <div className="adminAddCategoryPage__content">
+      <div className="mt-page">
         <FormContainer>
           <Button
             variant="secondary"
@@ -48,7 +48,8 @@ const AdminAddCategoryPage = () => {
           >
             ← Back to Classes
           </Button>
-          <h2>Add Class</h2>
+          <h2 style={{ color: "var(--mt-primary)" }}>Add Class</h2>
+          <div className="mt-card p-4">
           <Form onSubmit={submitHandler}>
             <Form.Group className="my-3" controlId="title">
               <Form.Label>Title</Form.Label>
@@ -86,6 +87,7 @@ const AdminAddCategoryPage = () => {
               Add
             </Button>
           </Form>
+          </div>
         </FormContainer>
       </div>
     </div>

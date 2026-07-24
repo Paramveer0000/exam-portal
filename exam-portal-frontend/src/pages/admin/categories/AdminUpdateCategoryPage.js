@@ -43,7 +43,7 @@ const AdminUpdateCategoryPage = () => {
       <div className="adminUpdateCategoryPage__sidebar">
         <RoleSidebar />
       </div>
-      <div className="adminUpdateCategoryPage__content">
+      <div className="mt-page">
         <FormContainer>
           <Button
             variant="secondary"
@@ -52,7 +52,8 @@ const AdminUpdateCategoryPage = () => {
           >
             ← Back to Classes
           </Button>
-          <h2>Update Class</h2>
+          <h2 style={{ color: "var(--mt-primary)" }}>Update Class</h2>
+          <div className="mt-card p-4">
           <Form onSubmit={submitHandler}>
             <Form.Group className="my-3" controlId="title">
               <Form.Label>Title</Form.Label>
@@ -90,6 +91,7 @@ const AdminUpdateCategoryPage = () => {
               Update
             </Button>
           </Form>
+          </div>
         </FormContainer>
       </div>
     </div>

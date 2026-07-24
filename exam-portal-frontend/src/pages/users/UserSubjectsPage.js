@@ -27,7 +27,7 @@ const UserSubjectsPage = () => {
         <SidebarUser />
       </div>
       <div className="userQuizzesPage__content">
-        <h2 className="mb-3">My Subjects</h2>
+        <h2 className="mb-3" style={{ color: "var(--mt-primary)" }}>My Subjects</h2>
         {subjects.length === 0 ? (
           <p>No subjects in your class yet.</p>
         ) : (
@@ -37,7 +37,7 @@ const UserSubjectsPage = () => {
                 <Card
                   bg="light"
                   text="dark"
-                  className="mb-2"
+                  className="mb-2 mt-card mt-card-hover"
                   style={{ cursor: "pointer", height: "95%", marginTop: "5px" }}
                   onClick={() => navigate(`/quizzes?subjectId=${s.subjectId}`)}
                 >

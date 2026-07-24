@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import { Badge, Button, Form, Table } from "react-bootstrap";
+import { BsSearch, BsSortDown, BsSortUp } from "react-icons/bs";
 import swal from "sweetalert";
 import RoleSidebar from "../../components/RoleSidebar";
 import studentsServices from "../../services/studentsServices";
@@ -26,6 +27,7 @@ const AdminStudentsPage = () => {
   const [newStudent, setNewStudent] = useState(emptyNew);
   const [schoolsById, setSchoolsById] = useState({});
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState({ key: "name", dir: 1 });
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const isSuperAdmin =
@@ -148,12 +150,33 @@ const AdminStudentsPage = () => {
     }
   };
 
-  const filtered = students.filter((s) => {
-    const q = search.trim().toLowerCase();
-    if (!q) return true;
-    const name = `${s.firstName || ""} ${s.lastName || ""} ${s.username || ""}`.toLowerCase();
-    return name.includes(q);
-  });
+  const toggleSort = (key) =>
+    setSort((prev) => (prev.key === key ? { key, dir: -prev.dir } : { key, dir: 1 }));
+
+  const sortIcon = (key) =>
+    sort.key !== key ? null : sort.dir === 1 ? (
+      <BsSortUp className="ms-1" />
+    ) : (
+      <BsSortDown className="ms-1" />
+    );
+
+  const studentName = (s) => `${s.firstName || ""} ${s.lastName || ""}`.trim() || s.username;
+
+  const initials = (s) =>
+    ((s.firstName?.[0] || s.username?.[0] || "?") + (s.lastName?.[0] || "")).toUpperCase();
+
+  const filtered = students
+    .filter((s) => {
+      const q = search.trim().toLowerCase();
+      if (!q) return true;
+      const name = `${s.firstName || ""} ${s.lastName || ""} ${s.username || ""}`.toLowerCase();
+      return name.includes(q);
+    })
+    .sort((a, b) => {
+      const dir = sort.dir;
+      if (sort.key === "id") return dir * (a.userId - b.userId);
+      return dir * studentName(a).localeCompare(studentName(b));
+    });
 
   const groups = [];
   const groupIndex = {};
@@ -191,9 +214,9 @@ const AdminStudentsPage = () => {
   return (
     <div style={{ display: "flex" }}>
       <RoleSidebar />
-      <div style={{ padding: "1.5rem", flexGrow: 1 }}>
+      <div className="mt-page">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h2>My Students</h2>
+          <h2 style={{ color: "var(--mt-primary)" }}>My Students</h2>
           {!isSuperAdmin && (
             <Button variant="success" onClick={() => setShowCreate((v) => !v)}>
               {showCreate ? "Close" : "+ Add Student"}
@@ -202,13 +225,14 @@ const AdminStudentsPage = () => {
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
 
-        <Form.Control
-          placeholder="Search by student name"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="mt-3"
-          style={{ maxWidth: 300 }}
-        />
+        <div className="mt-search mt-3" style={{ maxWidth: 300 }}>
+          <BsSearch />
+          <Form.Control
+            placeholder="Search by student name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         {showCreate && (
           <Form onSubmit={createHandler} className="p-3 mt-2" style={{ background: "#f6f9ff", borderRadius: 8 }}>
@@ -238,9 +262,13 @@ const AdminStudentsPage = () => {
           <Table striped bordered hover responsive>
           <thead>
             <tr>
-              <th>ID</th>
+              <th className="mt-sort-th" onClick={() => toggleSort("id")}>
+                ID {sortIcon("id")}
+              </th>
               <th>Username</th>
-              <th>Name</th>
+              <th className="mt-sort-th" onClick={() => toggleSort("name")}>
+                Name {sortIcon("name")}
+              </th>
               <th>Phone</th>
               {isSuperAdmin && <th>School</th>}
               <th>Class</th>
@@ -261,7 +289,11 @@ const AdminStudentsPage = () => {
                   <td><Form.Control name="phoneNumber" value={form.phoneNumber} onChange={setField} /></td>
                   {isSuperAdmin && <td>{schoolName(s.teacherId)}</td>}
                   <td>{classTitle(s.classId)}</td>
-                  <td>{s.active ? "Active" : "Disabled"}</td>
+                  <td>
+                    <Badge bg={s.active ? "success" : "secondary"}>
+                      {s.active ? "Active" : "Disabled"}
+                    </Badge>
+                  </td>
                   <td style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                     <Button size="sm" variant="success" onClick={() => saveEdit(s)}>Save</Button>
                     <Button size="sm" variant="light" onClick={cancelEdit}>Cancel</Button>
@@ -271,7 +303,12 @@ const AdminStudentsPage = () => {
                 <tr key={s.userId}>
                   <td>{s.userId}</td>
                   <td>{s.username}</td>
-                  <td>{`${s.firstName || ""} ${s.lastName || ""}`.trim()}</td>
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <div className="mt-avatar">{initials(s)}</div>
+                      {studentName(s)}
+                    </div>
+                  </td>
                   <td>{s.phoneNumber}</td>
                   {isSuperAdmin && <td>{schoolName(s.teacherId)}</td>}
                   <td style={{ minWidth: 160 }}>
@@ -286,7 +323,11 @@ const AdminStudentsPage = () => {
                       ))}
                     </Form.Select>
                   </td>
-                  <td>{s.active ? "Active" : "Disabled"}</td>
+                  <td>
+                    <Badge bg={s.active ? "success" : "secondary"}>
+                      {s.active ? "Active" : "Disabled"}
+                    </Badge>
+                  </td>
                   <td style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
                     <Button size="sm" variant="primary" onClick={() => startEdit(s)}>Edit</Button>
                     <Button size="sm" variant="secondary" onClick={() => toggleStatus(s)}>

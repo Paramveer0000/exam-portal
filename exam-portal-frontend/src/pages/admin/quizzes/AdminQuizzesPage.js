@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./AdminQuizzesPage.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, ListGroup } from "react-bootstrap";
+import { Badge, Button, Card, ListGroup } from "react-bootstrap";
+import { BsJournalBookmark } from "react-icons/bs";
 import Message from "../../../components/Message";
 import RoleSidebar from "../../../components/RoleSidebar";
 import Loader from "../../../components/Loader";
@@ -102,13 +103,17 @@ const AdminQuizzesPage = () => {
   const classGroups = buildClassGroups();
 
   const renderSubjectCard = (quiz) => (
-    <ListGroup
-      className="adminQuizzesPage__content--quizzesList"
-      key={quiz.quizId}
-    >
-      <ListGroup.Item className="align-items-start" action>
+    <Card className="mt-card mb-2" key={quiz.quizId}>
+      <ListGroup variant="flush">
+      <ListGroup.Item className="align-items-start">
         <div className="ms-2 me-auto">
-          <div className="fw-bold">{quiz.title}</div>
+          <div className="fw-bold d-flex align-items-center gap-2">
+            <BsJournalBookmark style={{ color: "var(--mt-secondary)" }} />
+            {quiz.title}
+            <Badge bg={quiz.isActive ? "success" : "secondary"}>
+              {quiz.isActive ? "Published" : "Draft"}
+            </Badge>
+          </div>
           {<p className="my-3">{quiz.description}</p>}
           <div className="adminQuizzesPage__content--ButtonsList">
             <div
@@ -178,7 +183,8 @@ const AdminQuizzesPage = () => {
           </div>
         </div>
       </ListGroup.Item>
-    </ListGroup>
+      </ListGroup>
+    </Card>
   );
 
   return (
@@ -186,7 +192,7 @@ const AdminQuizzesPage = () => {
       <div className="adminQuizzesPage__sidebar">
         <RoleSidebar />
       </div>
-      <div className="adminQuizzesPage__content">
+      <div className="mt-page">
         <div
           style={{
             display: "flex",
@@ -194,12 +200,8 @@ const AdminQuizzesPage = () => {
             alignItems: "center",
           }}
         >
-          <h2>Subjects</h2>
-          <Button
-            variant=""
-            className="adminQuizzesPage__content--button"
-            onClick={addNewQuizHandler}
-          >
+          <h2 style={{ color: "var(--mt-primary)" }}>Subjects</h2>
+          <Button variant="primary" onClick={addNewQuizHandler}>
             Add Subject
           </Button>
         </div>
@@ -210,12 +212,11 @@ const AdminQuizzesPage = () => {
             classGroups.map((group) => (
               <div
                 key={group.catId}
+                className="mt-card"
                 style={{
-                  border: "1px solid #ced4da",
-                  borderRadius: "8px",
                   padding: "12px 16px",
                   marginBottom: "20px",
-                  backgroundColor: "#f8f9fa",
+                  marginTop: "12px",
                 }}
               >
                 <h4 style={{ marginBottom: "12px" }}>

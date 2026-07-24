@@ -120,7 +120,7 @@ const AdminUpdateQuiz = () => {
       <div className="adminUpdateQuizPage__sidebar">
         <RoleSidebar />
       </div>
-      <div className="adminUpdateQuizPage__content">
+      <div className="mt-page">
         <FormContainer>
           <Button
             variant="secondary"
@@ -129,7 +129,8 @@ const AdminUpdateQuiz = () => {
           >
             ← Back to Subjects
           </Button>
-          <h2>Update Subject</h2>
+          <h2 style={{ color: "var(--mt-primary)" }}>Update Subject</h2>
+          <div className="mt-card p-4">
           <Form onSubmit={submitHandler}>
             <Form.Group className="my-3" controlId="title">
               <Form.Label>Title</Form.Label>
@@ -284,6 +285,7 @@ const AdminUpdateQuiz = () => {
               Update
             </Button>
           </Form>
+          </div>
         </FormContainer>
       </div>
     </div>

@@ -71,3 +71,85 @@ h1, h2, h3, h4, h5, h6 {
   line-height: var(--mt-lh-tight);
   font-weight: 600;
 }
+
+/* ============================================================
+   Shared component helpers — reused across dashboard/list pages
+   so pages don't hand-roll the same inline style object.
+   ============================================================ */
+.mt-card {
+  border-radius: var(--mt-radius-md);
+  border: 1px solid var(--mt-border);
+  box-shadow: var(--mt-shadow-sm);
+}
+
+.mt-card-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.mt-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--mt-shadow-lg);
+}
+
+.mt-stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.mt-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--mt-primary-light);
+  color: var(--mt-text-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--mt-fs-xs);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mt-search {
+  position: relative;
+}
+.mt-search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mt-text-muted);
+}
+.mt-search input {
+  padding-left: 34px;
+}
+
+.mt-sort-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.mt-progress-track {
+  flex-grow: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--mt-border);
+  overflow: hidden;
+}
+.mt-progress-fill {
+  height: 100%;
+  background: var(--mt-secondary);
+}
+
+.mt-page {
+  padding: 1.5rem;
+  flex-grow: 1;
+  min-width: 0;
+}

@@ -209,7 +209,7 @@ const UserQuestionsPage = () => {
   return (
     <div className="userQuestionsPage__container">
       <div className="userQuestionsPage__content">
-        <h2>{`Questions : ${quizTitle}`}</h2>
+        <h2 style={{ color: "var(--mt-primary)" }}>{`Questions : ${quizTitle}`}</h2>
         {questions.length > 0 && (
           <div style={{ margin: "10px 0" }}>
             <ProgressBar

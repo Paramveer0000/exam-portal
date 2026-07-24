@@ -65,13 +65,13 @@ const UserQuizManualPage = () => {
           </div>
 
           <div className="quizManualPage__content--section">
-            <h3>{quiz.title}</h3>
+            <h3 style={{ color: "var(--mt-primary)" }}>{quiz.title}</h3>
             <p>{quiz.description}</p>
           </div>
 
           <hr />
 
-          <div>
+          <div className="mt-card" style={{ padding: "16px 20px", marginBottom: "16px" }}>
             <h3>Important Instructions</h3>
             <ul>
               <li>
@@ -101,7 +101,7 @@ const UserQuizManualPage = () => {
 
           <hr />
 
-          <div>
+          <div className="mt-card" style={{ padding: "16px 20px", marginBottom: "16px" }}>
             <h3>Attempting Quiz</h3>
             <ul>
               <li>

@@ -1,6 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Card, Col, Form, Row, Table } from "react-bootstrap";
+import { Badge, Button, Card, Col, Form, Row, Table } from "react-bootstrap";
+import {
+  BsBoxArrowInRight,
+  BsKey,
+  BsGraphUp,
+  BsPauseCircle,
+  BsPlayCircle,
+  BsSearch,
+  BsSortDown,
+  BsSortUp,
+  BsTrash,
+} from "react-icons/bs";
 import swal from "sweetalert";
 import SuperAdminSidebar from "../../components/SuperAdminSidebar";
 import adminServices from "../../services/adminServices";
@@ -33,6 +44,7 @@ const SuperAdminAdminsPage = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [limitDraft, setLimitDraft] = useState({});
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState({ key: "name", dir: 1 });
 
   // Open the create form pre-set to a role (from the top-right buttons).
   const openCreate = (role) => {
@@ -153,12 +165,44 @@ const SuperAdminAdminsPage = () => {
     fetchActivity(dispatch, admin.userId, token);
   };
 
-  const filteredAdmins = admins.filter((a) => {
+  const toggleSort = (key) =>
+    setSort((prev) =>
+      prev.key === key ? { key, dir: -prev.dir } : { key, dir: 1 }
+    );
+
+  const sortIcon = (key) =>
+    sort.key !== key ? null : sort.dir === 1 ? (
+      <BsSortDown className="ms-1" />
+    ) : (
+      <BsSortUp className="ms-1" />
+    );
+
+  const filteredAdmins = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return true;
-    const name = `${a.firstName || ""} ${a.lastName || ""} ${a.username || ""}`.toLowerCase();
-    return name.includes(q);
-  });
+    const list = admins.filter((a) => {
+      if (!q) return true;
+      const name = `${a.firstName || ""} ${a.lastName || ""} ${a.username || ""}`.toLowerCase();
+      return name.includes(q);
+    });
+    const dir = sort.dir;
+    return [...list].sort((a, b) => {
+      if (sort.key === "students")
+        return dir * ((a.activeStudentCount || 0) - (b.activeStudentCount || 0));
+      const an = `${a.firstName || ""} ${a.lastName || ""}`.trim() || a.username;
+      const bn = `${b.firstName || ""} ${b.lastName || ""}`.trim() || b.username;
+      return dir * an.localeCompare(bn);
+    });
+  }, [admins, search, sort]);
+
+  const schools = admins.filter((a) => a.role !== "SUPER_ADMIN");
+  const stats = {
+    total: schools.length,
+    active: schools.filter((a) => a.active).length,
+    students: schools.reduce((sum, a) => sum + (a.activeStudentCount || 0), 0),
+    capacity: schools.some((a) => a.studentLimit == null)
+      ? "∞"
+      : schools.reduce((sum, a) => sum + (a.studentLimit || 0), 0),
+  };
 
   const currentUserId = (() => {
     try {
@@ -192,7 +236,7 @@ const SuperAdminAdminsPage = () => {
   return (
     <div style={{ display: "flex" }}>
       <SuperAdminSidebar />
-      <div style={{ padding: "1.5rem", flexGrow: 1, maxWidth: "1100px" }}>
+      <div style={{ padding: "1.5rem", flexGrow: 1, minWidth: 0 }}>
         <div
           style={{
             display: "flex",
@@ -202,7 +246,9 @@ const SuperAdminAdminsPage = () => {
             gap: "8px",
           }}
         >
-          <h2 className="mb-0">Schools</h2>
+          <h2 className="mb-0" style={{ color: "var(--mt-primary)" }}>
+            Schools
+          </h2>
           <div style={{ display: "flex", gap: "8px" }}>
             <Button variant="primary" onClick={() => openCreate("ADMIN")}>
               + Register Partner / School
@@ -215,6 +261,40 @@ const SuperAdminAdminsPage = () => {
             </Button>
           </div>
         </div>
+
+        <Row className="my-3">
+          {[
+            { label: "Schools", value: stats.total },
+            { label: "Active", value: stats.active },
+            { label: "Active students", value: stats.students },
+            { label: "Total capacity", value: stats.capacity },
+          ].map((s) => (
+            <Col key={s.label} xs={6} md={3} className="mb-3">
+              <Card
+                body
+                style={{
+                  borderRadius: "var(--mt-radius-md)",
+                  border: "1px solid var(--mt-border)",
+                  boxShadow: "var(--mt-shadow-sm)",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "var(--mt-fs-2xl)",
+                    fontWeight: 700,
+                    color: "var(--mt-primary)",
+                  }}
+                >
+                  {s.value}
+                </div>
+                <div style={{ color: "var(--mt-text-muted)", fontSize: "var(--mt-fs-sm)" }}>
+                  {s.label}
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
 
         {showCreate && (
         <Card body className="my-3">
@@ -319,88 +399,176 @@ const SuperAdminAdminsPage = () => {
         </Card>
         )}
 
-        <Card body className="my-3">
+        <Card
+          body
+          className="my-3"
+          style={{
+            borderRadius: "var(--mt-radius-md)",
+            border: "1px solid var(--mt-border)",
+            boxShadow: "var(--mt-shadow-sm)",
+          }}
+        >
           <h4>All Schools</h4>
-          <Form.Control
-            placeholder="Search by school name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="mb-3"
-            style={{ maxWidth: 300 }}
-          />
+          <div className="mb-3" style={{ maxWidth: 320, position: "relative" }}>
+            <BsSearch
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--mt-text-muted)",
+              }}
+            />
+            <Form.Control
+              placeholder="Search by school name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ paddingLeft: 34 }}
+            />
+          </div>
           <Table striped bordered hover responsive>
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Username</th>
-                <th>Name</th>
+                <th role="button" onClick={() => toggleSort("name")}>
+                  Name {sortIcon("name")}
+                </th>
                 <th>Phone</th>
                 <th>Role</th>
-                <th>Students</th>
+                <th role="button" onClick={() => toggleSort("students")}>
+                  Students {sortIcon("students")}
+                </th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredAdmins.map((a) => (
-                <tr key={a.userId}>
-                  <td>{a.userId}</td>
-                  <td>{a.username}</td>
-                  <td>{`${a.firstName || ""} ${a.lastName || ""}`.trim()}</td>
-                  <td>{a.phoneNumber}</td>
-                  <td>{a.role === "SUPER_ADMIN" ? "Super Admin" : "School"}</td>
-                  <td>
-                    {a.role === "SUPER_ADMIN" ? (
-                      "—"
-                    ) : (
-                      <div style={{ display: "flex", gap: "4px", alignItems: "center", minWidth: 200 }}>
-                        <span className="text-muted" style={{ whiteSpace: "nowrap" }}>
-                          {a.activeStudentCount} active / allowed:
-                        </span>
-                        <Form.Control
-                          size="sm"
-                          type="number"
-                          min="0"
-                          placeholder="∞"
-                          style={{ width: 80 }}
-                          value={limitValue(a)}
-                          onChange={(e) =>
-                            setLimitDraft((prev) => ({ ...prev, [a.userId]: e.target.value }))
-                          }
-                        />
-                        <Button size="sm" variant="outline-primary" onClick={() => saveLimit(a)}>
-                          Save
-                        </Button>
+              {filteredAdmins.map((a) => {
+                const initials = (
+                  (a.firstName?.[0] || a.username?.[0] || "?") +
+                  (a.lastName?.[0] || "")
+                ).toUpperCase();
+                const capacity = a.studentLimit;
+                const atCapacity =
+                  capacity != null && (a.activeStudentCount || 0) >= capacity;
+                return (
+                  <tr key={a.userId}>
+                    <td>{a.userId}</td>
+                    <td>{a.username}</td>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: "50%",
+                            background: "var(--mt-primary-light)",
+                            color: "var(--mt-text-on-primary)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "var(--mt-fs-xs)",
+                            fontWeight: 700,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {initials}
+                        </div>
+                        {`${a.firstName || ""} ${a.lastName || ""}`.trim() || "—"}
                       </div>
-                    )}
-                  </td>
-                  <td>{a.active ? "Active" : "Disabled"}</td>
-                  <td style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-                    {a.userId !== currentUserId && a.role !== "SUPER_ADMIN" && (
-                      <Button size="sm" variant="success" onClick={() => loginAsHandler(a)}>
-                        Login as
+                    </td>
+                    <td>{a.phoneNumber}</td>
+                    <td>
+                      <Badge bg={a.role === "SUPER_ADMIN" ? "dark" : "info"}>
+                        {a.role === "SUPER_ADMIN" ? "Super Admin" : "School"}
+                      </Badge>
+                    </td>
+                    <td>
+                      {a.role === "SUPER_ADMIN" ? (
+                        "—"
+                      ) : (
+                        <div style={{ display: "flex", gap: "4px", alignItems: "center", minWidth: 200 }}>
+                          <span
+                            className={atCapacity ? "text-danger" : "text-muted"}
+                            style={{ whiteSpace: "nowrap" }}
+                          >
+                            {a.activeStudentCount} active / allowed:
+                          </span>
+                          <Form.Control
+                            size="sm"
+                            type="number"
+                            min="0"
+                            placeholder="∞"
+                            style={{ width: 80 }}
+                            value={limitValue(a)}
+                            onChange={(e) =>
+                              setLimitDraft((prev) => ({ ...prev, [a.userId]: e.target.value }))
+                            }
+                          />
+                          <Button size="sm" variant="outline-primary" onClick={() => saveLimit(a)}>
+                            Save
+                          </Button>
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <Badge bg={a.active ? "success" : "secondary"}>
+                        {a.active ? "Active" : "Disabled"}
+                      </Badge>
+                    </td>
+                    <td style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                      {a.userId !== currentUserId && a.role !== "SUPER_ADMIN" && (
+                        <Button
+                          size="sm"
+                          variant="success"
+                          title="Login as this school"
+                          onClick={() => loginAsHandler(a)}
+                        >
+                          <BsBoxArrowInRight />
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="warning"
+                        title="Reset password"
+                        onClick={() => resetHandler(a)}
+                      >
+                        <BsKey />
                       </Button>
-                    )}
-                    <Button size="sm" variant="warning" onClick={() => resetHandler(a)}>
-                      Reset PW
-                    </Button>
-                    <Button size="sm" variant="info" onClick={() => viewActivity(a)}>
-                      Activity
-                    </Button>
-                    {/* You can't disable or delete your own account. */}
-                    {a.userId !== currentUserId && (
-                      <>
-                        <Button size="sm" variant="secondary" onClick={() => toggleStatus(a)}>
-                          {a.active ? "Disable" : "Enable"}
-                        </Button>
-                        <Button size="sm" variant="danger" onClick={() => deleteHandler(a)}>
-                          Delete
-                        </Button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                      <Button
+                        size="sm"
+                        variant="info"
+                        title="View activity"
+                        onClick={() => viewActivity(a)}
+                      >
+                        <BsGraphUp />
+                      </Button>
+                      {/* You can't disable or delete your own account. */}
+                      {a.userId !== currentUserId && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            title={a.active ? "Disable" : "Enable"}
+                            onClick={() => toggleStatus(a)}
+                          >
+                            {a.active ? <BsPauseCircle /> : <BsPlayCircle />}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            title="Delete"
+                            onClick={() => deleteHandler(a)}
+                          >
+                            <BsTrash />
+                          </Button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
               {filteredAdmins.length === 0 && (
                 <tr>
                   <td colSpan="8" className="text-center">
