@@ -756,3 +756,8 @@ gotchas, and open issues that are NOT in the source code or git history.
 - result: PASS — all three services up. Not driven through the UI this session (the in-app browser
   pane was not displayed, so navigate/screenshot failed with "the Browser pane is not displayed");
   verification was curl + SQL only.
+- session end: user said "kill". Frontend preview server stopped cleanly; backend (:8081) and mysqld
+  (:3306) force-killed via Stop-Process. netstat confirms :3306, :8081, :3000 all down. mysqld did
+  not get a normal shutdown, so expect InnoDB crash recovery in the .err log on the next start
+  (harmless, but it is why the log will not show "Shutdown complete" for this run). Working tree
+  clean — the log entry above is committed as 05af9e2.
