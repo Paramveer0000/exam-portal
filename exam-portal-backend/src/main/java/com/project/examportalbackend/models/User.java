@@ -77,11 +77,8 @@ public class User implements UserDetails {
     private String logo;
 
     // Student profile fields for The Mentalist PDF report. Optional, self- or admin-editable.
-    @Column(name = "father_name")
-    private String fatherName;
-
-    @Column(name = "mother_name")
-    private String motherName;
+    @Column(name = "guardian_name")
+    private String guardianName;
 
     @Column(name = "dob")
     private java.time.LocalDate dob;

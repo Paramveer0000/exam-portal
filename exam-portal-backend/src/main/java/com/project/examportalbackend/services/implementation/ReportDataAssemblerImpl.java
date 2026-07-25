@@ -190,8 +190,7 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
     private StudentProfile buildProfile(User student, QuizResult result, PsychometricReportDto psych, MentalistReport existing) {
         StudentProfile p = new StudentProfile();
         p.setStudentName(psych.getStudentName());
-        p.setFatherName(student.getFatherName());
-        p.setMotherName(student.getMotherName());
+        p.setGuardianName(student.getGuardianName());
         p.setGender(student.getGender());
         p.setAge(student.getDob() != null ? java.time.Period.between(student.getDob(), LocalDate.now()).getYears() : null);
         p.setDob(student.getDob() != null ? student.getDob().format(DATE_FMT) : null);

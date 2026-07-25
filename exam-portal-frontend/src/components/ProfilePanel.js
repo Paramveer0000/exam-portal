@@ -7,6 +7,19 @@ import profileServices from "../services/profileServices";
 import authServices from "../services/authServices";
 import { BOARDS, GRADES } from "../pages/users/OnboardingPage";
 
+// Age is derived from the date of birth, never stored separately, so the two
+// can't drift apart. Returns null when the DOB is unset or unparseable.
+const ageFromDob = (dob) => {
+  if (!dob) return null;
+  const d = new Date(dob);
+  if (isNaN(d)) return null;
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+  return age >= 0 ? age : null;
+};
+
 /**
  * Shared profile view for any role: details table, plus Edit Profile and
  * Change Password sections that are hidden behind buttons until clicked.
@@ -38,8 +51,9 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
   const [schoolName, setSchoolName] = useState(
     user ? user.schoolName || "" : ""
   );
-  const [fatherName, setFatherName] = useState(user ? user.fatherName || "" : "");
-  const [motherName, setMotherName] = useState(user ? user.motherName || "" : "");
+  const [guardianName, setGuardianName] = useState(
+    user ? user.guardianName || "" : ""
+  );
   const [gender, setGender] = useState(user ? user.gender || "" : "");
   const [dob, setDob] = useState(user ? user.dob || "" : "");
   const [city, setCity] = useState(user ? user.city || "" : "");
@@ -67,8 +81,7 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
       payload.grade = grade;
       payload.board = board;
       payload.schoolName = schoolName;
-      payload.fatherName = fatherName;
-      payload.motherName = motherName;
+      payload.guardianName = guardianName;
       payload.gender = gender;
       payload.dob = dob;
       payload.city = city;
@@ -244,6 +257,32 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
               </tr>
             </tbody>
           </Table>
+
+          <h5 className="text-start mt-4">Personal details</h5>
+          <Table bordered>
+            <tbody>
+              <tr>
+                <td>Guardian's name</td>
+                <td>{user.guardianName || "—"}</td>
+              </tr>
+              <tr>
+                <td>Gender</td>
+                <td>{user.gender || "—"}</td>
+              </tr>
+              <tr>
+                <td>Date of birth</td>
+                <td>{user.dob || "—"}</td>
+              </tr>
+              <tr>
+                <td>Age</td>
+                <td>{ageFromDob(user.dob) ?? "—"}</td>
+              </tr>
+              <tr>
+                <td>City</td>
+                <td>{user.city || "—"}</td>
+              </tr>
+            </tbody>
+          </Table>
         </>
       )}
 
@@ -352,22 +391,13 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
                 </Row>
 
                 <hr />
-                <h6 className="text-muted">
-                  For The Mentalist report (optional)
-                </h6>
+                <h6 className="text-muted">Personal details (optional)</h6>
                 <Row>
                   <Col md={6} className="mb-2">
-                    <Form.Label>Father's name</Form.Label>
+                    <Form.Label>Guardian's name</Form.Label>
                     <Form.Control
-                      value={fatherName}
-                      onChange={(e) => setFatherName(e.target.value)}
-                    />
-                  </Col>
-                  <Col md={6} className="mb-2">
-                    <Form.Label>Mother's name</Form.Label>
-                    <Form.Control
-                      value={motherName}
-                      onChange={(e) => setMotherName(e.target.value)}
+                      value={guardianName}
+                      onChange={(e) => setGuardianName(e.target.value)}
                     />
                   </Col>
                   <Col md={4} className="mb-2">

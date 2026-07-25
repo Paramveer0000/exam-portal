@@ -27,8 +27,7 @@ public class UpdateProfileRequest {
     private String logo;
 
     // Student profile fields for The Mentalist PDF report. All optional.
-    private String fatherName;
-    private String motherName;
+    private String guardianName;
     private String gender;
     private String dob; // ISO yyyy-MM-dd, or blank/null to leave unset
     private String city;

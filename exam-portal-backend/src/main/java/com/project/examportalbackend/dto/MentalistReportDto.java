@@ -51,8 +51,7 @@ public class MentalistReportDto {
     @Getter @Setter @NoArgsConstructor
     public static class StudentProfile {
         private String studentName;
-        private String fatherName;
-        private String motherName;
+        private String guardianName;
         private String gender;
         private Integer age;
         private String dob;

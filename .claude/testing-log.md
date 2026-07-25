@@ -695,3 +695,43 @@ gotchas, and open issues that are NOT in the source code or git history.
   frontend :3000, backend :8081, and MySQL :3306 all killed per user request ("kill and log");
   confirmed via netstat that all three ports are down. Uncommitted changes remain in the working
   tree (not committed this session).
+
+### 2026-07-25 — Student profile: guardian name + personal-details view  [type: change]
+- what: user asked for more student profile inputs (Guardian name, Age, Gender, DOB, City).
+  Gender/DOB/City already existed end-to-end (V22); Age is already derived from DOB in
+  ReportDataAssemblerImpl. Only genuinely new field is guardian name. Added it: V23 migration
+  (`users.guardian_name VARCHAR(100) NULL`), `User.guardianName`, `UpdateProfileRequest.guardianName`
+  + set in ProfileServiceImpl, `MentalistReportDto.StudentProfile.guardianName` + assembler +
+  new "Guardian's Name" row in report.html. Frontend ProfilePanel: guardian input in the edit form,
+  section header renamed "For The Mentalist report (optional)" -> "Personal details (optional)",
+  and a new read-only "Personal details" table (father/mother/guardian/gender/DOB/age/city) for
+  students, with age computed client-side from DOB (`ageFromDob`) — no age column anywhere, so the
+  two can't drift.
+- files: db/migration/V23__student_guardian_name.sql (new); models/User.java;
+  dto/UpdateProfileRequest.java; dto/MentalistReportDto.java;
+  services/implementation/{ProfileServiceImpl,ReportDataAssemblerImpl}.java;
+  templates/report/report.html; frontend src/components/ProfilePanel.js.
+- result: PASS (compile only). Backend `./mvnw -o compile` exit 0 with
+  JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.0.19.10-hotspot. Frontend
+  `npx react-scripts build` -> "Compiled with warnings", no ProfilePanel warnings.
+  NOT run against a live DB/browser this session — MySQL/backend/frontend were left down from the
+  previous session, so V23 has not actually been applied yet.
+- notes / follow-ups: (a) `CI=true react-scripts build` now FAILS on pre-existing lint warnings
+  (eqeqeq in categories/questions/quizzes reducers, exhaustive-deps, no-unused-vars) — none from
+  this change, but the previously-green CI build command is no longer green. (b) First real run
+  must apply V23 before Hibernate `ddl-auto=validate` passes. (c) CreateStudentRequest (admin
+  creating a student) still captures only username/password/name/phone/classId — guardian and the
+  other personal fields are student-self-serve via ProfilePanel only.
+- amendment (same day): user asked to drop father/mother name. V23 rewritten to both add
+  `guardian_name` and `DROP COLUMN father_name, mother_name` (V22 added them and is already applied
+  on the live DB, so the drop must be a migration, not a V22 edit; V23 itself was never applied
+  anywhere yet, so folding both into it is safe). Removed fatherName/motherName from User,
+  UpdateProfileRequest, ProfileServiceImpl, MentalistReportDto.StudentProfile,
+  ReportDataAssemblerImpl, report.html (page 2 profile table) and ProfilePanel (edit inputs +
+  read-only rows). grep for father/mother across backend+frontend src is clean apart from the V22
+  history. Recompiled: backend exit 0, frontend "Compiled with warnings" (none in ProfilePanel).
+  DESTRUCTIVE: applying V23 permanently deletes any existing father_name/mother_name data.
+- session end: nothing to kill — no server was started this session (work was compile-only).
+  netstat confirms :3306, :8081, :3000 all down. Uncommitted changes remain in the working tree.
+  Next run must apply V23 (destructive: drops father_name/mother_name) before Hibernate
+  `ddl-auto=validate` passes.
