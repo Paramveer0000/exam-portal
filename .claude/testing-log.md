@@ -735,3 +735,24 @@ gotchas, and open issues that are NOT in the source code or git history.
   netstat confirms :3306, :8081, :3000 all down. Uncommitted changes remain in the working tree.
   Next run must apply V23 (destructive: drops father_name/mother_name) before Hibernate
   `ddl-auto=validate` passes.
+
+### 2026-07-25 — Full local run (MySQL + backend + frontend)  [type: run]
+- what: user asked "run project". Brought stack up in order.
+- MySQL: XAMPP mysqld started manually (no Windows service registered) via
+  `C:\xampp\mysql\bin\mysqld.exe --defaults-file=C:\xampp\mysql\bin\my.ini --console`, empty root
+  password, :3306 up. First attempt with `Start-Process ... --standalone -WindowStyle Hidden` exited
+  silently with nothing in the .err log; running it in a foreground/background shell worked.
+- V23 applied for real this time. Pre-check before the destructive drop:
+  `SELECT COUNT(*) FROM users WHERE father_name IS NOT NULL OR mother_name IS NOT NULL` = 0, so no
+  data was lost. Flyway log: `Migrating schema to version "23 - student guardian name"` /
+  `Successfully applied 1 migration ... now at version v23`. `SHOW COLUMNS FROM users LIKE '%name%'`
+  now shows `guardian_name varchar(100)` and no father_name/mother_name. Hibernate validate passed.
+- Backend: `./mvnw spring-boot:run "-Dspring-boot.run.arguments=--spring.datasource.password="` with
+  JAVA_HOME=jdk-17.0.19.10-hotspot, JWT_SECRET=local-dev-secret, SUPERADMIN_PASSWORD=super123.
+  `Started ExamPortalBackendApplication in 21.475 seconds`. Smoke test `GET /api/teachers` = 200 with
+  a real teacher list.
+- Frontend: started through the preview tool (`.claude/launch.json` entry `exam-portal-frontend`),
+  CRA on :3000, `[HPM] Proxy created: / -> http://127.0.0.1:8081`, `GET http://localhost:3000` = 200.
+- result: PASS — all three services up. Not driven through the UI this session (the in-app browser
+  pane was not displayed, so navigate/screenshot failed with "the Browser pane is not displayed");
+  verification was curl + SQL only.
