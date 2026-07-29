@@ -42,7 +42,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.0"
+          cpus: "0.40"
           memory: 768M
 
   backend:
@@ -82,7 +82,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.5"
+          cpus: "0.40"
           memory: 1024M
 
   frontend:
@@ -106,7 +106,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.5"
+          cpus: "0.2"
           memory: 128M
 
 networks:
