@@ -65,6 +65,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .expressionHandler(webExpressionHandler())
 
+                // Health probe for orchestrators/load balancers — public, no DB/auth.
+                .antMatchers(HttpMethod.GET, "/health").permitAll()
                 .antMatchers("/api/register/school").permitAll()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/teachers").permitAll()
