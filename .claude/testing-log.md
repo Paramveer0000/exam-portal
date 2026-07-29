@@ -827,3 +827,35 @@ gotchas, and open issues that are NOT in the source code or git history.
   (eqeqeq/exhaustive-deps/no-extend-native in UserQuestions/UserQuizzes pages).
 - verify: backend GET /api/teachers=200 after changes; frontend compiled (warnings only, no errors);
   / and /login render with zero console errors. Screenshot still blocked (pane not displayed).
+
+### 2026-07-29 — Phase 2 production & release prep  [type: feature/release]
+- backend prod-readiness (new/changed):
+  * pom version 0.0.1-SNAPSHOT -> 1.0.0. application.properties: app.version=@project.version@
+    (resource-filtered), server.shutdown=graceful.
+  * application-prod.properties (NEW): jwt.secret + datasource.password with NO defaults (fail fast),
+    show_sql=false, include-stacktrace=never, INFO/WARN logging.
+  * HealthController (NEW): GET /health -> {status:ok,version}. SecurityConfig permits GET /health.
+  * EnvironmentValidator (NEW, @Profile prod): rejects missing/dev-default/<32 char JWT_SECRET with
+    clear FATAL message.
+  * GlobalExceptionHandler (NEW): extends ResponseEntityExceptionHandler so MVC 4xx untouched;
+    preserves ResponseStatusException {message}; logs unexpected at ERROR, returns opaque 500.
+- docker: backend Dockerfile (maven->JRE alpine, non-root, HEALTHCHECK), frontend Dockerfile
+  (node build -> nginx) + nginx.conf (/api proxy + SPA fallback), .dockerignore x2,
+  docker-compose.yml (mysql+backend+frontend, health-gated depends_on, named volumes),
+  root .env.example (grouped). .gitignore extended (dist/.next/coverage/.cache/uploads/tmp/.env.production).
+- docs: README rewritten (all requested sections), CHANGELOG.md, VERSION=1.0.0,
+  docs/release/phase-2-production-readiness.md (score 88/100).
+- BUILD VERIFICATION (all pass):
+  * mvnw clean package -DskipTests: exit 0 -> exam-portal-backend-1.0.0.jar (50MB).
+  * npm run build: exit 0 -> build/ ready (warnings only).
+  * prod jar boot with valid JWT_SECRET + empty XAMPP pw (--spring.datasource.password=): Started in
+    32s, profile prod. GET /health = 200 {"status":"ok","version":"1.0.0"}. Protected /api/admin/admins
+    = 403 (auth intact). Bad login = 401 {"message":"Invalid username or password"} (error contract
+    preserved through new handler).
+  * fail-fast: prod jar with JWT_SECRET=short -> IllegalStateException "FATAL: production configuration
+    error — JWT_SECRET is too short (5 chars)...", startup aborted.
+- gotcha: first prod jar run failed with MySQL "Access denied ... using password: YES" — the empty
+  DB_PASSWORD env var did not propagate as empty in the background PowerShell run. Fixed by passing
+  --spring.datasource.password= as a program arg (repo's known-good pattern). Not a code issue.
+- teardown: test jar on :8081 killed. Frontend dev server (:3000) + mysqld (:3306) left running.
+  Nothing deployed.
