@@ -3,11 +3,26 @@
 #
 #   docker compose up -d --build
 #
+# Reverse proxy: none bundled on purpose. Dockploy provides its own
+# Traefik-based reverse proxy / TLS termination in front of whatever port
+# "frontend" publishes — running a second internet-facing proxy here would
+# be redundant. If deploying outside Dockploy (plain VPS), put nginx/Caddy/
+# Traefik in front of ${FRONTEND_PORT} yourself for TLS.
+name: exam-portal
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   db:
     image: mysql:8.0
+    container_name: exam-portal-db
     restart: unless-stopped
     environment:
+      TZ: ${TZ:-UTC}
       MYSQL_DATABASE: ${DB_NAME:-exam-portal}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
     volumes:
@@ -17,17 +32,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    # Not published to the host — only the backend needs it.
+    # Not published to the host — only the backend reaches it, over the
+    # internal network below.
     expose:
       - "3306"
+    networks:
+      - internal
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768M
 
   backend:
     build: ./exam-portal-backend
+    container_name: exam-portal-backend
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
     environment:
+      TZ: ${TZ:-UTC}
       SPRING_PROFILES_ACTIVE: prod
       DB_URL: jdbc:mysql://db:3306/${DB_NAME:-exam-portal}?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
       DB_USERNAME: root
@@ -46,18 +72,49 @@ services:
       timeout: 5s
       retries: 3
       start_period: 60s
+    # Reachable from "frontend" over the internal network only — not
+    # published to the host.
     expose:
       - "8081"
+    networks:
+      - internal
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1024M
 
   frontend:
     build: ./exam-portal-frontend
+    container_name: exam-portal-frontend
     restart: unless-stopped
     depends_on:
       backend:
         condition: service_healthy
-    # Host port -> container 80. Put a TLS-terminating reverse proxy in front in prod.
+    environment:
+      TZ: ${TZ:-UTC}
+    # Host/Dockploy-published port -> container 8080 (nginx-unprivileged
+    # runs as non-root, so it cannot bind <1024). TLS is terminated by
+    # Dockploy's proxy (or your own) in front of this port; see the note
+    # above the services: key.
     ports:
-      - "${FRONTEND_PORT:-8080}:80"
+      - "${FRONTEND_PORT:-8080}:8080"
+    networks:
+      - internal
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+
+networks:
+  # Single internal network: db and backend are never published to the
+  # host; only "frontend" exposes a port, and only that port is meant to
+  # sit behind a reverse proxy / Dockploy.
+  internal:
+    driver: bridge
 
 volumes:
   db_data:

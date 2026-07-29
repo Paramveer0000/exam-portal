@@ -1,10 +1,16 @@
 node_modules/
 build/
 .git
+.github
 .gitignore
 .idea/
 .vscode/
 *.log
+logs/
+tmp/
+cache/
+.cache/
 .env
 .env.*
 coverage/
+src/**/*.test.js

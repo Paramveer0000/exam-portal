@@ -1,7 +1,11 @@
 target/
 data/
 *.log
+logs/
+tmp/
+cache/
 .git
+.github
 .gitignore
 .idea/
 .vscode/
@@ -9,3 +13,4 @@ data/
 .env
 .env.*
 README.md
+docs/
