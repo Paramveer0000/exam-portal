@@ -4,9 +4,15 @@ node_modules/
 # Build output
 target/
 exam-portal-frontend/build/
+dist/
+.next/
+coverage/
+.cache/
 
-# Runtime data / generated reports
+# Runtime data / generated reports / uploads
 exam-portal-backend/data/
+uploads/
+tmp/
 
 # Logs
 *.log
@@ -17,6 +23,7 @@ yarn-error.log*
 # Environment / secrets
 .env
 .env.local
+.env.production
 .env.*.local
 
 # Editor / IDE

@@ -1,0 +1,64 @@
+# Production stack for Docker / Dockploy / Hostinger VPS.
+# Copy .env.example to .env and fill in real values before running.
+#
+#   docker compose up -d --build
+#
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-exam-portal}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # Not published to the host — only the backend needs it.
+    expose:
+      - "3306"
+
+  backend:
+    build: ./exam-portal-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://db:3306/${DB_NAME:-exam-portal}?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      SUPERADMIN_USERNAME: ${SUPERADMIN_USERNAME:-superadmin}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:-}
+      SUPERADMIN_FIRST_NAME: ${SUPERADMIN_FIRST_NAME:-Super}
+      SUPERADMIN_LAST_NAME: ${SUPERADMIN_LAST_NAME:-Admin}
+      SUPERADMIN_PHONE: ${SUPERADMIN_PHONE:-0000000000}
+    volumes:
+      - reports_data:/app/data/mentalist-reports
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    expose:
+      - "8081"
+
+  frontend:
+    build: ./exam-portal-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    # Host port -> container 80. Put a TLS-terminating reverse proxy in front in prod.
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+
+volumes:
+  db_data:
+  reports_data:
