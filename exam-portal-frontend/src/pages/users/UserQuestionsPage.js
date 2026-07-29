@@ -37,7 +37,6 @@ const UserQuestionsPage = () => {
   const QUESTIONS_PER_PAGE = 6;
   const [page, setPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(questions.length / QUESTIONS_PER_PAGE));
-  console.log("timeRemaining ", timeRemaining);
 
   // Count how many of THIS quiz's questions have a saved answer.
   const recomputeAnswered = () => {

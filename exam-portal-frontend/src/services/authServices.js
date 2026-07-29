@@ -4,11 +4,6 @@ const register = async (user) => {
   try {
     const { data } = await axios.post("/api/register", user);
     if (data && data.userId) {
-      console.log(
-        "authService:register() Success: ",
-        user.username,
-        " successfully registerd."
-      );
       return { isRegistered: true, error: null };
     } else {
       console.error("authService:register() Error: ", data);
@@ -34,7 +29,6 @@ const login = async (username, password) => {
     if (data && data.jwtToken.length) {
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("jwtToken", JSON.stringify(data.jwtToken));
-      console.log("authService:login() Success: ", data.user);
       return data;
     } else {
       console.error("authService:login() Error: ", data);

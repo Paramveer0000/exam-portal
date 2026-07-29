@@ -11,7 +11,6 @@ const submitQuiz = async (quizId, answers, token) => {
       answers,
       config
     );
-    console.log("quizResultServices:submitQuiz() Success: ", data);
     return { data: data, isAdded: true, error: null };
   } catch (error) {
     console.error(
@@ -40,7 +39,6 @@ const fetchQuizResult = async (userId, token) => {
         config
       );
     }
-    console.log("quizResultServices:fetchQuizResult() Success: ", data);
     return data.data;
   } catch (error) {
     console.error(

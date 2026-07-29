@@ -6,7 +6,6 @@ const fetchCategories = async (token) => {
       headers: { Authorization: `Bearer ${token}` },
     };
     const { data } = await axios.get("/api/category/", config);
-    console.log("categoryService:fetchCategories() Success: ", data);
     return data;
   } catch (error) {
     console.error(
@@ -23,7 +22,6 @@ const addCategory = async (category, token) => {
       headers: { Authorization: `Bearer ${token}` },
     };
     const { data } = await axios.post("/api/category/", category, config);
-    console.log("categoryService:addCategory() Success: ", data);
     return { data: data, isAdded: true, error: null };
   } catch (error) {
     const message =
@@ -40,8 +38,7 @@ const deleteCategory = async (catId, token) => {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
     };
-    const { data } = await axios.delete(`/api/category/${catId}/`, config);
-    console.log("categoryService:deleteCategory()  Success: ", data);
+    await axios.delete(`/api/category/${catId}/`, config);
     return {
       isDeleted: true,
       error: null,
@@ -68,7 +65,6 @@ const updateCategory = async (category, token) => {
       category,
       config
     );
-    console.log("categoryService:updateCategory()  Success: ", data);
     return {
       data: data,
       isUpdated: true,

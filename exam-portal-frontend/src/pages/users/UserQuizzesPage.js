@@ -103,19 +103,16 @@ const UserQuizzesPage = () => {
 
                           <div
                             className="userQuizzesPage__content--Button"
-                            onClick={() => console.log("View")}
                             style={{ color: "black", backgroundColor: "white" }}
                           >{`${q.numOfQuestions * 2} Minutes`}</div>
 
                           <div
                             className="userQuizzesPage__content--Button"
-                            onClick={() => console.log("View")}
                             style={{ color: "black", backgroundColor: "white" }}
                           >{`${q.numOfQuestions} Questions`}</div>
 
                           <div
                             className="userQuizzesPage__content--Button"
-                            onClick={() => console.log("View")}
                             style={{ color: "black", backgroundColor: "white" }}
                           >{`Marks : ${q.numOfQuestions * 5}`}</div>
                         </div>
