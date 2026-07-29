@@ -761,3 +761,69 @@ gotchas, and open issues that are NOT in the source code or git history.
   not get a normal shutdown, so expect InnoDB crash recovery in the .err log on the next start
   (harmless, but it is why the log will not show "Shutdown complete" for this run). Working tree
   clean — the log entry above is committed as 05af9e2.
+
+### 2026-07-29 — Full local run (MySQL + backend + frontend)  [type: run]
+- what: user asked "run project". Same start order as the 2026-07-25 run.
+- MySQL: `C:\xampp\mysql\bin\mysqld.exe --defaults-file=C:\xampp\mysql\bin\my.ini --console` in a
+  background shell (no Windows service). `mysql -u root -h 127.0.0.1 -e "SELECT 1"` = 1, empty root
+  password. InnoDB crash recovery from last session's forced kill was harmless as predicted.
+- Backend: JAVA_HOME=jdk-17.0.19.10-hotspot (java -version confirmed 17.0.19), JWT_SECRET=
+  local-dev-secret, SUPERADMIN_PASSWORD=super123,
+  `./mvnw spring-boot:run "-Dspring-boot.run.arguments=--spring.datasource.password="`.
+  `Started ExamPortalBackendApplication in 18.952 seconds`. No Flyway migration applied — schema
+  already at v23 from the previous run; Hibernate validate passed. SuperAdminInitializer logged
+  "A SUPER_ADMIN already exists; nothing to seed."
+- Smoke test: `GET http://localhost:8081/api/teachers` = 200.
+- Frontend: preview tool, `.claude/launch.json` entry `exam-portal-frontend`. CRA on :3000,
+  `[HPM] Proxy created: / -> http://127.0.0.1:8081`, `Compiled successfully!`.
+- UI check: get_page_text on http://localhost:3000 returns the login page (Exam-Portal / Login /
+  Register / Sign In / User Name / Password). Screenshot still fails with "the Browser pane is not
+  displayed" — same limitation as 2026-07-25, so no visual verification, text only.
+- result: PASS — all three services up, login page served through the CRA proxy.
+- note: also produced an unrelated deliverable this session (ZoloSuit marketing site, published as
+  a Claude artifact from the scratchpad). No repo files touched by it.
+
+### 2026-07-29 — Public landing page at "/" (Stitch integration, Option 1)  [type: feature]
+- ask: make a marketing landing the public home at "/", move login to "/login", auth-redirect
+  logged-in visitors on "/" to their dashboard, fix nav routes.
+- BLOCKER: the Stitch design (project 13531886515221973744) could not be fetched — it's an
+  authenticated Google SPA; WebFetch returns only the page <title>. Built the landing on the
+  existing Mentalist design tokens (index.css) instead, structured so the visual layer can be
+  swapped when the Stitch HTML is pasted. This landing is NOT the Stitch design.
+- files: NEW pages/LandingPage.js + pages/LandingPage.css; App.js ("/" now LandingPage, import
+  added); components/Header.js (two nav LinkContainers "/" -> "/login": the guest Login link and
+  the Logout link). Nothing else touched — no backend, no auth, no protected routes.
+- routing model: "/" = LandingPage, "/login" = LoginPage (unchanged), "/register" unchanged, all
+  protected/admin/superadmin/student routes unchanged. LandingPage useEffect reads jwtToken+user and
+  navigate(homePathForRoles(roles), {replace:true}) for authed visitors — same helper LoginPage and
+  ProtectedRoute already use.
+- verified live (backend :8081, frontend :3000, CRA proxy):
+  * GET / renders the landing hero (get_page_text). No console errors.
+  * All anchor hrefs on / are /login or /register — no leftover "/". 4 hero/CTA buttons.
+  * GET /login still renders the real login form (#username, #password, h1 "Sign In").
+  * Seeded a fake USER session in localStorage, hit / -> redirected to /profile -> /onboarding
+    (onboarding gate). Confirms authed-visitor redirect. Cleared the fake session after.
+  * Compiled successfully; LandingPage.js/.css add ZERO eslint warnings. The 3 eslint warnings are
+    pre-existing dead code in Header.js (profilePageUrl, lines 14/55/57), not from this change.
+- NOT verified: visual/responsive proof — screenshot still fails ("Browser pane is not displayed").
+  Responsive relies on Bootstrap Col md/lg + CSS clamp(), not eyeballed this session.
+- pre-existing debt noted (out of scope, left as-is): Header.js dead profilePageUrl block.
+
+### 2026-07-29 — Phase 1 production cleanup & audit  [type: cleanup]
+- debug code: removed 23 console.log/debug (frontend), kept 22 console.error. 4 System.out.println
+  in JwtRequestFilter -> SLF4J log.debug (added Logger field + imports). Backend compile exit 0.
+- dead code: Header.js dead profilePageUrl var + its dead useEffect .map (also killed a latent
+  loginReducer.user null-deref); 3 dead onClick console.log("View") on UserQuizzesPage display chips.
+  Fixed 3 unused-`data` warnings my log-removal introduced in delete*() services.
+- deleted: root images/ (20 orphan screenshots — README uses github-hosted urls, verified no refs);
+  untracked exam-portal-frontend/.idea/ (5 files). public/images/user.png kept (used by ProfilePanel).
+- repo: rewrote .gitignore (.env*, .idea, .vscode, *.iml, OS junk, npm logs). Added
+  exam-portal-backend/.env.example (10 vars). index.html title/desc: "React App" -> "The Mentalist".
+- security scan: no hardcoded secrets/keys, no eval, no dangerouslySetInnerHTML/innerHTML, no raw
+  @Query/native SQL. All env-var backed. AI key DB-stored + masked in DTO.
+- NOT changed (reported in docs/release/phase-1-cleanup-report.md §10): JWT_SECRET dev fallback,
+  show_sql=true, plaintext AI key, bootstrap loaded from CDN beta (npm bootstrap dep unused),
+  19MB Project-Synopsis.pdf at root, broken default App.test.js, pre-existing eslint warnings
+  (eqeqeq/exhaustive-deps/no-extend-native in UserQuestions/UserQuizzes pages).
+- verify: backend GET /api/teachers=200 after changes; frontend compiled (warnings only, no errors);
+  / and /login render with zero console errors. Screenshot still blocked (pane not displayed).
