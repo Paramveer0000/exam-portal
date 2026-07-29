@@ -8,6 +8,7 @@ import AdminCategoriesPage from "./pages/admin/categories/AdminCategoriesPage";
 import AdminUpdateCategoryPage from "./pages/admin/categories/AdminUpdateCategoryPage";
 import AdminProfilePage from "./pages/admin/AdminProfilePage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AdminQuizzesPage from "./pages/admin/quizzes/AdminQuizzesPage";
@@ -54,7 +55,7 @@ const App = () => {
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 

@@ -11,7 +11,6 @@ const Header = () => {
   const loginReducer = useSelector((state) => state.loginReducer);
   const [isLoggedIn, setIsLoggedIn] = useState(loginReducer.loggedIn);
   const [companyLogo, setCompanyLogo] = useState(null);
-  let profilePageUrl = "";
 
   const isImpersonating = !!localStorage.getItem("impersonatorBackup");
 
@@ -52,13 +51,6 @@ const Header = () => {
   useEffect(() => {
     if (localStorage.getItem("jwtToken")) {
       setIsLoggedIn(true);
-      loginReducer.user.roles.map((r) => {
-        if (r["roleName"] === "ADMIN") {
-          profilePageUrl = "/adminProfile";
-        } else {
-          profilePageUrl = "/";
-        }
-      });
     }
   }, [navigate]);
 
@@ -96,13 +88,13 @@ const Header = () => {
               {isLoggedIn ? (
                   <Nav.Link>{loginReducer.user.firstName}</Nav.Link>
               ) : (
-                <LinkContainer to="/">
+                <LinkContainer to="/login">
                   <Nav.Link>Login</Nav.Link>
                 </LinkContainer>
               )}
 
               {isLoggedIn ? (
-                <LinkContainer to="/">
+                <LinkContainer to="/login">
                   <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
                 </LinkContainer>
               ) : (
