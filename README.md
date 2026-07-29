@@ -47,7 +47,8 @@ take assessments and receive psychometric profiles and PDF reports.
 │   ├── Dockerfile
 │   └── nginx.conf            prod static serving + /api reverse proxy
 ├── seed/psychometric/        question banks + seeding/validation scripts
-├── docs/release/             cleanup + production-readiness reports
+├── docs/release/             phase cleanup + production-readiness reports
+├── docs/deployment/          Docker deployment guide (architecture, ops)
 ├── docker-compose.yml        full production stack
 ├── .env.example              Compose environment template
 ├── VERSION                   1.0.0
@@ -73,6 +74,7 @@ cp .env.example .env
 | `SUPERADMIN_PASSWORD` | no | — (blank = skip seeding) | Seeds the first super admin on first boot. |
 | `SUPERADMIN_FIRST_NAME` / `_LAST_NAME` / `_PHONE` | no | `Super` / `Admin` / `0000000000` | Super admin profile fields. |
 | `FRONTEND_PORT` | no | `8080` | Host port the frontend is published on. |
+| `TZ` | no | `UTC` | IANA timezone applied to all containers (e.g. `Asia/Kolkata`). |
 | `DB_URL` / `DB_USERNAME` | no | local defaults | Full JDBC URL / user (Compose sets these for you). |
 | `MENTALIST_REPORTS_DIR` | no | `./data/mentalist-reports` | Where generated PDFs are written. |
 | `SPRING_PROFILES_ACTIVE` | prod | — | Set to `prod` for production hardening. |
@@ -142,6 +144,9 @@ docker compose logs -f backend
 Do not expose MySQL to the public internet — it is only reachable on the Compose
 network.
 
+Full architecture, networking, and operational detail:
+[docs/deployment/docker-deployment.md](docs/deployment/docker-deployment.md).
+
 ---
 
 ## Database Migration
@@ -162,7 +167,7 @@ network.
 docker compose exec db sh -c 'exec mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" exam-portal' > backup-$(date +%F).sql
 
 # Generated PDF reports live in the reports_data volume
-docker run --rm -v $(pwd):/out -v examportalmaster_reports_data:/data alpine \
+docker run --rm -v $(pwd):/out -v exam-portal_reports_data:/data alpine \
   tar czf /out/reports-$(date +%F).tar.gz -C /data .
 ```
 

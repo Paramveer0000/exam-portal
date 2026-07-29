@@ -23,16 +23,22 @@ First production release. A full-stack psychometric assessment platform
 - Production Spring profile (`prod`) with fail-fast configuration validation.
 - Global exception handler: intentional errors preserved, unexpected ones logged
   and returned as an opaque 500.
-- Docker packaging: backend (multi-stage Maven → JRE), frontend (build → nginx
-  with `/api` reverse-proxy and SPA routing), and a `docker-compose.yml` for the
-  full stack (MySQL + backend + frontend) with health checks.
+- Docker packaging: backend (multi-stage Maven → non-root JRE, container-aware
+  JVM heap sizing), frontend (build → non-root nginx with `/api` reverse-proxy
+  and SPA routing, HSTS + security headers), and a `docker-compose.yml` for the
+  full stack (MySQL + backend + frontend) with health checks, named containers,
+  an isolated internal network, per-service resource limits, and rotated logs.
 - `.env.example` templates (repo root for Compose, and backend-specific).
+- Deployment documentation: [docs/deployment/docker-deployment.md](docs/deployment/docker-deployment.md)
+  (architecture, update/rollback/backup procedures).
 
 ### Changed
 - Backend version `0.0.1-SNAPSHOT` → `1.0.0`.
 - Auth filter diagnostics moved from `System.out.println` to SLF4J `debug`.
 - Production logging levels (INFO app, WARN framework); SQL logging disabled in prod.
 - Graceful shutdown enabled for clean container SIGTERM handling.
+- Frontend container switched to `nginx-unprivileged` — fully non-root, not just
+  its worker processes.
 
 ### Fixed
 - Removed development debug logging (23 `console.log`) that leaked response data

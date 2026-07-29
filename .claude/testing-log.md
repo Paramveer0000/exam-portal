@@ -896,3 +896,26 @@ gotchas, and open issues that are NOT in the source code or git history.
   live docker compose up --build result. User needs to clear that Docker Desktop state themselves
   (delete run\ contents or Reset to factory defaults) before the one remaining manual validation step.
 - nothing deployed, nothing pushed.
+
+### 2026-07-29 — Phase 4 GitHub release verification (v1.0.0)  [type: release]
+- rebuilt both fresh (not assumed from Phase 2/3 runs): mvnw clean package -DskipTests exit 0 ->
+  exam-portal-backend-1.0.0.jar (~50MB); npm run build exit 0 -> build/ (144KB gz JS, 4.4KB CSS).
+- verified: git status clean, no stray temp files, .gitignore complete, .env not tracked, both
+  .env.example files complete, VERSION=1.0.0 matches pom.xml.
+- docker compose config re-validated (3rd time total across phases 3+4) with throwaway .env
+  (created, used, deleted, never committed) — still valid.
+- README fixes (was stale from before phase-3 hardening): backup command volume name
+  examportalmaster_reports_data -> exam-portal_reports_data (matches compose `name: exam-portal`);
+  added docs/deployment/ to folder structure; added TZ var to the env table; linked
+  docker-deployment.md from Production Deployment section.
+- CHANGELOG v1.0.0 entry updated to include phase-3 additions (non-root frontend container,
+  security headers/HSTS, named containers/internal network/resource limits/rotated logs, deployment
+  guide link) that were missing since the entry predated phase 3.
+- docs/release/phase-4-release-checklist.md (NEW) — full checklist + go/no-go.
+- confirmed still-open non-blocking debt (not touched, correctly deferred): Project-Synopsis.pdf
+  19MB at root, App.test.js still the stock CRA sample, AI key plaintext, root MySQL user.
+- BLOCKER (carried over, unchanged): Docker Desktop backend still crashes on this machine (stale
+  dockerInference socket under user AppData, outside repo scope) — live `docker compose up --build`
+  still not run end-to-end. Did not attempt to force-fix system files again. Reported as the one
+  open item before deploy.
+- nothing deployed, nothing tagged, nothing pushed.
