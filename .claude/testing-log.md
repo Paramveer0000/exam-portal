@@ -859,3 +859,40 @@ gotchas, and open issues that are NOT in the source code or git history.
   --spring.datasource.password= as a program arg (repo's known-good pattern). Not a code issue.
 - teardown: test jar on :8081 killed. Frontend dev server (:3000) + mysqld (:3306) left running.
   Nothing deployed.
+
+### 2026-07-29 — Phase 3 Docker/Dockploy hardening & readiness  [type: feature/release]
+- backend Dockerfile: merged user+dir+chown into one RUN, COPY --from=build --chown=app:app,
+  added JAVA_OPTS (-XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError), ENTRYPOINT switched to
+  `exec java $JAVA_OPTS -jar app.jar` (shell form for var expansion, exec keeps java as PID 1 for
+  graceful shutdown).
+- frontend Dockerfile: explicit ENV NODE_ENV=production in build stage, npm cache clean merged into
+  install RUN, base image swapped nginx:1.27-alpine -> nginxinc/nginx-unprivileged:1.27-alpine
+  (fully non-root, not just workers) -> listen/EXPOSE moved 80->8080. nginx.conf updated (listen 8080,
+  added security headers: X-Content-Type-Options, X-Frame-Options, Referrer-Policy, server_tokens off,
+  conditional HSTS via map on $http_x_forwarded_proto — first draft used invalid `if_https` inline
+  add_header syntax, fixed to a proper nginx map block).
+- docker-compose.yml: added explicit `name: exam-portal`, container_name x3, explicit `internal`
+  bridge network (only frontend publishes a port), TZ env x3, deploy.resources.limits x3
+  (db 1cpu/768M, backend 1.5cpu/1024M, frontend 0.5cpu/128M), x-logging anchor (json-file,
+  max-size 10m, max-file 3) applied to all 3 services. frontend port mapping 8080:80 -> 8080:8080
+  to match the unprivileged nginx image.
+- backend application-prod.properties: added server.forward-headers-strategy=framework (trust
+  X-Forwarded-* from nginx/Dockploy for HTTPS readiness).
+- .dockerignore x2 extended: .github, logs/, tmp/, cache/, docs/ (backend); .github, logs/, tmp/,
+  cache/, .cache/, src/**/*.test.js (frontend).
+- new docs: docs/deployment/docker-deployment.md (architecture diagram, container table, networking,
+  volumes, build/deploy/update/rollback/backup with runnable commands, health checks, troubleshooting),
+  docs/release/phase-3-docker-readiness.md (score 90/100).
+- VALIDATION: docker compose config (client-side, throwaway .env deleted after) — validated TWICE
+  (before and after the port/image edits). Confirmed env interpolation, resource limit byte math
+  (1024M=1073741824 etc.), internal network on all 3 services, frontend target:8080 published:8080.
+  Redis confirmed N/A by repo-wide grep (no redis anywhere).
+- BLOCKER (environment, not project): Docker Desktop backend crashed on launch —
+  "initializing Inference manager: listening on unix://.../dockerInference: remove
+  .../dockerInference: The file cannot be accessed by the system" (com.docker.backend.exe.log),
+  a stale socket file from a prior Docker Desktop session under the user's AppData\Local\Docker\run\.
+  Deleting files there was correctly blocked by the permission classifier (outside repo scope, system
+  AppData) — did not force it. Reported honestly in the readiness report rather than fabricating a
+  live docker compose up --build result. User needs to clear that Docker Desktop state themselves
+  (delete run\ contents or Reset to factory defaults) before the one remaining manual validation step.
+- nothing deployed, nothing pushed.
