@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { LinkContainer } from "react-router-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import platformServices from "../services/platformServices";
 import { homePathForRoles } from "./ProtectedRoute";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const loginReducer = useSelector((state) => state.loginReducer);
   const [isLoggedIn, setIsLoggedIn] = useState(loginReducer.loggedIn);
   const [companyLogo, setCompanyLogo] = useState(null);
@@ -54,6 +55,10 @@ const Header = () => {
       setIsLoggedIn(true);
     }
   }, [navigate]);
+
+  // The public landing page ships its own fixed navbar; rendering this one too
+  // stacks two brands at top:0 and buries its links under the landing nav.
+  if (location.pathname === "/") return null;
 
   return (
     <header>
