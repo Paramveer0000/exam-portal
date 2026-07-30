@@ -1,14 +1,14 @@
 package com.project.examportalbackend.repository;
 
 
+import com.project.examportalbackend.models.Category;
 import com.project.examportalbackend.models.Quiz;
-import com.project.examportalbackend.models.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
-    List<Quiz> findBySubject(Subject subject);
+    List<Quiz> findByCategory(Category category);
 
     List<Quiz> findByCreatedBy(Long createdBy);
 
@@ -16,8 +16,10 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     List<Quiz> findByCreatedByIsNull();
 
-    // Duplicate-name guards (within a subject, case-insensitive).
-    boolean existsByTitleIgnoreCaseAndSubject_SubjectId(String title, Long subjectId);
+    long countByCategory_CatId(Long catId);
 
-    boolean existsByTitleIgnoreCaseAndSubject_SubjectIdAndQuizIdNot(String title, Long subjectId, Long quizId);
+    // Duplicate-name guards (within a class, case-insensitive).
+    boolean existsByTitleIgnoreCaseAndCategory_CatId(String title, Long catId);
+
+    boolean existsByTitleIgnoreCaseAndCategory_CatIdAndQuizIdNot(String title, Long catId, Long quizId);
 }

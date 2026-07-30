@@ -1,8 +1,8 @@
 package com.project.examportalbackend.services;
 
 import com.project.examportalbackend.dto.ExamQuestionDto;
+import com.project.examportalbackend.models.Category;
 import com.project.examportalbackend.models.Quiz;
-import com.project.examportalbackend.models.Subject;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface QuizService {
     void deleteQuiz(Long quizId);
 
     // Extra methods
-    List<Quiz> getQuizBySubject(Subject subject);
+    List<Quiz> getQuizByCategory(Category category);
 
     /**
      * Builds the exam a student receives for a quiz: a subset of the pool sized by

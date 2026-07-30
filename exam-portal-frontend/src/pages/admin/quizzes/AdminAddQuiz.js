@@ -8,7 +8,6 @@ import RoleSidebar from "../../../components/RoleSidebar";
 import FormContainer from "../../../components/FormContainer";
 import * as quizzesConstants from "../../../constants/quizzesConstants";
 import { addQuiz } from "../../../actions/quizzesActions";
-import subjectsServices from "../../../services/subjectsServices";
 import categoriesServices from "../../../services/categoriesServices";
 
 const AdminAddQuiz = () => {
@@ -25,7 +24,6 @@ const AdminAddQuiz = () => {
   const [timerMinutes, setTimerMinutes] = useState("");
   const [allQuestionsMandatory, setAllQuestionsMandatory] = useState(false);
 
-  const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
 
   const navigate = useNavigate();
@@ -47,15 +45,6 @@ const AdminAddQuiz = () => {
       alert("Select a valid class!");
       return;
     }
-    const subject = subjects.find((s) => s.classId === Number(selectedClassId));
-    if (!subject) {
-      swal(
-        "No subject for this class",
-        "This class has no subject set up yet. Ask a platform admin to add one.",
-        "warning"
-      );
-      return;
-    }
     const quiz = {
       title: title,
       description: description,
@@ -68,7 +57,7 @@ const AdminAddQuiz = () => {
       timerMinutes:
         timerEnabled && timerMinutes !== "" ? Number(timerMinutes) : null,
       allQuestionsMandatory: allQuestionsMandatory,
-      subject: { subjectId: subject.subjectId },
+      category: { catId: Number(selectedClassId) },
     };
     addQuiz(dispatch, quiz, token).then((data) => {
       if (data.type === quizzesConstants.ADD_QUIZ_SUCCESS) {
@@ -82,9 +71,6 @@ const AdminAddQuiz = () => {
 
   useEffect(() => {
     if (!localStorage.getItem("jwtToken")) navigate("/");
-    subjectsServices.fetchSubjects(token).then(({ data }) => {
-      if (Array.isArray(data)) setSubjects(data);
-    });
     categoriesServices.fetchCategories(token).then((data) => {
       if (Array.isArray(data)) setClasses(data);
     });
@@ -103,16 +89,16 @@ const AdminAddQuiz = () => {
             className="mb-3"
             onClick={() => navigate("/adminQuizzes")}
           >
-            ← Back to Subjects
+            ← Back to Quizzes
           </Button>
-          <h2 style={{ color: "var(--mt-primary)" }}>Add Subject</h2>
+          <h2 style={{ color: "var(--mt-primary)" }}>Add Quiz</h2>
           <div className="mt-card p-4">
           <Form onSubmit={submitHandler}>
             <Form.Group className="my-3" controlId="title">
               <Form.Label>Title</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter Subject Title"
+                placeholder="Enter Quiz Title"
                 value={title}
                 required
                 onChange={(e) => {

@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { FaBars, FaUserAlt, FaRegChartBar, FaUserGraduate } from "react-icons/fa";
 import { TbLayoutGrid, TbReport } from "react-icons/tb";
 import { MdQuiz } from "react-icons/md";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { homePathForRoles } from "./ProtectedRoute";
 import "./Sidebar.css";
 
 const Sidebar = ({ children }) => {
+  const navigate = useNavigate();
   // Persist expanded/collapsed state so it survives navigation (each page mounts
   // its own Sidebar instance, which would otherwise reset to collapsed).
   const [isOpen, setIsOpen] = useState(
@@ -27,14 +29,14 @@ const Sidebar = ({ children }) => {
   const isSuperAdmin = roleNames.includes("SUPER_ADMIN");
 
   // Schools (ADMIN) manage students + assign classes only. Content management
-  // (Classes/Subjects) is SUPER_ADMIN-only, matching the backend authorization.
+  // (Classes/Quizzes) is SUPER_ADMIN-only, matching the backend authorization.
   const menuItem = [
     { path: "/adminDashboard", name: "Dashboard", icon: <FaRegChartBar /> },
     { path: "/adminProfile", name: "Profile", icon: <FaUserAlt /> },
     ...(isSuperAdmin
       ? [
           { path: "/adminCategories", name: "Classes", icon: <TbLayoutGrid /> },
-          { path: "/adminQuizzes", name: "Subjects", icon: <MdQuiz /> },
+          { path: "/adminQuizzes", name: "Quizzes", icon: <MdQuiz /> },
         ]
       : []),
     { path: "/adminStudents", name: "Students", icon: <FaUserGraduate /> },
@@ -55,7 +57,12 @@ const Sidebar = ({ children }) => {
     >
       <div style={{ width: isOpen ? "12em" : "3em" }} className="sidebar">
         <div className="top_section">
-          <h1 style={{ display: isOpen ? "block" : "none" }} className="logo">
+          <h1
+            style={{ display: isOpen ? "block" : "none", cursor: "pointer" }}
+            className="logo"
+            onClick={() => navigate(homePathForRoles(roleNames))}
+            title="Go to dashboard"
+          >
             Logo
           </h1>
           <div style={{ marginLeft: isOpen ? "50px" : "0px" }} className="bars">

@@ -16,8 +16,8 @@ public class AdminAnalyticsDto {
     private String name;
     private long students;
     private long classes;
-    private long subjects;
-    private long examsConducted; // distinct subjects that have at least one attempt
+    private long quizzes;
+    private long examsConducted; // distinct quizzes that have at least one attempt
     private long attempts;
     private double passRate;      // % of this admin's students' attempts that passed
 }

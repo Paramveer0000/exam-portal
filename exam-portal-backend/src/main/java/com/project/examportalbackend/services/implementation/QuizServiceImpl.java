@@ -1,7 +1,7 @@
 package com.project.examportalbackend.services.implementation;
 
 import com.project.examportalbackend.dto.ExamQuestionDto;
-import com.project.examportalbackend.models.Subject;
+import com.project.examportalbackend.models.Category;
 import com.project.examportalbackend.models.Question;
 import com.project.examportalbackend.models.Quiz;
 import com.project.examportalbackend.repository.QuizRepository;
@@ -27,6 +27,9 @@ public class QuizServiceImpl implements QuizService {
     @Autowired
     private AuthFacade authFacade;
 
+    @Autowired
+    private com.project.examportalbackend.repository.CategoryRepository categoryRepository;
+
     /** The class (category) id the current student belongs to, or null. */
     private Long myClassId() {
         return authFacade.getCurrentUser().getClassId();
@@ -35,8 +38,8 @@ public class QuizServiceImpl implements QuizService {
     private boolean inMyClass(Quiz q) {
         Long myClass = myClassId();
         return myClass != null
-                && q.getSubject() != null
-                && myClass.equals(q.getSubject().getClassId());
+                && q.getCategory() != null
+                && myClass.equals(q.getCategory().getCatId());
     }
 
     private boolean studentCanSee(Quiz q) {
@@ -46,7 +49,8 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public Quiz addQuiz(Quiz quiz) {
         assertTitlePresent(quiz);
-        assertUniqueTitleInSubject(quiz, null);
+        assertClassExists(quiz);
+        assertUniqueTitleInClass(quiz, null);
         quiz.setCreatedBy(authFacade.getCurrentUserId());
         validateQuestionsPerExam(quiz.getQuestionsPerExam(), quiz.getNumOfQuestions());
         validateTimer(quiz);
@@ -55,8 +59,8 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public List<Quiz> getQuizzes() {
-        // Students see published quizzes under subjects in their own class; admins
-        // and super admins see all (admins read-only).
+        // Students see published quizzes in their own class; admins and super
+        // admins see all (admins read-only).
         if (authFacade.isStudent()) {
             if (myClassId() == null) {
                 return Collections.emptyList();
@@ -79,7 +83,8 @@ public class QuizServiceImpl implements QuizService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
         authFacade.assertCanManage(existing.getCreatedBy());
         assertTitlePresent(quiz);
-        assertUniqueTitleInSubject(quiz, existing.getQuizId());
+        assertClassExists(quiz);
+        assertUniqueTitleInClass(quiz, existing.getQuizId());
         // Preserve server-managed fields the client doesn't send, so an update of
         // quiz settings can't wipe ownership, the pool count, or the pass mark.
         quiz.setCreatedBy(existing.getCreatedBy());
@@ -100,8 +105,8 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<Quiz> getQuizBySubject(Subject subject) {
-        List<Quiz> quizzes = quizRepository.findBySubject(subject);
+    public List<Quiz> getQuizByCategory(Category category) {
+        List<Quiz> quizzes = quizRepository.findByCategory(category);
         if (authFacade.isStudent()) {
             return quizzes.stream()
                     .filter(this::studentCanSee)
@@ -115,12 +120,12 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
 
-        // A student may take an exam only if the quiz's subject is in their class
+        // A student may take an exam only if the quiz is in their class
         // and the quiz is published.
         if (authFacade.isStudent()) {
             if (!inMyClass(quiz)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "This subject is not in your class");
+                        "This quiz is not in your class");
             }
             if (!quiz.isIActive()) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -178,21 +183,34 @@ public class QuizServiceImpl implements QuizService {
     }
 
     /**
-     * A quiz title must be unique within its subject. quizIdToExclude is the id
+     * A quiz hangs directly off a class, so the class must be supplied and real —
+     * otherwise the insert fails on the FK and surfaces as an opaque 500.
+     */
+    private void assertClassExists(Quiz quiz) {
+        if (quiz.getCategory() == null || quiz.getCategory().getCatId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A class is required");
+        }
+        if (!categoryRepository.existsById(quiz.getCategory().getCatId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected class does not exist");
+        }
+    }
+
+    /**
+     * A quiz title must be unique within its class. quizIdToExclude is the id
      * of the quiz being updated (null on create) so it doesn't clash with itself.
      */
-    private void assertUniqueTitleInSubject(Quiz quiz, Long quizIdToExclude) {
-        if (quiz.getSubject() == null || quiz.getSubject().getSubjectId() == null) {
+    private void assertUniqueTitleInClass(Quiz quiz, Long quizIdToExclude) {
+        if (quiz.getCategory() == null || quiz.getCategory().getCatId() == null) {
             return;
         }
-        Long subjectId = quiz.getSubject().getSubjectId();
+        Long catId = quiz.getCategory().getCatId();
         boolean duplicate = quizIdToExclude == null
-                ? quizRepository.existsByTitleIgnoreCaseAndSubject_SubjectId(quiz.getTitle(), subjectId)
-                : quizRepository.existsByTitleIgnoreCaseAndSubject_SubjectIdAndQuizIdNot(
-                        quiz.getTitle(), subjectId, quizIdToExclude);
+                ? quizRepository.existsByTitleIgnoreCaseAndCategory_CatId(quiz.getTitle(), catId)
+                : quizRepository.existsByTitleIgnoreCaseAndCategory_CatIdAndQuizIdNot(
+                        quiz.getTitle(), catId, quizIdToExclude);
         if (duplicate) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "A quiz named '" + quiz.getTitle() + "' already exists in this subject");
+                    "A quiz named '" + quiz.getTitle() + "' already exists in this class");
         }
     }
 

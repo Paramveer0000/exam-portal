@@ -1,9 +1,9 @@
 package com.project.examportalbackend.controllers;
 
+import com.project.examportalbackend.models.Category;
 import com.project.examportalbackend.models.Quiz;
-import com.project.examportalbackend.models.Subject;
+import com.project.examportalbackend.services.CategoryService;
 import com.project.examportalbackend.services.QuizService;
-import com.project.examportalbackend.services.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class QuizController {
     private QuizService quizService;
 
     @Autowired
-    private SubjectService subjectService;
+    private CategoryService categoryService;
 
     @PostMapping("/")
     public ResponseEntity<?> addQuiz(@RequestBody Quiz quiz) {
@@ -44,10 +44,10 @@ public class QuizController {
         return ResponseEntity.ok(quizService.getExamQuestions(quizId));
     }
 
-    @GetMapping(value = "/", params = "subjectId")
-    public ResponseEntity<?> getQuizBySubject(@RequestParam Long subjectId) {
-        Subject subject = subjectService.getSubject(subjectId);
-        return ResponseEntity.ok(quizService.getQuizBySubject(subject));
+    @GetMapping(value = "/", params = "catId")
+    public ResponseEntity<?> getQuizByCategory(@RequestParam Long catId) {
+        Category category = categoryService.getCategory(catId);
+        return ResponseEntity.ok(quizService.getQuizByCategory(category));
     }
 
     @PutMapping("/{quizId}")

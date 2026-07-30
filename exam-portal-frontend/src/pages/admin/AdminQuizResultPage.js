@@ -70,7 +70,7 @@ const AdminQuizResultPage = () => {
                       <Table striped bordered size="sm" responsive>
                         <thead>
                           <tr>
-                            <th>Subject</th>
+                            <th>Quiz</th>
                             <th>Date</th>
                             <th>Report</th>
                           </tr>

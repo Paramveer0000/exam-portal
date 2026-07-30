@@ -19,7 +19,6 @@ import AdminAddQuestionsPage from "./pages/admin/questions/AdminAddQuestionsPage
 import AdminUpdateQuestionPage from "./pages/admin/questions/AdminUpdateQuestionPage";
 import UserProfilePage from "./pages/users/UserProfilePage";
 import UserQuizzesPage from "./pages/users/UserQuizzesPage";
-import UserSubjectsPage from "./pages/users/UserSubjectsPage";
 import UserQuizManualPage from "./pages/users/UserQuizManualPage";
 import UserQuestionsPage from "./pages/users/UserQuestionsPage";
 import UserQuizResultPage from "./pages/users/UserQuizResultPage";
@@ -143,7 +142,6 @@ const App = () => {
           }
         />
         <Route path="/profile" element={userRoute(<UserProfilePage />)} />
-        <Route path="/subjects" element={userRoute(<UserSubjectsPage />)} />
         <Route path="/quizzes" element={userRoute(<UserQuizzesPage />)} />
         <Route path="/quiz/*" element={userRoute(<UserQuizzesPage />)} />
         <Route path="/quizManual/" element={userRoute(<UserQuizManualPage />)} />

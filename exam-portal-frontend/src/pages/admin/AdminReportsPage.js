@@ -39,19 +39,19 @@ const AdminReportsPage = () => {
     }
   };
 
-  // Group subjects by class for the dropdown (class-wise <optgroup>s).
-  const subjectGroups = (() => {
+  // Group quizzes by class for the dropdown (class-wise <optgroup>s).
+  const quizGroups = (() => {
     const groups = {};
     const order = [];
     quizzesReducer.quizzes.forEach((q) => {
-      const cname = q.subject ? q.subject.title : "Uncategorized";
+      const cname = q.category ? q.category.title : "Uncategorized";
       if (!groups[cname]) {
         groups[cname] = [];
         order.push(cname);
       }
       groups[cname].push(q);
     });
-    return order.map((cname) => ({ className: cname, subjects: groups[cname] }));
+    return order.map((cname) => ({ className: cname, quizzes: groups[cname] }));
   })();
 
   const toggleSort = (key) =>
@@ -82,15 +82,15 @@ const AdminReportsPage = () => {
         <Form onSubmit={runReport}>
           <Row className="align-items-end">
             <Col md={4} className="mb-2">
-              <Form.Label>Subject</Form.Label>
+              <Form.Label>Quiz</Form.Label>
               <Form.Select
                 value={quizId}
                 onChange={(e) => setQuizId(e.target.value)}
               >
-                <option value="">Choose a subject</option>
-                {subjectGroups.map((group) => (
+                <option value="">Choose a quiz</option>
+                {quizGroups.map((group) => (
                   <optgroup key={group.className} label={group.className}>
-                    {group.subjects.map((q) => (
+                    {group.quizzes.map((q) => (
                       <option key={q.quizId} value={q.quizId}>
                         {q.title}
                       </option>
@@ -148,7 +148,7 @@ const AdminReportsPage = () => {
                 Student {sortIcon("studentName")}
               </th>
               <th className="mt-sort-th" onClick={() => toggleSort("quizTitle")}>
-                Subject {sortIcon("quizTitle")}
+                Quiz {sortIcon("quizTitle")}
               </th>
               <th className="mt-sort-th" onClick={() => toggleSort("attemptNumber")}>
                 Attempt {sortIcon("attemptNumber")}

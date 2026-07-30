@@ -20,14 +20,15 @@ const Header = () => {
     );
   }, []);
 
-  // The brand acts as a dashboard button: go to the user's home, or login.
+  // The brand acts as a dashboard button when logged in; otherwise it goes to
+  // the public landing page (not back to the login form).
   const goHome = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const roles = user && user.roles ? user.roles.map((r) => r.roleName) : [];
-      navigate(localStorage.getItem("jwtToken") ? homePathForRoles(roles) : "/login");
+      navigate(localStorage.getItem("jwtToken") ? homePathForRoles(roles) : "/");
     } catch (e) {
-      navigate("/login");
+      navigate("/");
     }
   };
 
@@ -70,7 +71,7 @@ const Header = () => {
                   style={{ height: "40px", objectFit: "contain" }}
                 />
               ) : (
-                "Exam-Portal"
+                "The Mentalist"
               )}
             </Navbar.Brand>
 

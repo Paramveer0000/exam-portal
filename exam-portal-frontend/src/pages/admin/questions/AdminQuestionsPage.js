@@ -112,7 +112,7 @@ const AdminQuestionsPage = () => {
           className="mb-3"
           onClick={() => navigate("/adminQuizzes")}
         >
-          ← Back to Subjects
+          ← Back to Quizzes
         </Button>
         <h2 style={{ color: "var(--mt-primary)" }}>{`Questions : ${quizTitle}`}</h2>
         {!canEdit && (

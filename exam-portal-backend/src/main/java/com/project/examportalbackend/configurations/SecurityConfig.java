@@ -95,12 +95,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/category/**").hasAuthority("SUPER_ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/category/**").hasAuthority("SUPER_ADMIN")
 
-                // Subjects (class -> subject -> quiz): SUPER_ADMIN writes; USER/ADMIN read.
-                .antMatchers(HttpMethod.POST, "/api/subject/**").hasAuthority("SUPER_ADMIN")
-                .antMatchers(HttpMethod.GET, "/api/subject/**").hasAnyAuthority("USER", "ADMIN")
-                .antMatchers(HttpMethod.PUT, "/api/subject/**").hasAuthority("SUPER_ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/api/subject/**").hasAuthority("SUPER_ADMIN")
-
                 // Student exam delivery (answers stripped) lives under /api/quiz/**.
                 .antMatchers(HttpMethod.POST, "/api/quiz/**").hasAuthority("SUPER_ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/quiz/**").hasAnyAuthority("USER", "ADMIN")

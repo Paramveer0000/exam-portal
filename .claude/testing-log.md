@@ -919,3 +919,52 @@ gotchas, and open issues that are NOT in the source code or git history.
   still not run end-to-end. Did not attempt to force-fix system files again. Reported as the one
   open item before deploy.
 - nothing deployed, nothing tagged, nothing pushed.
+
+### 2026-07-30 14:30 — Removed the Subject tier (Class -> Quiz)  [type: change]
+- what: deleted the Subject entity/CRUD entirely; quizzes hang directly off a class (category) again.
+  V20 had inserted a Subject tier and auto-seeded a placeholder "General" subject per class, but no UI
+  was ever built to create one — so any class made after that (e.g. "asd") could not accept a quiz:
+  Add Quiz died on the frontend guard "No subject for this class". Old classes worked only because
+  they carried the seeded "General" row. Also fixed labels: the Quizzes list/forms were captioned
+  "Subject(s)" while actually managing quizzes.
+- files: migration V24__drop_subject_tier.sql (new); deleted Subject.java, SubjectController,
+  SubjectService(+Impl), SubjectRepository, UserSubjectsPage.js, subjectsServices.js; edited Quiz.java,
+  QuizRepository, QuizService(+Impl), QuizController, QuizResultController, SecurityConfig, Category.java,
+  AdminServiceImpl, AdminAnalyticsDto (subjects -> quizzes), ReportDataAssemblerImpl, App.js,
+  SidebarUser/Sidebar/SuperAdminSidebar, AdminAddQuiz, AdminUpdateQuiz, AdminQuizzesPage,
+  AdminReportsPage, AdminQuizResultPage, AdminQuestionsPage, UserQuizzesPage, UserQuizResultPage,
+  UserQuizManualPage, SuperAdminDashboardPage, SuperAdminResultsPage.
+- result: PASS. mysqldump taken before migrating (scratchpad/exam-portal-before-V24.sql). V24 applied
+  clean, ddl-auto=validate passed, all 10 pre-existing quizzes kept their correct class (backfilled via
+  subjects.class_id), subjects table dropped, zero orphans. API matrix: create in class 22 -> 200
+  (this is the case that used to fail); bogus catId 999 -> 400; no class -> 400; blank title -> 400;
+  duplicate title in same class -> 409; same title in a different class -> 200. Reports verified on real
+  data: /quizResult/all resolves className via quiz.category; mentalist-report/30 profile shows
+  className "Class 6-8" and subjectName now the quiz title. Frontend compiles (pre-existing lint only);
+  Quizzes page groups by class incl. the previously-broken "asd".
+- notes / follow-ups: **regression I introduced and fixed mid-change** — the old SubjectServiceImpl
+  validated `categoryRepository.existsById`, so dropping that tier left Quiz accepting any catId and
+  failing with an opaque FK 500. Added `assertClassExists` to QuizServiceImpl add/update (400 instead).
+  V20's other change (one class per student, users.class_id) was deliberately left alone.
+  `MentalistReportDto.subjectName` kept as a field but now fed the quiz title — rename if the PDF
+  template's wording matters. Test rows created and deleted; quizzes back to the original 10.
+
+### 2026-07-30 15:10 — Class delete guard, JWT expiry, sidebar home links  [type: change]
+- what: (1) DELETE /api/category/{id} was throwing a raw 500 (FK violation) whenever a class still had
+  a quiz or a student assigned — now a clean 409 with counts. (2) JWT expiry was 10h with zero client-side
+  handling of expiry; extended to 30 days so a login survives well past a browser session. (3) The
+  sidebar's static "Logo" heading (Sidebar.js, SuperAdminSidebar.js) did nothing on click; wired both to
+  navigate home (role-aware path / superadmin dashboard), matching the top navbar brand's existing
+  behavior.
+- files: CategoryServiceImpl.java, QuizRepository.java (+countByCategory_CatId), UserRepository.java
+  (+countByClassId), JwtUtil.java, Sidebar.js, SuperAdminSidebar.js.
+- result: PASS. Verified live: reassigned test student ppp out of class "asd" via
+  PUT /api/students/12/class/15, then deleted class "asd"/22 (turned out already removed by other
+  session activity — confirmed via DB). Re-verified the guard on class 26 ("mnglygl", 1 quiz, 0
+  students): DELETE now returns 409 "This class has 1 quiz(zes) and 0 student(s) assigned..." instead
+  of a 500. Sidebar Logo click confirmed navigating to /superadmin from a nested page.
+- notes / follow-ups: same root-cause pattern as the earlier Quiz/class FK 500 — removing a layer
+  (Subject) or tightening a schema exposes any FK that isn't guarded in the service layer as an opaque
+  500; worth grepping for other unguarded deletes if this recurs. JWT secret/expiry change requires
+  users to re-login once (old tokens still validate under new expiry logic since expiry is only checked
+  at validation, not re-signed).

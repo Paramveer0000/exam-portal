@@ -30,6 +30,6 @@ public class Category {
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
-    // A class (category) owns subjects (Subject.classId); subjects own quizzes.
+    // A class (category) owns quizzes (Quiz.category).
     // No JPA back-reference is needed here.
 }

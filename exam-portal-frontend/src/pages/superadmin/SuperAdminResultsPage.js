@@ -96,7 +96,7 @@ const SuperAdminResultsPage = () => {
                         <thead>
                           <tr>
                             <th>Class</th>
-                            <th>Subject</th>
+                            <th>Quiz</th>
                             <th>Date</th>
                             <th>Report</th>
                           </tr>
