@@ -16,10 +16,9 @@ import com.project.examportalbackend.dto.PsychometricReportDto.RiasecRow;
 import com.project.examportalbackend.dto.ReportSectionContent;
 import com.project.examportalbackend.models.Category;
 import com.project.examportalbackend.models.MentalistReport;
+import com.project.examportalbackend.models.Quiz;
 import com.project.examportalbackend.models.QuizResult;
-import com.project.examportalbackend.models.Subject;
 import com.project.examportalbackend.models.User;
-import com.project.examportalbackend.repository.CategoryRepository;
 import com.project.examportalbackend.repository.MentalistReportRepository;
 import com.project.examportalbackend.repository.QuizResultRepository;
 import com.project.examportalbackend.repository.UserRepository;
@@ -74,7 +73,6 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
     @Autowired private PsychometricReportService psychometricReportService;
     @Autowired private QuizResultRepository quizResultRepository;
     @Autowired private UserRepository userRepository;
-    @Autowired private CategoryRepository categoryRepository;
     @Autowired private MentalistReportRepository mentalistReportRepository;
     @Autowired private InterpretationEngine interpretationEngine;
     @Autowired private ReportContentAiService reportContentAiService;
@@ -200,12 +198,13 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
         p.setReportNumber(existing != null ? existing.getReportNumber() : reportNumberFor(result.getQuizResId()));
         p.setCounsellorName(existing != null ? existing.getCounsellorName() : null);
 
-        Subject subject = result.getQuiz() != null ? result.getQuiz().getSubject() : null;
-        if (subject != null) {
-            p.setSubjectName(subject.getTitle());
-            if (subject.getClassId() != null) {
-                Category cat = categoryRepository.findById(subject.getClassId()).orElse(null);
-                p.setClassName(cat != null ? cat.getTitle() : student.getGrade());
+        // The quiz is the assessment, and it hangs directly off a class.
+        Quiz quiz = result.getQuiz();
+        if (quiz != null) {
+            p.setSubjectName(quiz.getTitle());
+            Category cat = quiz.getCategory();
+            if (cat != null) {
+                p.setClassName(cat.getTitle() != null ? cat.getTitle() : student.getGrade());
             }
         }
         if (p.getClassName() == null) {

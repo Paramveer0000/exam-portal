@@ -2,6 +2,8 @@ package com.project.examportalbackend.services.implementation;
 
 import com.project.examportalbackend.models.Category;
 import com.project.examportalbackend.repository.CategoryRepository;
+import com.project.examportalbackend.repository.QuizRepository;
+import com.project.examportalbackend.repository.UserRepository;
 import com.project.examportalbackend.security.AuthFacade;
 import com.project.examportalbackend.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private AuthFacade authFacade;
+
+    @Autowired
+    private QuizRepository quizRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public Category addCategory(Category category) {
@@ -82,6 +90,13 @@ public class CategoryServiceImpl implements CategoryService {
         Category existing = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
         authFacade.assertCanManage(existing.getCreatedBy());
+        long quizzes = quizRepository.countByCategory_CatId(categoryId);
+        long students = userRepository.countByClassId(categoryId);
+        if (quizzes > 0 || students > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "This class has " + quizzes + " quiz(zes) and " + students
+                            + " student(s) assigned. Reassign or delete them before deleting the class.");
+        }
         categoryRepository.delete(existing);
     }
 }

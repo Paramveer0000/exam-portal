@@ -48,15 +48,15 @@ public class QuizResultController {
         if (quiz == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found");
         }
-        // A student may submit only exams whose subject is in their class.
+        // A student may submit only exams that are in their class.
         if (authFacade.isStudent()) {
             Long myClassId = authFacade.getCurrentUser().getClassId();
-            boolean inMyClass = quiz.getSubject() != null
+            boolean inMyClass = quiz.getCategory() != null
                     && myClassId != null
-                    && myClassId.equals(quiz.getSubject().getClassId());
+                    && myClassId.equals(quiz.getCategory().getCatId());
             if (!inMyClass) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "This subject is not in your class");
+                        "This quiz is not in your class");
             }
         }
 

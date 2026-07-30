@@ -28,7 +28,7 @@ const UserQuizManualPage = () => {
       : quiz
       ? quiz.numOfQuestions
       : 0;
-  // Time limit comes from the school-configured timer (see Add/Update Subject).
+  // Time limit comes from the school-configured timer (see Add/Update Quiz).
   const timeLimit =
     quiz && quiz.timerEnabled && quiz.timerMinutes
       ? `${quiz.timerMinutes} minute${quiz.timerMinutes === 1 ? "" : "s"}`

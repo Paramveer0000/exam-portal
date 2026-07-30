@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { FaBars, FaUsers, FaRegChartBar, FaUserAlt, FaRobot } from "react-icons/fa";
 import { TbLayoutGrid, TbReport } from "react-icons/tb";
 import { MdQuiz } from "react-icons/md";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 
 const SuperAdminSidebar = ({ children }) => {
+  const navigate = useNavigate();
   // Persist expanded/collapsed state across navigation (each page mounts its own).
   const [isOpen, setIsOpen] = useState(
     () => localStorage.getItem("sidebarOpen") === "true"
@@ -67,7 +68,12 @@ const SuperAdminSidebar = ({ children }) => {
     >
       <div style={{ width: isOpen ? "12em" : "3em" }} className="sidebar">
         <div className="top_section">
-          <h1 style={{ display: isOpen ? "block" : "none" }} className="logo">
+          <h1
+            style={{ display: isOpen ? "block" : "none", cursor: "pointer" }}
+            className="logo"
+            onClick={() => navigate("/superadmin")}
+            title="Go to dashboard"
+          >
             Logo
           </h1>
           <div style={{ marginLeft: isOpen ? "50px" : "0px" }} className="bars">

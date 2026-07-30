@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import RoleSidebar from "../../../components/RoleSidebar";
 import FormContainer from "../../../components/FormContainer";
 import * as quizzesConstants from "../../../constants/quizzesConstants";
-import subjectsServices from "../../../services/subjectsServices";
 import categoriesServices from "../../../services/categoriesServices";
 import "./AdminUpdateQuiz.css";
 import { fetchQuizzes, updateQuiz } from "../../../actions/quizzesActions";
@@ -30,7 +29,7 @@ const AdminUpdateQuiz = () => {
   );
   const [isActive, setIsActive] = useState(oldQuiz.isActive);
   const [selectedClassId, setSelectedClassId] = useState(
-    oldQuiz.subject ? oldQuiz.subject.classId : null
+    oldQuiz.category ? oldQuiz.category.catId : null
   );
   const [questionsPerExam, setQuestionsPerExam] = useState(
     oldQuiz.questionsPerExam == null ? "" : oldQuiz.questionsPerExam
@@ -51,7 +50,6 @@ const AdminUpdateQuiz = () => {
     oldQuiz.allQuestionsMandatory || false
   );
 
-  const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
 
   const onClickPublishedHandler = () => {
@@ -70,15 +68,6 @@ const AdminUpdateQuiz = () => {
       alert("Select a valid class!");
       return;
     }
-    const subject = subjects.find((s) => s.classId === Number(selectedClassId));
-    if (!subject) {
-      swal(
-        "No subject for this class",
-        "This class has no subject set up yet. Ask a platform admin to add one.",
-        "warning"
-      );
-      return;
-    }
     const quiz = {
       quizId: quizId,
       title: title,
@@ -92,7 +81,7 @@ const AdminUpdateQuiz = () => {
       timerMinutes:
         timerEnabled && timerMinutes !== "" ? Number(timerMinutes) : null,
       allQuestionsMandatory: allQuestionsMandatory,
-      subject: { subjectId: subject.subjectId },
+      category: { catId: Number(selectedClassId) },
     };
     updateQuiz(dispatch, quiz, token).then((data) => {
       if (data.type === quizzesConstants.UPDATE_QUIZ_SUCCESS) {
@@ -106,9 +95,6 @@ const AdminUpdateQuiz = () => {
 
   useEffect(() => {
     if (!localStorage.getItem("jwtToken")) navigate("/");
-    subjectsServices.fetchSubjects(token).then(({ data }) => {
-      if (Array.isArray(data)) setSubjects(data);
-    });
     categoriesServices.fetchCategories(token).then((data) => {
       if (Array.isArray(data)) setClasses(data);
     });
@@ -127,16 +113,16 @@ const AdminUpdateQuiz = () => {
             className="mb-3"
             onClick={() => navigate("/adminQuizzes")}
           >
-            ← Back to Subjects
+            ← Back to Quizzes
           </Button>
-          <h2 style={{ color: "var(--mt-primary)" }}>Update Subject</h2>
+          <h2 style={{ color: "var(--mt-primary)" }}>Update Quiz</h2>
           <div className="mt-card p-4">
           <Form onSubmit={submitHandler}>
             <Form.Group className="my-3" controlId="title">
               <Form.Label>Title</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter Subject Title"
+                placeholder="Enter Quiz Title"
                 value={title}
                 required
                 onChange={(e) => {

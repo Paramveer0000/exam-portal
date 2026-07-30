@@ -82,16 +82,16 @@ const AdminQuizzesPage = () => {
   // Group quizzes by their class; optionally filter to one class (catId param).
   const buildClassGroups = () => {
     const visible = (quizzes || []).filter(
-      (q) => catId == null || (q.subject && q.subject.classId == catId)
+      (q) => catId == null || (q.category && q.category.catId == catId)
     );
     const groups = [];
     const byId = {};
     visible.forEach((quiz) => {
-      const cid = quiz.subject ? quiz.subject.classId : "unassigned";
+      const cid = quiz.category ? quiz.category.catId : "unassigned";
       if (!byId[cid]) {
         byId[cid] = {
           catId: cid,
-          title: quiz.subject ? classesById[cid] || `Class #${cid}` : "Unassigned",
+          title: quiz.category ? classesById[cid] || `Class #${cid}` : "Unassigned",
           quizzes: [],
         };
         groups.push(byId[cid]);
@@ -102,7 +102,7 @@ const AdminQuizzesPage = () => {
   };
   const classGroups = buildClassGroups();
 
-  const renderSubjectCard = (quiz) => (
+  const renderQuizCard = (quiz) => (
     <Card className="mt-card mb-2" key={quiz.quizId}>
       <ListGroup variant="flush">
       <ListGroup.Item className="align-items-start">
@@ -200,14 +200,14 @@ const AdminQuizzesPage = () => {
             alignItems: "center",
           }}
         >
-          <h2 style={{ color: "var(--mt-primary)" }}>Subjects</h2>
+          <h2 style={{ color: "var(--mt-primary)" }}>Quizzes</h2>
           <Button variant="primary" onClick={addNewQuizHandler}>
-            Add Subject
+            Add Quiz
           </Button>
         </div>
         {quizzes ? (
           classGroups.length === 0 ? (
-            <Message>No subjects are present. Try adding some subjects.</Message>
+            <Message>No quizzes are present. Try adding some quizzes.</Message>
           ) : (
             classGroups.map((group) => (
               <div
@@ -232,7 +232,7 @@ const AdminQuizzesPage = () => {
                     {group.quizzes.length === 1 ? "quiz" : "quizzes"})
                   </span>
                 </h4>
-                {group.quizzes.map((quiz) => renderSubjectCard(quiz))}
+                {group.quizzes.map((quiz) => renderQuizCard(quiz))}
               </div>
             ))
           )

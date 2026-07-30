@@ -199,7 +199,7 @@ public class AdminServiceImpl implements AdminService {
         if (ownedCategories > 0 || ownedQuizzes > 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Admin owns " + ownedCategories + " classes and " + ownedQuizzes
-                            + " subjects. Reassign or disable the admin instead of deleting.");
+                            + " quizzes. Reassign or disable the admin instead of deleting.");
         }
         long students = userRepository.findByTeacherId(adminId).size();
         if (students > 0) {
@@ -332,7 +332,7 @@ public class AdminServiceImpl implements AdminService {
             dto.setName((a.getFirstName() + " " + a.getLastName()).trim());
             dto.setStudents(userRepository.findByTeacherId(id).size());
             dto.setClasses(categoryRepository.countByCreatedBy(id));
-            dto.setSubjects(quizzes.size());
+            dto.setQuizzes(quizzes.size());
             dto.setExamsConducted(results.stream()
                     .filter(r -> r.getQuiz() != null)
                     .map(r -> r.getQuiz().getQuizId())
@@ -419,8 +419,8 @@ public class AdminServiceImpl implements AdminService {
             if (student == null || !teacherId.equals(student.getTeacherId())) {
                 continue;
             }
-            Long classId = r.getQuiz() != null && r.getQuiz().getSubject() != null
-                    ? r.getQuiz().getSubject().getClassId() : null;
+            Long classId = r.getQuiz() != null && r.getQuiz().getCategory() != null
+                    ? r.getQuiz().getCategory().getCatId() : null;
 
             com.project.examportalbackend.dto.SchoolResultsDto.ResultRow row =
                     new com.project.examportalbackend.dto.SchoolResultsDto.ResultRow();
@@ -465,13 +465,13 @@ public class AdminServiceImpl implements AdminService {
         return out;
     }
 
-    /** The class (category) title a quiz belongs to, via its subject. */
+    /** The class (category) title a quiz belongs to. */
     private String className(Quiz quiz) {
-        if (quiz == null || quiz.getSubject() == null || quiz.getSubject().getClassId() == null) {
+        if (quiz == null || quiz.getCategory() == null) {
             return "";
         }
-        return categoryRepository.findById(quiz.getSubject().getClassId())
-                .map(Category::getTitle).orElse("");
+        String title = quiz.getCategory().getTitle();
+        return title == null ? "" : title;
     }
 
     private String displayName(User u) {

@@ -74,8 +74,8 @@ public class Quiz {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "subject_id")
-    private Subject subject;
+    @JoinColumn(name = "category_cat_id")
+    private Category category;
 
     @OneToMany(mappedBy = "quiz", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore

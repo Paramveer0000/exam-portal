@@ -78,7 +78,7 @@ const SuperAdminDashboardPage = () => {
       color: "var(--mt-accent-dark)",
     },
     {
-      label: "Subjects",
+      label: "Quizzes",
       value: metrics?.totalQuizzes,
       icon: <BsJournalBookmark />,
       color: "var(--mt-info)",
@@ -223,8 +223,8 @@ const SuperAdminDashboardPage = () => {
                 <th role="button" onClick={() => toggleSort("classes")}>
                   Classes {sortIcon("classes")}
                 </th>
-                <th role="button" onClick={() => toggleSort("subjects")}>
-                  Subjects {sortIcon("subjects")}
+                <th role="button" onClick={() => toggleSort("quizzes")}>
+                  Quizzes {sortIcon("quizzes")}
                 </th>
                 <th role="button" onClick={() => toggleSort("examsConducted")}>
                   Exams conducted {sortIcon("examsConducted")}
@@ -268,7 +268,7 @@ const SuperAdminDashboardPage = () => {
                     </div>
                   </td>
                   <td>{a.classes}</td>
-                  <td>{a.subjects}</td>
+                  <td>{a.quizzes}</td>
                   <td>{a.examsConducted}</td>
                   <td>{a.attempts}</td>
                 </tr>
@@ -298,7 +298,7 @@ const SuperAdminDashboardPage = () => {
           unowned.categories.length === 0 &&
           unowned.quizzes.length === 0 ? (
             <p className="mb-0">
-              Nothing unassigned — every class and subject has an owner.
+              Nothing unassigned — every class and quiz has an owner.
             </p>
           ) : (
             <>
@@ -320,7 +320,7 @@ const SuperAdminDashboardPage = () => {
                 </Col>
                 <Col md={6}>
                   <strong>
-                    Subjects ({unowned ? unowned.quizzes.length : 0})
+                    Quizzes ({unowned ? unowned.quizzes.length : 0})
                   </strong>
                   <ul>
                     {unowned &&
