@@ -155,6 +155,13 @@
   box-shadow: 0 6px 25px rgba(41, 151, 255, 0.5);
 }
 
+/* `.page a { color: inherit }` (0,1,1) outranks `.btnPrimary` (0,1,0), so an
+   anchor styled as a primary button would take the body text colour instead of
+   white — unreadable on the blue fill in light theme. */
+.page a.btnPrimary {
+  color: #ffffff;
+}
+
 .btnSecondary {
   display: inline-flex;
   align-items: center;

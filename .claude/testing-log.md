@@ -1003,3 +1003,26 @@ gotchas, and open issues that are NOT in the source code or git history.
   persisted it needs a real backend endpoint. `data-theme` is set on <html> and persists in
   localStorage as `mtTheme` after navigating away — harmless today since only `--mt-*` vars key off it,
   but it is global state set by one page.
+
+### 2026-07-30 16:40 — Navbar CTA switched from Book Consultation to Login  [type: change]
+- what: Landing navbar's primary button is now a react-router <Link to="/login"> reading "Login"
+  (was a <button> opening the booking modal). Booking modal is unchanged and still reachable from
+  the hero "Schedule Session", the floating dock "Book Session", and each assessment panel's
+  "Inquire About Assessment".
+- files: pages/LandingPage.js (import Link; nav button -> Link), pages/LandingPage.module.css
+  (+ `.page a.btnPrimary { color: #ffffff }`).
+- result: PASS. Login link renders href="/login", text "Login", white on accent blue; navigates
+  client-side to /login where the global Header returns with Login/Register and the landing navbar is
+  gone. "Book Consultation" no longer appears anywhere. Modal still opens from Schedule Session
+  (verified modalBackdropActive applied).
+- notes / follow-ups: swapping the <button> for an <a> exposed a latent specificity bug —
+  `.page a { color: inherit }` is (0,1,1) and outranks `.btnPrimary` (0,1,0), so the anchor took the
+  body text colour instead of white. Harmless in dark theme (#f8fafc vs #ffffff) but in light theme it
+  renders #0f172a on #0284c7. Added a (0,2,1) rule; this also covers the pre-existing WhatsApp anchor
+  in the modal confirmation, which had the same defect.
+  TOOLING GOTCHA worth remembering: when the Browser pane is not displayed the page stops compositing
+  and getComputedStyle returns STALE values for any transitioned property (color, background-color,
+  visibility, opacity) while custom properties update instantly. This produced three separate false
+  readings this session. Reliable workarounds: read an untransitioned property instead
+  (pointer-events), or set `el.style.transition='none'` before measuring. Do not trust a theme/visibility
+  colour reading taken right after a class or attribute change.

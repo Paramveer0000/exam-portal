@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { homePathForRoles } from "../components/ProtectedRoute";
 import styles from "./LandingPage.module.css";
 
@@ -400,10 +400,10 @@ const LandingPage = () => {
             >
               <i className={`fa-solid ${theme === "light" ? "fa-sun" : "fa-moon"}`} />
             </button>
-            <button type="button" className={styles.btnPrimary} onClick={() => openBookingModal()}>
-              <span>Book Consultation</span>
+            <Link to="/login" className={styles.btnPrimary}>
+              <span>Login</span>
               <i className="fa-solid fa-arrow-right" />
-            </button>
+            </Link>
           </div>
         </div>
       </nav>
