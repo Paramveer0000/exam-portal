@@ -968,3 +968,38 @@ gotchas, and open issues that are NOT in the source code or git history.
   500; worth grepping for other unguarded deletes if this recurs. JWT secret/expiry change requires
   users to re-login once (old tokens still validate under new expiry logic since expiry is only checked
   at validation, not re-signed).
+
+### 2026-07-30 16:10 — Landing page replaced with The Mentalist marketing site  [type: change]
+- what: Replaced the placeholder LandingPage with the supplied static homepage (public_html: index.html
+  + styles.css + app.js), ported to React. Sections: fixed navbar w/ dark-light toggle, hero + animated
+  stats counter, about/vision/mission, expertise grid, bento services, 3-step assessment-finder quiz,
+  5-tab psychometric assessment panels, why-mental-health, testimonials carousel, booking modal
+  (submits to a wa.me deep link — no backend endpoint), floating contact dock, footer. All imperative
+  DOM logic from app.js rewritten as React state. Per user decision the page carries NO auth CTA;
+  Login/Register stay in the global Header.
+- files: pages/LandingPage.js (rewrite), pages/LandingPage.module.css (new), pages/LandingPage.css
+  (deleted), components/Header.js, public/index.html, public/mentalist/*.jpg (2 images).
+- result: PASS after fixing 3 bugs found in live browser testing (all re-verified):
+  (1) CRITICAL — whole page rendered invisible. CRA hashed the CSS-module class to
+  `LandingPage_reveal__9EF+u`; the `+` is a sibling combinator, so `querySelectorAll('.'+styles.reveal)`
+  matched 0 elements *without throwing* (silent, nothing in console). IntersectionObserver observed
+  nothing, so all 18 `.reveal` elements stayed at opacity:0. Fixed with `CSS.escape()` → 18 matches.
+  Latent: a rebuild whose hash lacks `+`/`/` would have masked it.
+  (2) Landing page's fixed navbar (top:0, z-index 1000, 86px) covered the Bootstrap <Header/>
+  (top:0, 56px) — two brands overlapping, and elementFromPoint over "Login" returned the Book
+  Consultation button, so header links were unclickable. Header.js now returns null on "/" (check put
+  in Header, which already runs inside the Router, rather than restructuring App.js).
+  (3) Closed booking modal used only `opacity:0; pointer-events:none` — 7 controls stayed in the tab
+  order and could take focus. Added `visibility:hidden` (transitionable, fade preserved).
+  Also silently fixed a bug inherited from app.js: `getRecommendedTest` keyed testMap as `leadership`
+  while the quiz option emitted scoreKey `benchmark`, so that answer fell through to the career
+  default. Verified both paths now: wellness → "Mental Skills Assessment", benchmark → "Brain
+  Benchmark Assessment".
+  Clean final state: no console errors, all network 200, FontAwesome + Plus Jakarta Sans loading,
+  images served from /mentalist/, quiz/tabs/stats/theme-toggle working, /login unaffected by the
+  CSS module (no style bleed).
+- notes / follow-ups: CSS Modules + `querySelectorAll` on a generated class name is a repo-wide trap —
+  always `CSS.escape()`. Booking form is fire-and-forget to WhatsApp; if these leads should be
+  persisted it needs a real backend endpoint. `data-theme` is set on <html> and persists in
+  localStorage as `mtTheme` after navigating away — harmless today since only `--mt-*` vars key off it,
+  but it is global state set by one page.
