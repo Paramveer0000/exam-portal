@@ -17,18 +17,17 @@ const initials = (name) =>
 
 const SuperAdminResultsPage = () => {
   const navigate = useNavigate();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
 
   const [schools, setSchools] = useState(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    if (!token) navigate("/");
+    // Auth guard handled by ProtectedRoute; cookie-based auth needs no check here.
   }, []);
 
   useEffect(() => {
-    adminServices.fetchResultsBySchool(token).then(({ data, error }) => {
+    adminServices.fetchResultsBySchool().then(({ data, error }) => {
       if (data) setSchools(data);
       else setError(error || "Could not load results");
     });

@@ -9,9 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api")
 public class AuthController {
@@ -23,22 +24,20 @@ public class AuthController {
     // Public School (admin) self-signup. Students are created by their school
     // (POST /api/students), never via public self-registration.
     @PostMapping("/register/school")
-    public User registerSchool(@RequestBody User user) throws Exception {
-        return authService.registerSchoolService(user);
+    public ResponseEntity<?> registerSchool(@RequestBody User user) throws Exception {
+        return ResponseEntity.ok(authService.registerSchoolService(user));
     }
 
-    // Public: teachers (admins) a student can register under.
     @GetMapping("/teachers")
     public ResponseEntity<?> getTeachers() {
         return ResponseEntity.ok(authService.getTeachers());
     }
 
-    // Returns the error message in the body so the login page can show it
-    // (a thrown 401 otherwise reaches the client with an empty body).
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest,
+                                       HttpServletResponse response) {
         try {
-            return ResponseEntity.ok(authService.loginUserService(loginRequest));
+            return ResponseEntity.ok(authService.loginUserService(loginRequest, response));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatus())
                     .body(Collections.singletonMap("message", e.getReason()));
@@ -48,4 +47,26 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request,
+                                          HttpServletResponse response) {
+        try {
+            return ResponseEntity.ok(authService.refreshTokens(request, response));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatus())
+                    .body(Collections.singletonMap("message", e.getReason()));
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request,
+                                    HttpServletResponse response) {
+        authService.logout(request, response);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Logged out"));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser() {
+        return ResponseEntity.ok(authService.getCurrentUser());
+    }
 }

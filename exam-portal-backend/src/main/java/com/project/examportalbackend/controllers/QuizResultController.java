@@ -18,7 +18,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/quizResult")
 public class QuizResultController {

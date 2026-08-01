@@ -2,6 +2,7 @@ package com.project.examportalbackend.configurations;
 
 import com.project.examportalbackend.services.implementation.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,6 +19,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -28,6 +36,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsServiceImpl;
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
+
+    @Value("${cors.allowed-origins:http://localhost:3000}")
+    private String allowedOrigins;
 
     @Bean
     @Override
@@ -40,10 +51,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * SUPER_ADMIN inherits everything ADMIN can do; ADMIN and USER stay distinct
-     * (admins are not students and vice versa).
-     */
     @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
@@ -57,52 +64,75 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return handler;
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Content-Type", "X-XSRF-TOKEN"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", config);
+        return source;
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.cors();
-        http.csrf().disable()
-                .authorizeRequests()
+        http.cors().configurationSource(corsConfigurationSource());
+
+        // CSRF with cookie-based token: JS reads XSRF-TOKEN cookie, sends it as
+        // X-XSRF-TOKEN header. Login/register/refresh are exempt (no session yet).
+        http.csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringAntMatchers("/api/login", "/api/register", "/api/register/school", "/api/refresh", "/api/logout");
+
+        // Security headers.
+        http.headers()
+                .frameOptions().deny()
+                .contentTypeOptions().and()
+                .xssProtection().block(true).and()
+                .httpStrictTransportSecurity()
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000)
+                    .and()
+                .referrerPolicy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN);
+
+        http.authorizeRequests()
                 .expressionHandler(webExpressionHandler())
 
                 // Health probe for orchestrators/load balancers — public, no DB/auth.
                 .antMatchers(HttpMethod.GET, "/health").permitAll()
                 .antMatchers("/api/register/school").permitAll()
                 .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/logout").permitAll()
+                .antMatchers("/api/refresh").permitAll()
+                .antMatchers("/api/me").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/teachers").permitAll()
-                // Platform branding: logo is public (header on every page);
-                // only a SUPER_ADMIN may change it.
+
                 .antMatchers(HttpMethod.GET, "/api/platform/**").permitAll()
                 .antMatchers("/api/platform/**").hasAuthority("SUPER_ADMIN")
 
-                // Any authenticated user may manage their own profile.
                 .antMatchers("/api/profile/**").authenticated()
 
-                // Super Admin management surface.
                 .antMatchers("/api/admin/**").hasAuthority("SUPER_ADMIN")
 
-                // Reporting is admin-only (super admin inherits via role hierarchy).
                 .antMatchers("/api/reports/**").hasAuthority("ADMIN")
 
-                // Teachers manage their own students.
                 .antMatchers("/api/students/**").hasAuthority("ADMIN")
 
-                // Content (classes/quizzes/questions) is created and managed ONLY by
-                // SUPER_ADMIN. Schools (ADMIN) get read access to assign classes; students
-                // read to browse/take. hasAuthority("SUPER_ADMIN") excludes plain ADMIN.
                 .antMatchers(HttpMethod.POST, "/api/category/**").hasAuthority("SUPER_ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/category/**").hasAnyAuthority("USER", "ADMIN")
                 .antMatchers(HttpMethod.PUT, "/api/category/**").hasAuthority("SUPER_ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/category/**").hasAuthority("SUPER_ADMIN")
 
-                // Student exam delivery (answers stripped) lives under /api/quiz/**.
                 .antMatchers(HttpMethod.POST, "/api/quiz/**").hasAuthority("SUPER_ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/quiz/**").hasAnyAuthority("USER", "ADMIN")
                 .antMatchers(HttpMethod.PUT, "/api/quiz/**").hasAuthority("SUPER_ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/api/quiz/**").hasAuthority("SUPER_ADMIN")
 
-                // Question CRUD (answers included): SUPER_ADMIN only. Reads allow ADMIN
-                // (super admin via hierarchy) so content can be viewed; students never call it.
                 .antMatchers(HttpMethod.GET, "/api/question/**").hasAuthority("ADMIN")
                 .antMatchers("/api/question/**").hasAuthority("SUPER_ADMIN")
 
@@ -111,8 +141,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/quizResult/by-class/**").hasAuthority("ADMIN")
                 .antMatchers(HttpMethod.GET, "/api/quizResult/**").hasAnyAuthority("USER", "ADMIN")
 
-                // Psychometric report: students read their own, teachers their
-                // students' (per-row scoping in the service). POST = generate AI summary.
                 .antMatchers(HttpMethod.GET, "/api/psychometric-report/**").hasAnyAuthority("USER", "ADMIN")
                 .antMatchers(HttpMethod.POST, "/api/psychometric-report/**").hasAnyAuthority("USER", "ADMIN")
 

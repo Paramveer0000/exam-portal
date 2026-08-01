@@ -38,7 +38,6 @@ const emptyForm = {
 
 const SuperAdminAdminsPage = () => {
   const dispatch = useDispatch();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   const { admins, activity, error } = useSelector((state) => state.adminReducer);
   const [form, setForm] = useState(emptyForm);
   const [showCreate, setShowCreate] = useState(false);
@@ -53,7 +52,7 @@ const SuperAdminAdminsPage = () => {
   };
 
   useEffect(() => {
-    fetchAdmins(dispatch, token);
+    fetchAdmins(dispatch);
   }, []);
 
   const onFormChange = (e) =>
@@ -69,12 +68,12 @@ const SuperAdminAdminsPage = () => {
       ...form,
       studentLimit: form.studentLimit === "" ? null : Number(form.studentLimit),
     };
-    createAdmin(dispatch, payload, token).then((data) => {
+    createAdmin(dispatch, payload).then((data) => {
       if (data.type === "CREATE_ADMIN_SUCCESS") {
         swal("Created", `${form.username} was added`, "success");
         setForm(emptyForm);
         setShowCreate(false);
-        fetchMetrics(dispatch, token);
+        fetchMetrics(dispatch);
       } else {
         swal("Not created", data.payload || "Failed to create admin", "error");
       }
@@ -103,8 +102,7 @@ const SuperAdminAdminsPage = () => {
         lastName: admin.lastName,
         phoneNumber: admin.phoneNumber,
         studentLimit,
-      },
-      token
+      }
     ).then((data) => {
       if (data.type === "UPDATE_ADMIN_SUCCESS") {
         swal("Saved", "Student limit updated", "success");
@@ -120,7 +118,7 @@ const SuperAdminAdminsPage = () => {
   };
 
   const toggleStatus = (admin) => {
-    setAdminStatus(dispatch, admin.userId, !admin.active, token);
+    setAdminStatus(dispatch, admin.userId, !admin.active);
   };
 
   const resetHandler = (admin) => {
@@ -128,7 +126,7 @@ const SuperAdminAdminsPage = () => {
       `Enter a new password for ${admin.username}`
     );
     if (newPassword) {
-      resetAdminPassword(dispatch, admin.userId, newPassword, token).then(
+      resetAdminPassword(dispatch, admin.userId, newPassword).then(
         (data) => {
           if (data.type === "RESET_ADMIN_PASSWORD_SUCCESS") {
             swal("Password reset", `Updated for ${admin.username}`, "success");
@@ -149,10 +147,10 @@ const SuperAdminAdminsPage = () => {
       dangerMode: true,
     }).then((confirmed) => {
       if (confirmed) {
-        deleteAdmin(dispatch, admin.userId, token).then((data) => {
+        deleteAdmin(dispatch, admin.userId).then((data) => {
           if (data.type === "DELETE_ADMIN_SUCCESS") {
             swal("Deleted", `${admin.username} removed`, "success");
-            fetchMetrics(dispatch, token);
+            fetchMetrics(dispatch);
           } else {
             swal("Not deleted", data.payload || "Could not delete", "error");
           }
@@ -162,7 +160,7 @@ const SuperAdminAdminsPage = () => {
   };
 
   const viewActivity = (admin) => {
-    fetchActivity(dispatch, admin.userId, token);
+    fetchActivity(dispatch, admin.userId);
   };
 
   const toggleSort = (key) =>
@@ -215,16 +213,12 @@ const SuperAdminAdminsPage = () => {
   // Sign in as the target admin: stash the super-admin session, swap in the
   // admin's token/user, then reload into the admin portal.
   const loginAsHandler = (admin) => {
-    adminServices.impersonate(admin.userId, token).then(({ data, error }) => {
-      if (data && data.jwtToken) {
-        localStorage.setItem(
-          "impersonatorBackup",
-          JSON.stringify({
-            token: localStorage.getItem("jwtToken"),
-            user: localStorage.getItem("user"),
-          })
-        );
-        localStorage.setItem("jwtToken", JSON.stringify(data.jwtToken));
+    adminServices.impersonate(admin.userId).then(({ data, error }) => {
+      if (data && data.user) {
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        localStorage.setItem("impersonatorBackup", JSON.stringify({
+          userId: currentUser.userId,
+        }));
         localStorage.setItem("user", JSON.stringify(data.user));
         window.location.href = "/adminProfile";
       } else {

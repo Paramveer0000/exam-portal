@@ -25,7 +25,6 @@ const AdminQuestionsPage = () => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(new Set());
   const [deleting, setDeleting] = useState(false);
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   const storedUser = JSON.parse(localStorage.getItem("user") || "null");
   // Question CRUD is SUPER_ADMIN-only on the backend (see SecurityConfig); a plain ADMIN
   // can view but every write 403s. Hide the write controls instead of letting them silently fail.
@@ -67,12 +66,12 @@ const AdminQuestionsPage = () => {
       setDeleting(true);
       let failures = 0;
       for (const quesId of selected) {
-        const result = await deleteQuestion(dispatch, quesId, token);
+        const result = await deleteQuestion(dispatch, quesId);
         if (result.type !== questionsConstants.DELETE_QUESTION_SUCCESS) failures++;
       }
       setDeleting(false);
       setSelected(new Set());
-      fetchQuestionsByQuiz(dispatch, quizId, token).then((data) =>
+      fetchQuestionsByQuiz(dispatch, quizId).then((data) =>
         setQuestions(data.payload)
       );
       if (failures > 0) {
@@ -90,13 +89,13 @@ const AdminQuestionsPage = () => {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   // Re-fetch every time this page becomes active (including navigating back
   // from Add/Update Question), not just on first mount, so edits always show.
   useEffect(() => {
-    fetchQuestionsByQuiz(dispatch, quizId, token).then((data) =>
+    fetchQuestionsByQuiz(dispatch, quizId).then((data) =>
       setQuestions(data.payload)
     );
   }, [location.key]);

@@ -43,8 +43,9 @@ public interface AdminService {
 
     void reassignQuiz(Long quizId, Long adminId);
 
-    /** Issues a login token for the target admin so a Super Admin can act as them. */
-    LoginResponse impersonate(Long adminId);
+    LoginResponse impersonate(Long adminId, javax.servlet.http.HttpServletResponse response);
+
+    LoginResponse stopImpersonation(Long originalUserId, javax.servlet.http.HttpServletResponse response);
 
     /** All quiz results grouped by school (partner) then student. */
     List<com.project.examportalbackend.dto.SchoolResultsDto> getResultsBySchool();

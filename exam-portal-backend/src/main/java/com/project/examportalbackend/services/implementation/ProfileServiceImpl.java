@@ -1,12 +1,13 @@
 package com.project.examportalbackend.services.implementation;
 
 import com.project.examportalbackend.configurations.JwtUtil;
+import com.project.examportalbackend.dto.AuthUserDto;
 import com.project.examportalbackend.dto.ChangePasswordRequest;
 import com.project.examportalbackend.dto.UpdateProfileRequest;
-import com.project.examportalbackend.models.LoginResponse;
 import com.project.examportalbackend.models.User;
 import com.project.examportalbackend.repository.UserRepository;
 import com.project.examportalbackend.security.AuthFacade;
+import com.project.examportalbackend.security.CookieUtil;
 import com.project.examportalbackend.services.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class ProfileServiceImpl implements ProfileService {
@@ -26,9 +29,11 @@ public class ProfileServiceImpl implements ProfileService {
     private JwtUtil jwtUtil;
     @Autowired
     private AuthFacade authFacade;
+    @Autowired
+    private CookieUtil cookieUtil;
 
     @Override
-    public LoginResponse updateProfile(UpdateProfileRequest request) {
+    public AuthUserDto updateProfile(UpdateProfileRequest request, HttpServletResponse response) {
         User user = loadCurrentUser();
 
         if (!StringUtils.hasText(request.getUsername())) {
@@ -37,7 +42,6 @@ public class ProfileServiceImpl implements ProfileService {
         if (!StringUtils.hasText(request.getPhoneNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phone number is required");
         }
-        // Enforce username uniqueness when it actually changes.
         if (!request.getUsername().equals(user.getUsername())) {
             User other = userRepository.findByUsername(request.getUsername());
             if (other != null && other.getUserId() != user.getUserId()) {
@@ -45,8 +49,6 @@ public class ProfileServiceImpl implements ProfileService {
             }
         }
 
-        // Students may switch which school (teacher) they belong to; the field is
-        // meaningless for ADMIN/SUPER_ADMIN accounts, so it's only honored here.
         if (authFacade.isStudent() && request.getTeacherId() != null
                 && !request.getTeacherId().equals(user.getTeacherId())) {
             User teacher = userRepository.findById(request.getTeacherId())
@@ -76,10 +78,11 @@ public class ProfileServiceImpl implements ProfileService {
         }
         User saved = userRepository.save(user);
 
-        // The JWT subject is the username, so a rename needs a fresh token to keep
-        // the current session valid.
         String token = jwtUtil.generateToken(saved);
-        return new LoginResponse(saved, token);
+        long maxAge = jwtUtil.getAccessTokenValidityMs() / 1000;
+        cookieUtil.addAccessTokenCookie(response, token, (int) maxAge);
+
+        return AuthUserDto.from(saved);
     }
 
     @Override

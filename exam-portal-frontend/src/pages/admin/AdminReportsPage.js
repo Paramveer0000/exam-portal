@@ -8,7 +8,6 @@ import { fetchQuizReport, exportQuizReport } from "../../actions/reportsActions"
 
 const AdminReportsPage = () => {
   const dispatch = useDispatch();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   const quizzesReducer = useSelector((state) => state.quizzesReducer);
   const reportsReducer = useSelector((state) => state.reportsReducer);
 
@@ -20,7 +19,7 @@ const AdminReportsPage = () => {
 
   useEffect(() => {
     if (quizzesReducer.quizzes.length === 0) {
-      fetchQuizzes(dispatch, token);
+      fetchQuizzes(dispatch);
     }
   }, []);
 
@@ -29,13 +28,13 @@ const AdminReportsPage = () => {
   const runReport = (e) => {
     if (e) e.preventDefault();
     if (quizId) {
-      fetchQuizReport(dispatch, quizId, filters, token);
+      fetchQuizReport(dispatch, quizId, filters);
     }
   };
 
   const exportHandler = () => {
     if (quizId) {
-      exportQuizReport(quizId, filters, token);
+      exportQuizReport(quizId, filters);
     }
   };
 

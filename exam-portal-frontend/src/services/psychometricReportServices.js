@@ -1,21 +1,14 @@
-import axios from "axios";
+import api from "./api";
 
-const fetchReport = async (quizResId, token) => {
+const fetchReport = async (quizResId) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const { data } = await axios.get(
-      `/api/psychometric-report/${quizResId}`,
-      config
-    );
+    const { data } = await api.get(`/api/psychometric-report/${quizResId}`);
     return { data, error: null };
   } catch (error) {
     const message =
       (error.response && error.response.data && error.response.data.message) ||
       (error.response && error.response.statusText) ||
       "Request failed";
-    console.error("psychometricReportServices:fetchReport() Error: ", message);
     return { data: null, error: message };
   }
 };

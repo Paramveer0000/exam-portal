@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Header from "./components/Header";
+import IdleTimeout from "./components/IdleTimeout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RequireStudentOnboarding from "./components/RequireStudentOnboarding";
 import AdminAddCategoryPage from "./pages/admin/categories/AdminAddCategoryPage";
@@ -53,6 +54,7 @@ const App = () => {
   return (
     <Router>
       <Header />
+      <IdleTimeout />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />

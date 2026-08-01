@@ -10,15 +10,13 @@ import "./UserProfilePage.css";
 const UserProfilePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   useEffect(() => {
-    fetchCategories(dispatch, token);
-    fetchQuizzes(dispatch, token);
+    fetchCategories(dispatch);
+    fetchQuizzes(dispatch);
   }, [dispatch]);
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   return (

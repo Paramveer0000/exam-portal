@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Self-service profile endpoints for the authenticated user (any role).
- */
-@CrossOrigin
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/api/profile")
 public class ProfileController {
@@ -19,8 +17,9 @@ public class ProfileController {
     private ProfileService profileService;
 
     @PutMapping("/")
-    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileRequest request) {
-        return ResponseEntity.ok(profileService.updateProfile(request));
+    public ResponseEntity<?> updateProfile(@RequestBody UpdateProfileRequest request,
+                                           HttpServletResponse response) {
+        return ResponseEntity.ok(profileService.updateProfile(request, response));
     }
 
     @PostMapping("/change-password")

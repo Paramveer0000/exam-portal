@@ -17,8 +17,6 @@ import swal from "sweetalert";
 const AdminCategoriesPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const categoriesReducer = useSelector((state) => state.categoriesReducer);
   const [categories, setCategories] = useState(categoriesReducer.categories);
 
@@ -45,7 +43,7 @@ const AdminCategoriesPage = () => {
       dangerMode: true,
     }).then((willDelete) => {
       if (willDelete) {
-        deleteCategory(dispatch, category.catId, token).then((data) => {
+        deleteCategory(dispatch, category.catId).then((data) => {
           if (data.type === categoriesConstants.DELETE_CATEGORY_SUCCESS) {
             swal(
               "Category Deleted!",
@@ -67,12 +65,12 @@ const AdminCategoriesPage = () => {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   useEffect(() => {
     if (categories.length === 0) {
-      fetchCategories(dispatch, token).then((data) => {
+      fetchCategories(dispatch).then((data) => {
         setCategories(data.payload);
       });
     }

@@ -19,8 +19,6 @@ const UserQuizManualPage = () => {
   const [quiz, setQuiz] = useState(
     quizzes.filter((q) => q.quizId == quizId)[0]
   );
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   // Questions a student actually receives: the per-exam limit if set, else the whole pool.
   const questionsCount =
     quiz && quiz.questionsPerExam != null
@@ -40,7 +38,7 @@ const UserQuizManualPage = () => {
 
   useEffect(() => {
     if (quizzes.length == 0) {
-      fetchQuizzes(dispatch, token).then((data) => {
+      fetchQuizzes(dispatch).then((data) => {
         const temp = data.payload;
         setQuizzes(temp);
         setQuiz(temp.filter((q) => q.quizId == quizId)[0]);
@@ -49,7 +47,7 @@ const UserQuizManualPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   return (

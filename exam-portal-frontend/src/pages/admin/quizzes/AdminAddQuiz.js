@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Form } from "react-bootstrap";
 import "./AdminAddQuiz.css";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import swal from "sweetalert";
 import RoleSidebar from "../../../components/RoleSidebar";
 import FormContainer from "../../../components/FormContainer";
@@ -37,8 +37,6 @@ const AdminAddQuiz = () => {
     setSelectedClassId(e.target.value);
   };
 
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const submitHandler = (e) => {
     e.preventDefault();
     if (selectedClassId === null || selectedClassId === "n/a") {
@@ -59,7 +57,7 @@ const AdminAddQuiz = () => {
       allQuestionsMandatory: allQuestionsMandatory,
       category: { catId: Number(selectedClassId) },
     };
-    addQuiz(dispatch, quiz, token).then((data) => {
+    addQuiz(dispatch, quiz).then((data) => {
       if (data.type === quizzesConstants.ADD_QUIZ_SUCCESS) {
         swal("Quiz Added!", `${quiz.title} succesfully added`, "success");
         navigate("/adminQuizzes");
@@ -70,8 +68,8 @@ const AdminAddQuiz = () => {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
-    categoriesServices.fetchCategories(token).then((data) => {
+    if (!localStorage.getItem("user")) navigate("/");
+    categoriesServices.fetchCategories().then((data) => {
       if (Array.isArray(data)) setClasses(data);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

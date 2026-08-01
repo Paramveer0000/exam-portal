@@ -31,7 +31,6 @@ const AdminAddQuestionsPage = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const quizId = urlParams.get("quizId");
   const quizTitle = urlParams.get("quizTitle");
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   const backToQuestionsUrl = `/adminQuestions/?quizId=${quizId}${
     quizTitle ? `&quizTitle=${quizTitle}` : ""
   }`;
@@ -65,7 +64,7 @@ const AdminAddQuestionsPage = () => {
         },
       };
 
-      addQuestion(dispatch, question, token).then((data) => {
+      addQuestion(dispatch, question).then((data) => {
         if (data.type === questionsConstants.ADD_QUESTION_SUCCESS) {
           swal("Question Added!", `${content} succesfully added`, "success").then(() =>
             navigate(backToQuestionsUrl)

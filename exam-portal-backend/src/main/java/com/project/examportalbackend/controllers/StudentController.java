@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Teacher (admin) management of their own students.
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/api/students")
 public class StudentController {

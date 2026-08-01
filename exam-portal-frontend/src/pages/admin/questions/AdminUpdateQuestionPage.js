@@ -64,8 +64,6 @@ const AdminUpdateQuestionPage = () => {
     oldQuestion ? oldQuestion.option4Dimension || "" : ""
   );
 
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const onSelectAnswerHandler = (e) => {
     setAnswer(e.target.value);
   };
@@ -96,7 +94,7 @@ const AdminUpdateQuestionPage = () => {
         },
       };
 
-      updateQuestion(dispatch, question, token).then((data) => {
+      updateQuestion(dispatch, question).then((data) => {
         if (data.type === questionsConstants.UPDATE_QUESTION_SUCCESS) {
           swal(
             "Question Updated!",

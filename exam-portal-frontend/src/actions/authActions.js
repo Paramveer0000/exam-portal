@@ -32,3 +32,8 @@ export const login = async (dispatch, username, password) => {
     });
   }
 };
+
+export const logout = async (dispatch) => {
+  await authServices.logout();
+  dispatch({ type: authConstants.USER_LOGOUT });
+};

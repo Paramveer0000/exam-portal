@@ -11,8 +11,6 @@ const UserQuizzesPage = () => {
   const dispatch = useDispatch();
   const urlParams = new URLSearchParams(window.location.search);
   const catId = urlParams.get("catId");
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const quizzesReducer = useSelector((state) => state.quizzesReducer);
   const [quizzes, setQuizzes] = useState(quizzesReducer.quizzes);
 
@@ -25,14 +23,14 @@ const UserQuizzesPage = () => {
 
   useEffect(() => {
     if (quizzes.length === 0) {
-      fetchQuizzes(dispatch, token).then((data) => {
+      fetchQuizzes(dispatch).then((data) => {
         setQuizzes(data.payload);
       });
     }
   }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   return (

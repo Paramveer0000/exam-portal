@@ -24,7 +24,6 @@ import {
 
 const SuperAdminDashboardPage = () => {
   const dispatch = useDispatch();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   const { admins, metrics, analytics, unowned } = useSelector(
     (state) => state.adminReducer
   );
@@ -33,10 +32,10 @@ const SuperAdminDashboardPage = () => {
   const [sort, setSort] = useState({ key: "students", dir: -1 });
 
   useEffect(() => {
-    fetchAdmins(dispatch, token);
-    fetchMetrics(dispatch, token);
-    fetchAnalytics(dispatch, token);
-    fetchUnowned(dispatch, token);
+    fetchAdmins(dispatch);
+    fetchMetrics(dispatch);
+    fetchAnalytics(dispatch);
+    fetchUnowned(dispatch);
   }, []);
 
   const reassignHandler = () => {
@@ -44,14 +43,14 @@ const SuperAdminDashboardPage = () => {
       swal("Pick an admin", "Choose an admin to receive the content", "info");
       return;
     }
-    reassignUnowned(dispatch, reassignTarget, token).then((data) => {
+    reassignUnowned(dispatch, reassignTarget).then((data) => {
       if (data.type === "REASSIGN_UNOWNED_SUCCESS") {
         swal(
           "Reassigned",
           `${data.payload.categoriesReassigned} categories and ${data.payload.quizzesReassigned} quizzes reassigned`,
           "success"
         );
-        fetchUnowned(dispatch, token);
+        fetchUnowned(dispatch);
       } else {
         swal("Failed", data.payload || "Could not reassign", "error");
       }

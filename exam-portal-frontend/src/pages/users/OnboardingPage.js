@@ -22,8 +22,6 @@ const OnboardingPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.loginReducer.user);
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber || "");
@@ -41,7 +39,7 @@ const OnboardingPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!token) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   // Already fully onboarded and lands here directly -> nothing to do here.
@@ -55,13 +53,12 @@ const OnboardingPage = () => {
 
   const save = (payload) => {
     setSaving(true);
-    profileServices.updateProfile(payload, token).then(({ data, error }) => {
+    profileServices.updateProfile(payload).then(({ data, error }) => {
       setSaving(false);
-      if (data && data.jwtToken) {
-        localStorage.setItem("jwtToken", JSON.stringify(data.jwtToken));
-        localStorage.setItem("user", JSON.stringify(data.user));
-        dispatch({ type: authConstants.USER_LOGIN_SUCCESS, payload: data.user });
-        if (isAcademicsComplete(data.user)) {
+      if (data) {
+        localStorage.setItem("user", JSON.stringify(data));
+        dispatch({ type: authConstants.USER_LOGIN_SUCCESS, payload: data });
+        if (isAcademicsComplete(data)) {
           swal("All set!", "Your profile is complete.", "success").then(() =>
             navigate("/profile")
           );

@@ -60,8 +60,6 @@ const AdminUpdateQuiz = () => {
     setSelectedClassId(e.target.value);
   };
 
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const submitHandler = (e) => {
     e.preventDefault();
     if (selectedClassId === null || selectedClassId === "n/a") {
@@ -83,10 +81,10 @@ const AdminUpdateQuiz = () => {
       allQuestionsMandatory: allQuestionsMandatory,
       category: { catId: Number(selectedClassId) },
     };
-    updateQuiz(dispatch, quiz, token).then((data) => {
+    updateQuiz(dispatch, quiz).then((data) => {
       if (data.type === quizzesConstants.UPDATE_QUIZ_SUCCESS) {
         swal("Quiz Updated!", `${quiz.title} succesfully updated`, "success");
-        fetchQuizzes(dispatch, token);
+        fetchQuizzes(dispatch);
       } else {
         swal("Quiz Not Updated!", `${quiz.title} not updated`, "error");
       }
@@ -94,8 +92,8 @@ const AdminUpdateQuiz = () => {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
-    categoriesServices.fetchCategories(token).then((data) => {
+    if (!localStorage.getItem("user")) navigate("/");
+    categoriesServices.fetchCategories().then((data) => {
       if (Array.isArray(data)) setClasses(data);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

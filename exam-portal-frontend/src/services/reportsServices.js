@@ -1,10 +1,5 @@
-import axios from "axios";
+import api from "./api";
 
-const authConfig = (token) => ({
-  headers: { Authorization: `Bearer ${token}` },
-});
-
-// Builds a query string from optional filters (passed, from, to).
 const filterQuery = ({ passed, from, to } = {}) => {
   const params = [];
   if (passed !== undefined && passed !== null && passed !== "")
@@ -14,12 +9,9 @@ const filterQuery = ({ passed, from, to } = {}) => {
   return params.length ? `?${params.join("&")}` : "";
 };
 
-const fetchQuizReport = async (quizId, filters, token) => {
+const fetchQuizReport = async (quizId, filters) => {
   try {
-    const { data } = await axios.get(
-      `/api/reports/quiz/${quizId}${filterQuery(filters)}`,
-      authConfig(token)
-    );
+    const { data } = await api.get(`/api/reports/quiz/${quizId}${filterQuery(filters)}`);
     return { data, error: null };
   } catch (error) {
     return {
@@ -29,12 +21,9 @@ const fetchQuizReport = async (quizId, filters, token) => {
   }
 };
 
-const fetchStudentReport = async (userId, filters, token) => {
+const fetchStudentReport = async (userId, filters) => {
   try {
-    const { data } = await axios.get(
-      `/api/reports/student/${userId}${filterQuery(filters)}`,
-      authConfig(token)
-    );
+    const { data } = await api.get(`/api/reports/student/${userId}${filterQuery(filters)}`);
     return { data, error: null };
   } catch (error) {
     return {
@@ -44,12 +33,11 @@ const fetchStudentReport = async (userId, filters, token) => {
   }
 };
 
-// Downloads the CSV export for a quiz report as a file in the browser.
-const exportQuizReport = async (quizId, filters, token) => {
+const exportQuizReport = async (quizId, filters) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `/api/reports/quiz/${quizId}/export${filterQuery(filters)}`,
-      { ...authConfig(token), responseType: "blob" }
+      { responseType: "blob" }
     );
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");

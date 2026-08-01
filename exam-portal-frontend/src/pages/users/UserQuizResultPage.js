@@ -15,13 +15,12 @@ const UserQuizResultPage = () => {
 
   const quizResultReducer = useSelector((state) => state.quizResultReducer);
   const [quizResults, setQuizResults] = useState(null);
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.userId : null;
 
   useEffect(() => {
     if (quizResults == null)
-      fetchQuizResult(dispatch, userId, token).then((data) => {
+      fetchQuizResult(dispatch, userId).then((data) => {
         if (data.type === quizResultConstants.FETCH_QUIZ_RESULT_SUCCESS) {
           setQuizResults(data.payload);
         }
@@ -29,7 +28,7 @@ const UserQuizResultPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   return (

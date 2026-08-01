@@ -8,17 +8,16 @@ import adminServices from "../../services/adminServices";
 
 const AdminQuizResultPage = () => {
   const navigate = useNavigate();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
 
   const [classes, setClasses] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!token) {
+    if (!localStorage.getItem("user")) {
       navigate("/");
       return;
     }
-    adminServices.fetchResultsByClass(token).then(({ data, error }) => {
+    adminServices.fetchResultsByClass().then(({ data, error }) => {
       if (data) setClasses(data);
       else setError(error || "Could not load results");
     });

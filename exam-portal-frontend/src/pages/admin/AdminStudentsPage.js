@@ -17,7 +17,6 @@ const emptyNew = {
 };
 
 const AdminStudentsPage = () => {
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   const [students, setStudents] = useState([]);
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
@@ -36,7 +35,7 @@ const AdminStudentsPage = () => {
     currentUser.roles.some((r) => r.roleName === "SUPER_ADMIN");
 
   const load = () => {
-    studentsServices.fetchStudents(token).then(({ data, error }) => {
+    studentsServices.fetchStudents().then(({ data, error }) => {
       if (data) setStudents(data);
       else setError(error || "Could not load students");
     });
@@ -44,7 +43,7 @@ const AdminStudentsPage = () => {
 
   useEffect(() => {
     load();
-    categoriesServices.fetchCategories(token).then((data) => {
+    categoriesServices.fetchCategories().then((data) => {
       if (Array.isArray(data)) setAllClasses(data);
     });
     if (isSuperAdmin) {
@@ -77,7 +76,7 @@ const AdminStudentsPage = () => {
       return;
     }
     studentsServices
-      .createStudent({ ...newStudent, classId: Number(newStudent.classId) }, token)
+      .createStudent({ ...newStudent, classId: Number(newStudent.classId) })
       .then(({ data, error }) => {
         if (data) {
           setStudents((prev) => [...prev, data]);
@@ -92,7 +91,7 @@ const AdminStudentsPage = () => {
 
   const changeClass = (s, classId) => {
     if (!classId) return;
-    studentsServices.setClass(s.userId, Number(classId), token).then(({ data, error }) => {
+    studentsServices.setClass(s.userId, Number(classId)).then(({ data, error }) => {
       if (data) {
         setStudents((prev) => prev.map((x) => (x.userId === data.userId ? data : x)));
       } else {
@@ -120,7 +119,7 @@ const AdminStudentsPage = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const saveEdit = (s) => {
-    studentsServices.updateStudent(s.userId, form, token).then(({ data, error }) => {
+    studentsServices.updateStudent(s.userId, form).then(({ data, error }) => {
       if (data) {
         setStudents((prev) => prev.map((x) => (x.userId === data.userId ? data : x)));
         cancelEdit();
@@ -131,7 +130,7 @@ const AdminStudentsPage = () => {
   };
 
   const toggleStatus = (s) => {
-    studentsServices.setStatus(s.userId, !s.active, token).then(({ data }) => {
+    studentsServices.setStatus(s.userId, !s.active).then(({ data }) => {
       if (data)
         setStudents((prev) => prev.map((x) => (x.userId === data.userId ? data : x)));
     });
@@ -140,7 +139,7 @@ const AdminStudentsPage = () => {
   const resetHandler = (s) => {
     const newPassword = window.prompt(`New password for ${s.username}`);
     if (newPassword) {
-      studentsServices.resetPassword(s.userId, newPassword, token).then(({ ok, error }) => {
+      studentsServices.resetPassword(s.userId, newPassword).then(({ ok, error }) => {
         swal(
           ok ? "Password reset" : "Failed",
           ok ? `Updated for ${s.username}` : error || "Could not reset",
@@ -199,7 +198,7 @@ const AdminStudentsPage = () => {
       dangerMode: true,
     }).then((confirmed) => {
       if (confirmed) {
-        studentsServices.deleteStudent(s.userId, token).then(({ ok, error }) => {
+        studentsServices.deleteStudent(s.userId).then(({ ok, error }) => {
           if (ok) {
             swal("Deleted", `${s.username} removed`, "success");
             setStudents((prev) => prev.filter((x) => x.userId !== s.userId));

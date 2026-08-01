@@ -17,8 +17,6 @@ const AdminQuizzesPage = () => {
   const dispatch = useDispatch();
   const urlParams = new URLSearchParams(window.location.search);
   const catId = urlParams.get("catId");
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const quizzesReducer = useSelector((state) => state.quizzesReducer);
   const [quizzes, setQuizzes] = useState(quizzesReducer.quizzes);
   const [classesById, setClassesById] = useState({});
@@ -35,7 +33,7 @@ const AdminQuizzesPage = () => {
       dangerMode: true,
     }).then((willDelete) => {
       if (willDelete) {
-        deleteQuiz(dispatch, quiz.quizId, token).then((data) => {
+        deleteQuiz(dispatch, quiz.quizId).then((data) => {
           if (data.type === quizzesConstants.DELETE_QUIZ_SUCCESS) {
             swal(
               "Quiz Deleted!",
@@ -61,15 +59,15 @@ const AdminQuizzesPage = () => {
 
   useEffect(() => {
     if (quizzes.length === 0) {
-      fetchQuizzes(dispatch, token).then((data) => {
+      fetchQuizzes(dispatch).then((data) => {
         setQuizzes(data.payload);
       });
     }
   }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
-    categoriesServices.fetchCategories(token).then((data) => {
+    if (!localStorage.getItem("user")) navigate("/");
+    categoriesServices.fetchCategories().then((data) => {
       if (Array.isArray(data)) {
         const map = {};
         data.forEach((c) => (map[c.catId] = c.title));

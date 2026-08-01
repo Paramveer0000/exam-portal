@@ -15,7 +15,6 @@ import java.util.Map;
  * Platform branding. The logo is readable by everyone (shown in the header on
  * every page); only a SUPER_ADMIN may change it (enforced in SecurityConfig).
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/api/platform")
 public class PlatformController {

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
  * Super Admin management API. Every endpoint is additionally guarded by the URL
  * rules in SecurityConfig; the class-level @PreAuthorize is defence in depth.
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasAuthority('SUPER_ADMIN')")
@@ -104,8 +103,15 @@ public class AdminController {
 
     // Issues a token to act as the given admin (Super Admin only).
     @PostMapping("/{adminId}/impersonate")
-    public ResponseEntity<?> impersonate(@PathVariable Long adminId) {
-        return ResponseEntity.ok(adminService.impersonate(adminId));
+    public ResponseEntity<?> impersonate(@PathVariable Long adminId,
+                                         javax.servlet.http.HttpServletResponse response) {
+        return ResponseEntity.ok(adminService.impersonate(adminId, response));
+    }
+
+    @PostMapping("/stop-impersonation")
+    public ResponseEntity<?> stopImpersonation(@RequestParam Long originalUserId,
+                                               javax.servlet.http.HttpServletResponse response) {
+        return ResponseEntity.ok(adminService.stopImpersonation(originalUserId, response));
     }
 
     // --- Legacy ownership reassignment ---

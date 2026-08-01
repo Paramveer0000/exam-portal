@@ -9,69 +9,41 @@ const registerInitialState = {
 export function registerReducer(state = registerInitialState, action) {
   switch (action.type) {
     case authConstants.USER_REGISTER_REQUEST:
-      return {
-        ...state,
-        loading: true,
-      };
-
+      return { ...state, loading: true };
     case authConstants.USER_REGISTER_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        isRegsitered: true,
-      };
-
+      return { ...state, loading: false, isRegsitered: true };
     case authConstants.USER_REGISTER_FAILURE:
-      return {
-        ...state,
-        error: action.payload,
-      };
-
+      return { ...state, error: action.payload };
     default:
       return state;
   }
 }
 
-const user = localStorage.getItem("user");
+const user = (() => {
+  try {
+    return JSON.parse(localStorage.getItem("user"));
+  } catch (e) {
+    return null;
+  }
+})();
+
 const loginInitialState = {
   loading: false,
   error: null,
-  loggedIn: user ? true : false,
-  user: JSON.parse(user),
+  loggedIn: !!user,
+  user: user,
 };
 
 export function loginReducer(state = loginInitialState, action) {
   switch (action.type) {
     case authConstants.USER_LOGIN_REQUEST:
-      return {
-        ...state,
-        loading: true,
-        loggedIn: false,
-      };
-
+      return { ...state, loading: true, loggedIn: false };
     case authConstants.USER_LOGIN_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        loggedIn: true,
-        user: action.payload,
-      };
-
+      return { ...state, loading: false, loggedIn: true, user: action.payload };
     case authConstants.USER_LOGIN_FAILURE:
-      return {
-        ...state,
-        loading: false,
-        loggedIn: false,
-        error: action.payload,
-      };
-
+      return { ...state, loading: false, loggedIn: false, error: action.payload };
     case authConstants.USER_LOGOUT:
-      return {
-        ...state,
-        loggedIn: false,
-        user: null,
-      };
-
+      return { ...state, loggedIn: false, user: null };
     default:
       return state;
   }

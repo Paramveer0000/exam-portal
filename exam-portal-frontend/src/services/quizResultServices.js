@@ -1,55 +1,31 @@
-import axios from "axios";
+import api from "./api";
 
-const submitQuiz = async (quizId, answers, token) => {
+const submitQuiz = async (quizId, answers) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    // The backend derives the user from the JWT; no userId is sent.
-    const { data } = await axios.post(
-      `/api/quizResult/submit/?quizId=${quizId}`,
-      answers,
-      config
-    );
+    const { data } = await api.post(`/api/quizResult/submit/?quizId=${quizId}`, answers);
     return { data: data, isAdded: true, error: null };
   } catch (error) {
-    console.error(
-      "quizResultServices:submitQuiz() Error: ",
-      error.response.statusText
-    );
-    return { data: null, isAdded: false, error: error.response.statusText };
+    return {
+      data: null,
+      isAdded: false,
+      error: error.response ? error.response.statusText : "Request failed",
+    };
   }
 };
 
-const fetchQuizResult = async (userId, token) => {
+const fetchQuizResult = async (userId) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    let data = null;
+    let response;
     if (userId) {
-      data = await axios.get(
-        `/api/quizResult/?userId=${userId}`,
-        config
-      );
+      response = await api.get(`/api/quizResult/?userId=${userId}`);
+    } else {
+      response = await api.get("/api/quizResult/all");
     }
-    else {
-      data = await axios.get(
-        `/api/quizResult/all`,
-        config
-      );
-    }
-    return data.data;
+    return response.data;
   } catch (error) {
-    console.error(
-      "quizResultServices:fetchQuizResult() Error: ",
-      error.response.statusText
-    );
     return null;
   }
 };
 
-
 const quizResultServices = { submitQuiz, fetchQuizResult };
-
 export default quizResultServices;

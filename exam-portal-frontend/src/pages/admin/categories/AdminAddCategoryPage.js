@@ -15,15 +15,13 @@ import { useNavigate } from "react-router-dom";
 const AdminAddCategoryPage = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const submitHandler = (e) => {
     e.preventDefault();
     const category = { title: title, description: description };
-    addCategory(dispatch, category, token).then((data) => {
+    addCategory(dispatch, category).then((data) => {
       if (data.type === categoriesConstants.ADD_CATEGORY_SUCCESS) {
         swal("Class Added!", `${title} succesfully added`, "success");
         navigate("/adminCategories");

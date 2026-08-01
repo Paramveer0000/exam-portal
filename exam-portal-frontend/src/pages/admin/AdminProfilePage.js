@@ -10,15 +10,14 @@ import { fetchQuizzes } from "../../actions/quizzesActions";
 const AdminProfilePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   useEffect(() => {
-    fetchCategories(dispatch, token);
-    fetchQuizzes(dispatch, token);
+    fetchCategories(dispatch);
+    fetchQuizzes(dispatch);
   }, [dispatch]);
 
   return (

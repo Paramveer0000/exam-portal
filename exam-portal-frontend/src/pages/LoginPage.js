@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Button, InputGroup } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
@@ -16,8 +16,7 @@ const LoginPage = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [searchParams] = useSearchParams();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,11 +25,7 @@ const LoginPage = () => {
   const showPasswordHandler = () => {
     const temp = !showPassword;
     setShowPassword(temp);
-    if (temp) {
-      setPasswordType("text");
-    } else {
-      setPasswordType("password");
-    }
+    setPasswordType(temp ? "text" : "password");
   };
 
   const submitHandler = (e) => {
@@ -50,11 +45,22 @@ const LoginPage = () => {
   };
 
   useEffect(() => {
-    if (token && user) {
+    if (searchParams.get("expired") === "1") {
+      setErrorMsg("Your session has expired. Please log in again.");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const user = (() => {
+      try { return JSON.parse(localStorage.getItem("user")); }
+      catch (e) { return null; }
+    })();
+    if (user) {
       const roleNames = user.roles.map((r) => r.roleName);
       navigate(homePathForRoles(roleNames));
     }
   }, []);
+
   return (
     <FormContainer>
       <h1>Sign In</h1>
@@ -67,9 +73,7 @@ const LoginPage = () => {
             placeholder="Enter User Name"
             value={username}
             required
-            onChange={(e) => {
-              setUsername(e.target.value);
-            }}
+            onChange={(e) => setUsername(e.target.value)}
           ></Form.Control>
         </Form.Group>
 
@@ -77,13 +81,11 @@ const LoginPage = () => {
           <Form.Label>Password</Form.Label>
           <InputGroup>
             <Form.Control
-              type={`${passwordType}`}
+              type={passwordType}
               placeholder="Enter Password"
               value={password}
               required
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <Button
               onClick={showPasswordHandler}

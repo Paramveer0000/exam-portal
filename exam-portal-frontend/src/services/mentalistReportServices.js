@@ -1,12 +1,10 @@
-import axios from "axios";
+import api from "./api";
 
-const generateReport = async (quizResId, token, { counsellorName, counsellorRemarks, regenerate } = {}) => {
+const generateReport = async (quizResId, { counsellorName, counsellorRemarks, regenerate } = {}) => {
   try {
-    const config = { headers: { Authorization: `Bearer ${token}` } };
-    const { data } = await axios.post(
+    const { data } = await api.post(
       `/api/mentalist-report/${quizResId}/generate?regenerate=${!!regenerate}`,
-      { counsellorName, counsellorRemarks },
-      config
+      { counsellorName, counsellorRemarks }
     );
     return { data, error: null };
   } catch (error) {
@@ -21,13 +19,11 @@ const generateReport = async (quizResId, token, { counsellorName, counsellorRema
 
 // Downloads the stored PDF and triggers a browser save-as, without the
 // service having to know about DOM APIs beyond the blob it returns.
-const downloadReport = async (quizResId, token) => {
+const downloadReport = async (quizResId) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await api.get(`/api/mentalist-report/${quizResId}/download`, {
       responseType: "blob",
-    };
-    const response = await axios.get(`/api/mentalist-report/${quizResId}/download`, config);
+    });
     return { blob: response.data, error: null };
   } catch (error) {
     return { blob: null, error: "Could not download the report" };

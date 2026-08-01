@@ -32,7 +32,6 @@ const PROVIDERS = [
 
 const SuperAdminAiSettingsPage = () => {
   const navigate = useNavigate();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
 
   const [loaded, setLoaded] = useState(false);
   const [provider, setProvider] = useState("openai");
@@ -50,7 +49,7 @@ const SuperAdminAiSettingsPage = () => {
   const [logoBusy, setLogoBusy] = useState(false);
 
   useEffect(() => {
-    if (!token) navigate("/");
+    // Auth guard handled by ProtectedRoute; cookie-based auth needs no check here.
   }, []);
 
   useEffect(() => {
@@ -74,7 +73,7 @@ const SuperAdminAiSettingsPage = () => {
     const reader = new FileReader();
     reader.onload = () => {
       setLogoBusy(true);
-      platformServices.updateBranding(reader.result, token).then(({ companyLogo, error }) => {
+      platformServices.updateBranding(reader.result).then(({ companyLogo, error }) => {
         setLogoBusy(false);
         if (error) swal("Upload failed", error, "error");
         else {
@@ -90,7 +89,7 @@ const SuperAdminAiSettingsPage = () => {
 
   const clearLogo = () => {
     setLogoBusy(true);
-    platformServices.updateBranding(null, token).then(({ error }) => {
+    platformServices.updateBranding(null).then(({ error }) => {
       setLogoBusy(false);
       if (error) swal("Failed", error, "error");
       else {
@@ -103,7 +102,7 @@ const SuperAdminAiSettingsPage = () => {
   };
 
   useEffect(() => {
-    aiServices.getSettings(token).then(({ data, error }) => {
+    aiServices.getSettings().then(({ data, error }) => {
       if (data) {
         setProvider(data.provider || "openai");
         setBaseUrl(data.baseUrl || "");
@@ -129,7 +128,7 @@ const SuperAdminAiSettingsPage = () => {
 
   const testConnection = async () => {
     setTesting(true);
-    const { data, error } = await aiServices.testSettings(token);
+    const { data, error } = await aiServices.testSettings();
     setTesting(false);
     if (data) {
       setTestStatus("live");
@@ -146,7 +145,7 @@ const SuperAdminAiSettingsPage = () => {
     // apiKey blank => keep the stored key unchanged.
     const payload = { provider, baseUrl, model, systemPrompt };
     if (apiKey.trim()) payload.apiKey = apiKey.trim();
-    aiServices.updateSettings(payload, token).then(({ data, error }) => {
+    aiServices.updateSettings(payload).then(({ data, error }) => {
       setSaving(false);
       if (data) {
         setKeyConfigured(data.keyConfigured);

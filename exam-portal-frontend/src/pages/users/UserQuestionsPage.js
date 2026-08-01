@@ -29,7 +29,6 @@ const UserQuestionsPage = () => {
   );
   const questionsReducer = useSelector((state) => state.questionsReducer);
   const [questions, setQuestions] = useState(questionsReducer.questions);
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.userId : null;
   const [timeRemaining, setTimeRemaining] = useState(questions.length * 2 * 60);
@@ -90,7 +89,7 @@ const UserQuestionsPage = () => {
   const submitQuizHandler = (isTimesUp = false) => {
     const answers = JSON.parse(localStorage.getItem("answers"));
     if (isTimesUp) {
-      submitQuiz(dispatch, quizId, answers, token).then((data) => {
+      submitQuiz(dispatch, quizId, answers).then((data) => {
         if (data.type === quizResultConstants.ADD_QUIZ_RESULT_SUCCESS) {
           swal(
             "Quiz Submitted!",
@@ -131,7 +130,7 @@ const UserQuestionsPage = () => {
         if (willSubmit) {
           submittedRef.current = true;
           stopTimer();
-          submitQuiz(dispatch, quizId, answers, token).then((data) => {
+          submitQuiz(dispatch, quizId, answers).then((data) => {
             if (data.type === quizResultConstants.ADD_QUIZ_RESULT_SUCCESS) {
               swal(
                 "Quiz Submitted!",
@@ -155,12 +154,12 @@ const UserQuestionsPage = () => {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   useEffect(() => {
     if (quizzes.length == 0) {
-      fetchQuizzes(dispatch, token).then((data) => {
+      fetchQuizzes(dispatch).then((data) => {
         const temp = data.payload;
         setQuizzes(temp);
         setQuiz(temp.filter((q) => q.quizId == quizId)[0]);
@@ -181,7 +180,7 @@ const UserQuestionsPage = () => {
         localStorage.setItem(key, JSON.stringify(opened));
       }
     }
-    fetchExamQuestions(dispatch, quizId, token).then((data) => {
+    fetchExamQuestions(dispatch, quizId).then((data) => {
       setQuestions(data.payload);
       setPage(0);
       // Countdown is started by the timer effect once questions are set.

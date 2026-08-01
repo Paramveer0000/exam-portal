@@ -18,7 +18,6 @@ import quizResultServices from "../../services/quizResultServices";
 // Everything is scoped server-side to this school's students.
 const AdminDashboardPage = () => {
   const navigate = useNavigate();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
 
   const [students, setStudents] = useState(null);
   const [results, setResults] = useState(null);
@@ -26,15 +25,15 @@ const AdminDashboardPage = () => {
   const [sort, setSort] = useState({ key: "name", dir: 1 });
 
   useEffect(() => {
-    if (!token) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   useEffect(() => {
-    studentsServices.fetchStudents(token).then(({ data }) => setStudents(data || []));
-    quizResultServices.fetchQuizResult(null, token).then((data) =>
+    studentsServices.fetchStudents().then(({ data }) => setStudents(data || []));
+    quizResultServices.fetchQuizResult(null).then((data) =>
       setResults(Array.isArray(data) ? data : [])
     );
-    categoriesServices.fetchCategories(token).then((data) =>
+    categoriesServices.fetchCategories().then((data) =>
       setClassCount(Array.isArray(data) ? data.length : 0)
     );
   }, []);

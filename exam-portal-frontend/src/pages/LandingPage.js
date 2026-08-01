@@ -289,8 +289,7 @@ const LandingPage = () => {
 
   // Authenticated visitors don't need the marketing page — send them home.
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
-    if (!token) return;
+    if (!localStorage.getItem("user")) return;
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const roles = user && user.roles ? user.roles.map((r) => r.roleName) : [];

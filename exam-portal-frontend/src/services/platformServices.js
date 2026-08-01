@@ -1,23 +1,17 @@
-import axios from "axios";
+import api from "./api";
 
-// Public: the platform company logo shown in the header for everyone.
 const getBranding = async () => {
   try {
-    const { data } = await axios.get("/api/platform/branding");
+    const { data } = await api.get("/api/platform/branding");
     return { companyLogo: data.companyLogo || null, error: null };
   } catch (error) {
     return { companyLogo: null, error: "Could not load branding" };
   }
 };
 
-// SUPER_ADMIN only. Pass null companyLogo to clear it.
-const updateBranding = async (companyLogo, token) => {
+const updateBranding = async (companyLogo) => {
   try {
-    const { data } = await axios.put(
-      "/api/platform/branding",
-      { companyLogo },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const { data } = await api.put("/api/platform/branding", { companyLogo });
     return { companyLogo: data.companyLogo || null, error: null };
   } catch (error) {
     const message =

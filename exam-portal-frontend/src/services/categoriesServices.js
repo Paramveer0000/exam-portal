@@ -1,84 +1,48 @@
-import axios from "axios";
+import api from "./api";
 
-const fetchCategories = async (token) => {
+const fetchCategories = async () => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const { data } = await axios.get("/api/category/", config);
+    const { data } = await api.get("/api/category/");
     return data;
   } catch (error) {
-    console.error(
-      "categoryService:fetchCategories() Error: ",
-      error.response.statusText
-    );
-    return error.response.statusText;
+    return error.response ? error.response.statusText : "Request failed";
   }
 };
 
-const addCategory = async (category, token) => {
+const addCategory = async (category) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const { data } = await axios.post("/api/category/", category, config);
+    const { data } = await api.post("/api/category/", category);
     return { data: data, isAdded: true, error: null };
   } catch (error) {
     const message =
       (error.response && error.response.data && error.response.data.message) ||
       (error.response && error.response.statusText) ||
       "Request failed";
-    console.error("categoryService:addCategory() Error: ", message);
     return { data: null, isAdded: false, error: message };
   }
 };
 
-const deleteCategory = async (catId, token) => {
+const deleteCategory = async (catId) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    await axios.delete(`/api/category/${catId}/`, config);
-    return {
-      isDeleted: true,
-      error: null,
-    };
+    await api.delete(`/api/category/${catId}/`);
+    return { isDeleted: true, error: null };
   } catch (error) {
-    console.error(
-      "categoryService:deleteCategory()  Error: ",
-      error.response.statusText
-    );
     return {
       isDeleted: false,
-      error: error.response.statusText,
+      error: error.response ? error.response.statusText : "Request failed",
     };
   }
 };
 
-const updateCategory = async (category, token) => {
+const updateCategory = async (category) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const { data } = await axios.put(
-      `/api/category/${category.catId}/`,
-      category,
-      config
-    );
-    return {
-      data: data,
-      isUpdated: true,
-      error: null,
-    };
+    const { data } = await api.put(`/api/category/${category.catId}/`, category);
+    return { data: data, isUpdated: true, error: null };
   } catch (error) {
-    console.error(
-      "categoryService:updateCategory()  Error: ",
-      error.response.statusText
-    );
     return {
       data: null,
       isUpdated: false,
-      error: error.response.statusText,
+      error: error.response ? error.response.statusText : "Request failed",
     };
   }
 };

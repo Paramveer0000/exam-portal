@@ -1,88 +1,49 @@
-import axios from "axios";
+import api from "./api";
 
-const fetchQuizzes = async (token, catId) => {
+const fetchQuizzes = async (catId) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-
-    let quizzes = null;
-    if (catId === null) {
-      const { data } = await axios.get("/api/quiz/", config);
-      quizzes = data;
-    } else {
-      const { data } = await axios.get(`/api/quiz/?catId=${catId}`, config);
-      quizzes = data;
-    }
-    return quizzes;
+    const url = catId === null ? "/api/quiz/" : `/api/quiz/?catId=${catId}`;
+    const { data } = await api.get(url);
+    return data;
   } catch (error) {
-    console.error(
-      "quizzesServices:fetchQuizzes() Error: ",
-      error.response.statusText
-    );
-    return error.response.statusText;
+    return error.response ? error.response.statusText : "Request failed";
   }
 };
 
-const addQuiz = async (quiz, token) => {
+const addQuiz = async (quiz) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const { data } = await axios.post("/api/quiz/", quiz, config);
+    const { data } = await api.post("/api/quiz/", quiz);
     return { data: data, isAdded: true, error: null };
   } catch (error) {
     const message =
       (error.response && error.response.data && error.response.data.message) ||
       (error.response && error.response.statusText) ||
       "Request failed";
-    console.error("quizzesServices:addQuiz()  Error: ", message);
     return { data: null, isAdded: false, error: message };
   }
 };
 
-const deleteQuiz = async (quizId, token) => {
+const deleteQuiz = async (quizId) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    await axios.delete(`/api/quiz/${quizId}/`, config);
-    return {
-      isDeleted: true,
-      error: null,
-    };
+    await api.delete(`/api/quiz/${quizId}/`);
+    return { isDeleted: true, error: null };
   } catch (error) {
-    console.error(
-      "quizzesServices:deleteQuiz()  Error: ",
-      error.response.statusText
-    );
     return {
       isDeleted: false,
-      error: error.response.statusText,
+      error: error.response ? error.response.statusText : "Request failed",
     };
   }
 };
 
-const updateQuiz = async (quiz, token) => {
+const updateQuiz = async (quiz) => {
   try {
-    const config = {
-      headers: { Authorization: `Bearer ${token}` },
-    };
-    const { data } = await axios.put(`/api/quiz/${quiz.quizId}/`, quiz, config);
-    return {
-      data: data,
-      isUpdated: true,
-      error: null,
-    };
+    const { data } = await api.put(`/api/quiz/${quiz.quizId}/`, quiz);
+    return { data: data, isUpdated: true, error: null };
   } catch (error) {
-    console.error(
-      "quizzesServices:updateQuiz()  Error: ",
-      error.response.statusText
-    );
     return {
       data: null,
       isUpdated: false,
-      error: error.response.statusText,
+      error: error.response ? error.response.statusText : "Request failed",
     };
   }
 };

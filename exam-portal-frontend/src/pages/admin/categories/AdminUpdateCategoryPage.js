@@ -23,12 +23,10 @@ const AdminUpdateCategoryPage = () => {
   const [description, setDescription] = useState(
     oldCategory ? oldCategory.description : ""
   );
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const submitHandler = (e) => {
     e.preventDefault();
     const category = { catId: catId, title: title, description: description };
-    updateCategory(dispatch, category, token).then((data) => {
+    updateCategory(dispatch, category).then((data) => {
       if (data.type === categoriesConstants.UPDATE_CATEGORY_SUCCESS) {
         swal("Category Updated!", `${title} succesfully updated`, "success");
       } else {

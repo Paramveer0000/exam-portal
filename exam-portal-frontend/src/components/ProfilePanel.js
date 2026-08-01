@@ -28,7 +28,6 @@ const ageFromDob = (dob) => {
  */
 const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }) => {
   const user = useSelector((state) => state.loginReducer.user);
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
 
   const [showEdit, setShowEdit] = useState(false);
   const [showPw, setShowPw] = useState(false);
@@ -87,11 +86,10 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
       payload.city = city;
     }
     profileServices
-      .updateProfile(payload, token)
+      .updateProfile(payload)
       .then(({ data, error }) => {
-        if (data && data.jwtToken) {
-          localStorage.setItem("jwtToken", JSON.stringify(data.jwtToken));
-          localStorage.setItem("user", JSON.stringify(data.user));
+        if (data) {
+          localStorage.setItem("user", JSON.stringify(data));
           swal("Profile updated", "Your details were saved", "success").then(
             () => window.location.reload()
           );
@@ -119,21 +117,17 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
       // The profile update requires the identity fields, so send the current
       // values alongside the new logo (the service only overwrites the logo).
       profileServices
-        .updateProfile(
-          {
+        .updateProfile({
             firstName: user.firstName,
             lastName: user.lastName,
             username: user.username,
             phoneNumber: user.phoneNumber,
             logo: reader.result,
-          },
-          token
-        )
+          })
         .then(({ data, error }) => {
           setUploadingLogo(false);
-          if (data && data.jwtToken) {
-            localStorage.setItem("jwtToken", JSON.stringify(data.jwtToken));
-            localStorage.setItem("user", JSON.stringify(data.user));
+          if (data) {
+            localStorage.setItem("user", JSON.stringify(data));
             swal("Logo updated", "Your logo was saved", "success").then(() =>
               window.location.reload()
             );
@@ -152,7 +146,7 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
       return;
     }
     profileServices
-      .changePassword({ currentPassword, newPassword }, token)
+      .changePassword({ currentPassword, newPassword })
       .then(({ ok, error }) => {
         if (ok) {
           swal("Password changed", "Your password was updated", "success");

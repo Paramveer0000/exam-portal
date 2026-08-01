@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Navbar, Nav, Container } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { LinkContainer } from "react-router-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import platformServices from "../services/platformServices";
+import adminServices from "../services/adminServices";
 import { homePathForRoles } from "./ProtectedRoute";
+import { logout } from "../actions/authActions";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const loginReducer = useSelector((state) => state.loginReducer);
   const [isLoggedIn, setIsLoggedIn] = useState(loginReducer.loggedIn);
   const [companyLogo, setCompanyLogo] = useState(null);
@@ -27,34 +30,45 @@ const Header = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       const roles = user && user.roles ? user.roles.map((r) => r.roleName) : [];
-      navigate(localStorage.getItem("jwtToken") ? homePathForRoles(roles) : "/");
+      navigate(user ? homePathForRoles(roles) : "/");
     } catch (e) {
       navigate("/");
     }
   };
 
-  const logoutHandler = () => {
+  const logoutHandler = async () => {
     setIsLoggedIn(false);
-    localStorage.clear();
+    await logout(dispatch);
     navigate("/login");
   };
 
-  // Restore the stashed Super Admin session and go back to the dashboard.
-  const returnToSuperAdmin = () => {
+  const returnToSuperAdmin = async () => {
     const backup = JSON.parse(localStorage.getItem("impersonatorBackup"));
     if (backup) {
-      localStorage.setItem("jwtToken", backup.token);
-      localStorage.setItem("user", backup.user);
+      const { data } = await adminServices.stopImpersonation(backup.userId);
+      if (data) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
       localStorage.removeItem("impersonatorBackup");
     }
     window.location.href = "/superadmin";
   };
 
   useEffect(() => {
-    if (localStorage.getItem("jwtToken")) {
+    if (loginReducer.loggedIn) {
       setIsLoggedIn(true);
     }
-  }, [navigate]);
+  }, [loginReducer.loggedIn]);
+
+  // Listen for session-expired events from the axios interceptor.
+  useEffect(() => {
+    const handler = () => {
+      setIsLoggedIn(false);
+      dispatch({ type: "USER_LOGOUT" });
+    };
+    window.addEventListener("auth:session-expired", handler);
+    return () => window.removeEventListener("auth:session-expired", handler);
+  }, [dispatch]);
 
   // The public landing page ships its own fixed navbar; rendering this one too
   // stacks two brands at top:0 and buries its links under the landing nav.
@@ -92,7 +106,7 @@ const Header = () => {
                 </Nav.Link>
               )}
               {isLoggedIn ? (
-                  <Nav.Link>{loginReducer.user.firstName}</Nav.Link>
+                  <Nav.Link>{loginReducer.user && loginReducer.user.firstName}</Nav.Link>
               ) : (
                 <LinkContainer to="/login">
                   <Nav.Link>Login</Nav.Link>

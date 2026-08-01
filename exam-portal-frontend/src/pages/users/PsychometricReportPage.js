@@ -32,8 +32,6 @@ const PsychometricReportPage = () => {
   const { quizResId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
-
   const { loading, report, error } = useSelector(
     (state) => state.psychometricReportReducer
   );
@@ -46,7 +44,7 @@ const PsychometricReportPage = () => {
   const generateAi = (regenerate = false) => {
     setAiLoading(true);
     return aiServices
-      .generateSummary(quizResId, token, regenerate)
+      .generateSummary(quizResId, regenerate)
       .then(({ summary, error }) => {
         setAiLoading(false);
         if (summary) {
@@ -64,13 +62,13 @@ const PsychometricReportPage = () => {
   const downloadPdf = async () => {
     setPdfLoading(true);
     setPdfError(null);
-    const gen = await mentalistReportServices.generateReport(quizResId, token, {});
+    const gen = await mentalistReportServices.generateReport(quizResId, {});
     if (!gen.data) {
       setPdfLoading(false);
       setPdfError(gen.error || "Could not generate the report");
       return;
     }
-    const { blob, error } = await mentalistReportServices.downloadReport(quizResId, token);
+    const { blob, error } = await mentalistReportServices.downloadReport(quizResId);
     setPdfLoading(false);
     if (!blob) {
       setPdfError(error || "Could not download the report");
@@ -87,11 +85,11 @@ const PsychometricReportPage = () => {
   };
 
   useEffect(() => {
-    if (!localStorage.getItem("jwtToken")) navigate("/");
+    if (!localStorage.getItem("user")) navigate("/");
   }, []);
 
   useEffect(() => {
-    fetchPsychReport(dispatch, quizResId, token);
+    fetchPsychReport(dispatch, quizResId);
   }, [quizResId]);
 
   if (loading || (!report && !error)) return <Loader />;

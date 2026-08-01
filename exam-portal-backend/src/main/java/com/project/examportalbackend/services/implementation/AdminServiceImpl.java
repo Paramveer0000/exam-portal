@@ -10,10 +10,12 @@ import com.project.examportalbackend.dto.ReassignResultDto;
 import com.project.examportalbackend.dto.UnownedContentDto;
 import com.project.examportalbackend.dto.UpdateAdminRequest;
 import com.project.examportalbackend.configurations.JwtUtil;
+import com.project.examportalbackend.dto.AuthUserDto;
 import com.project.examportalbackend.models.Category;
 import com.project.examportalbackend.models.LoginResponse;
 import com.project.examportalbackend.models.Quiz;
 import com.project.examportalbackend.models.QuizResult;
+import com.project.examportalbackend.models.RefreshToken;
 import com.project.examportalbackend.models.Role;
 import com.project.examportalbackend.models.User;
 import com.project.examportalbackend.repository.CategoryRepository;
@@ -22,6 +24,7 @@ import com.project.examportalbackend.repository.QuizResultRepository;
 import com.project.examportalbackend.repository.RoleRepository;
 import com.project.examportalbackend.repository.UserRepository;
 import com.project.examportalbackend.security.AuthFacade;
+import com.project.examportalbackend.security.CookieUtil;
 import com.project.examportalbackend.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -295,13 +298,18 @@ public class AdminServiceImpl implements AdminService {
         quizRepository.save(quiz);
     }
 
+    @Autowired
+    private CookieUtil cookieUtil;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+
     @Override
-    public LoginResponse impersonate(Long adminId) {
+    public LoginResponse impersonate(Long adminId, javax.servlet.http.HttpServletResponse response) {
         if (adminId.equals(authFacade.getCurrentUserId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "You are already signed in as yourself");
         }
-        User target = loadAdmin(adminId); // validates it's a manageable admin
+        User target = loadAdmin(adminId);
         if (isSuperAdmin(target)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "You cannot sign in as another Super Admin");
@@ -310,9 +318,37 @@ public class AdminServiceImpl implements AdminService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Cannot sign in as a disabled account");
         }
-        // User implements UserDetails, so we can mint a normal login token for them.
-        String token = jwtUtil.generateToken(target);
-        return new LoginResponse(target, token);
+        // Mint access token and refresh token, set cookies.
+        String accessToken = jwtUtil.generateToken(target);
+        int accessMaxAge = (int) (jwtUtil.getAccessTokenValidityMs() / 1000);
+        cookieUtil.addAccessTokenCookie(response, accessToken, accessMaxAge);
+
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(target.getUserId(), false);
+        int refreshMaxAge = refreshTokenService.getExpiryDays() * 24 * 60 * 60;
+        cookieUtil.addRefreshTokenCookie(response, refreshToken.getToken(), refreshMaxAge);
+
+        return new LoginResponse(AuthUserDto.from(target));
+    }
+
+    @Override
+    public LoginResponse stopImpersonation(Long originalUserId, javax.servlet.http.HttpServletResponse response) {
+        User original = userRepository.findById(originalUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Original user not found"));
+        boolean isSA = original.getRoles().stream()
+                .anyMatch(r -> AuthFacade.ROLE_SUPER_ADMIN.equals(r.getRoleName()));
+        if (!isSA) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only Super Admin sessions can be restored");
+        }
+
+        String accessToken = jwtUtil.generateToken(original);
+        int accessMaxAge = (int) (jwtUtil.getAccessTokenValidityMs() / 1000);
+        cookieUtil.addAccessTokenCookie(response, accessToken, accessMaxAge);
+
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(original.getUserId(), false);
+        int refreshMaxAge = refreshTokenService.getExpiryDays() * 24 * 60 * 60;
+        cookieUtil.addRefreshTokenCookie(response, refreshToken.getToken(), refreshMaxAge);
+
+        return new LoginResponse(AuthUserDto.from(original));
     }
 
     @Override

@@ -11,7 +11,6 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const answer = question.answer;
-  const token = JSON.parse(localStorage.getItem("jwtToken"));
   // Admin list can hold dozens of questions; collapsed by default so Update/Delete
   // are reachable without scrolling past every option block.
   const [expanded, setExpanded] = useState(!isAdmin);
@@ -46,7 +45,7 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
       dangerMode: true,
     }).then((willDelete) => {
       if (willDelete) {
-        deleteQuestion(dispatch, ques.quesId, token).then((data) => {
+        deleteQuestion(dispatch, ques.quesId).then((data) => {
           if (data.type === questionsConstants.DELETE_QUESTION_SUCCESS) {
             swal(
               "Question Deleted!",
