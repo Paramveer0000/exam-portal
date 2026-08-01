@@ -1160,3 +1160,11 @@ gotchas, and open issues that are NOT in the source code or git history.
 - notes: local dev DB was apparently wiped at some point between sessions (previously had ~15
   users per last logged state) -- worth confirming with user if intentional (XAMPP data dir reset,
   fresh clone, etc.) since it means all previously-seeded demo/test data is gone.
+
+### 2026-08-01 15:40 — Session end: stack shut down  [type: run]
+- what: stopped all three tiers. Backend :8081 and frontend :3000 processes killed via
+  Stop-Process; MySQL (XAMPP mysqld :3306) stopped gracefully via mysqladmin shutdown.
+  netstat confirms :3306, :8081, :3000 all down.
+- result: PASS. Working tree clean (all session commits pushed to origin/main:
+  multi-dimensional questions feature + 2 fixes, add-one-by-one dimension picker UI,
+  hide Option1/2 dimension override, group Students page by school). No uncommitted changes.
