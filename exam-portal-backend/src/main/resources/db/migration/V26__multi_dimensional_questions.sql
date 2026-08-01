@@ -33,9 +33,9 @@ INSERT INTO dimensions (dimension_code, dimension_type, display_name, descriptio
 ('C', 'RIASEC', 'Conventional', 'Organization, details, structure'),
 
 -- Learning Preference — 3 types
-('VISUAL', 'LEARNING_PREF', 'Visual', 'Learns best through images and diagrams'),
-('AUDITORY', 'LEARNING_PREF', 'Auditory', 'Learns best through listening and discussion'),
-('KINESTHETIC', 'LEARNING_PREF', 'Kinesthetic', 'Learns best through hands-on practice'),
+('VISUAL_LEARNING', 'LEARNING_PREF', 'Visual Learning', 'Learns best through images and diagrams'),
+('AUDITORY_LEARNING', 'LEARNING_PREF', 'Auditory Learning', 'Learns best through listening and discussion'),
+('KINESTHETIC_LEARNING', 'LEARNING_PREF', 'Kinesthetic Learning', 'Learns best through hands-on practice'),
 
 -- Career Interest Assessment — 13 domains
 ('ENGINEERING', 'CAREER_INTEREST', 'Engineering', 'Design, build, innovate'),
