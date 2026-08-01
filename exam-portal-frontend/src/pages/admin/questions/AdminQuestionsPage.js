@@ -28,7 +28,7 @@ const AdminQuestionsPage = () => {
   const storedUser = JSON.parse(localStorage.getItem("user") || "null");
   // Question CRUD is SUPER_ADMIN-only on the backend (see SecurityConfig); a plain ADMIN
   // can view but every write 403s. Hide the write controls instead of letting them silently fail.
-  const canEdit = !!storedUser?.authorities?.some((a) => a.authority === "SUPER_ADMIN");
+  const canEdit = !!storedUser?.roles?.some((r) => r.roleName === "SUPER_ADMIN");
   let answers = {};
 
   const filtered = questions
