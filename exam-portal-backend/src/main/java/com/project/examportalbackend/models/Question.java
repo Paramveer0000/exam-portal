@@ -64,8 +64,8 @@ public class Question {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "question_dimensions",
-            joinColumns = @JoinColumn(name = "question_id", referencedColumnName = "ques_id"),
-            inverseJoinColumns = @JoinColumn(name = "dimension_code", referencedColumnName = "dimension_code")
+            joinColumns = @JoinColumn(name = "ques_id"),
+            inverseJoinColumns = @JoinColumn(name = "dimension_code")
     )
     private Set<Dimension> dimensions = new HashSet<>();
 

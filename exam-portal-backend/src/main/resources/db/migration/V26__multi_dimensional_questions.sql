@@ -54,15 +54,15 @@ INSERT INTO dimensions (dimension_code, dimension_type, display_name, descriptio
 
 -- Many-to-many: questions can belong to multiple dimensions.
 CREATE TABLE question_dimensions (
-    question_id BIGINT NOT NULL,
+    ques_id BIGINT NOT NULL,
     dimension_code VARCHAR(20) NOT NULL,
-    PRIMARY KEY (question_id, dimension_code),
-    FOREIGN KEY (question_id) REFERENCES questions(ques_id) ON DELETE CASCADE,
+    PRIMARY KEY (ques_id, dimension_code),
+    FOREIGN KEY (ques_id) REFERENCES questions(ques_id) ON DELETE CASCADE,
     FOREIGN KEY (dimension_code) REFERENCES dimensions(dimension_code) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Backfill: each existing question contributes its primary dimension to the join table.
-INSERT INTO question_dimensions (question_id, dimension_code)
+INSERT INTO question_dimensions (ques_id, dimension_code)
 SELECT ques_id, dimension FROM questions WHERE dimension IS NOT NULL;
 
 -- Index for fast dimension lookups.
