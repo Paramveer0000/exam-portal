@@ -157,17 +157,6 @@ const AdminUpdateQuestionPage = () => {
                   setOption1(e.target.value);
                 }}
               ></Form.Control>
-              <div className="mt-1">
-                <label htmlFor="option1-dimension" className="form-text">
-                  Scores as (optional — leave blank to use the dimension below)
-                </label>
-                <DimensionSelect
-                  id="option1-dimension"
-                  value={option1Dimension}
-                  onChange={(e) => setOption1Dimension(e.target.value)}
-                  blankLabel="Use question's dimension"
-                />
-              </div>
             </Form.Group>
 
             <Form.Group className="my-3" controlId="option2">
@@ -184,17 +173,6 @@ const AdminUpdateQuestionPage = () => {
                   setOption2(e.target.value);
                 }}
               ></Form.Control>
-              <div className="mt-1">
-                <label htmlFor="option2-dimension" className="form-text">
-                  Scores as (optional — leave blank to use the dimension below)
-                </label>
-                <DimensionSelect
-                  id="option2-dimension"
-                  value={option2Dimension}
-                  onChange={(e) => setOption2Dimension(e.target.value)}
-                  blankLabel="Use question's dimension"
-                />
-              </div>
             </Form.Group>
 
             <Form.Group className="my-3" controlId="option3">
