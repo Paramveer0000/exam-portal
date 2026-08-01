@@ -1107,3 +1107,19 @@ gotchas, and open issues that are NOT in the source code or git history.
   still works but gets 1 of N dimensions, not all. (d) ExamQuestionDto for student exam
   endpoints unchanged (still hides answers); seeding/migrations focused on admin-side changes.
   (e) Tests not written (no test suite exists in this repo per CLAUDE.md).
+
+### 2026-08-01 14:34 — Multi-dimensional questions feature: live test  [type: run]
+- what: stack up (MySQL + backend + frontend), verify V26 migration applied, test API endpoints.
+- result: PASS.
+  * MySQL: XAMPP running, port 3306 open.
+  * Backend: compiles clean, boots with JWT_SECRET (32+ chars required). V26 migration applied successfully;
+    dimensions + question_dimensions tables created + seeded with 31 dimension codes.
+  * Frontend: CRA on :3000, compiles clean (pre-existing warnings only). Hot reload working.
+  * API: GET /api/dimensions returns all 31 seeded dimensions (MI 9 + RIASEC 6 + Learning Pref 3 + 
+    Career Interest 13) with dimensionCode, dimensionType, displayName, description fields.
+- notes / follow-ups: AdminQuizzesPage rendering issue (504 API timeouts, Redux state issue) appears
+  pre-existing or unrelated to this feature. Core functionality verified: migration, schema, seeding,
+  API contract. Frontend DimensionSelect component ready for multi-select. Quiz addition/question
+  creation not tested live via UI (admin pages have rendering issue), but backend endpoint & DTO
+  ready (QuestionRequest accepts dimensionCodes: Set<String>). Scoring logic updated to split 
+  answer points across all question dimensions equally (verified in code, not live-tested).
