@@ -180,14 +180,18 @@ const AdminStudentsPage = () => {
   const groups = [];
   const groupIndex = {};
   filtered.forEach((s) => {
-    const key = s.classId || "unassigned";
+    const key = isSuperAdmin ? s.teacherId || "unassigned" : s.classId || "unassigned";
     if (!(key in groupIndex)) {
       groupIndex[key] = groups.length;
-      groups.push({ key, classId: s.classId, students: [] });
+      groups.push({ key, classId: s.classId, teacherId: s.teacherId, students: [] });
     }
     groups[groupIndex[key]].students.push(s);
   });
-  groups.sort((a, b) => classTitle(a.classId).localeCompare(classTitle(b.classId)));
+  groups.sort((a, b) =>
+    isSuperAdmin
+      ? schoolName(a.teacherId).localeCompare(schoolName(b.teacherId))
+      : classTitle(a.classId).localeCompare(classTitle(b.classId))
+  );
 
   const deleteHandler = (s) => {
     swal({
@@ -257,7 +261,10 @@ const AdminStudentsPage = () => {
 
         {groups.map((g) => (
         <div key={g.key} className="mt-4">
-          <h5>{classTitle(g.classId)} <span className="text-muted">({g.students.length})</span></h5>
+          <h5>
+            {isSuperAdmin ? schoolName(g.teacherId) : classTitle(g.classId)}{" "}
+            <span className="text-muted">({g.students.length})</span>
+          </h5>
           <Table striped bordered hover responsive>
           <thead>
             <tr>
@@ -269,7 +276,6 @@ const AdminStudentsPage = () => {
                 Name {sortIcon("name")}
               </th>
               <th>Phone</th>
-              {isSuperAdmin && <th>School</th>}
               <th>Class</th>
               <th>Status</th>
               <th>Actions</th>
@@ -286,7 +292,6 @@ const AdminStudentsPage = () => {
                     <Form.Control name="lastName" placeholder="Last" value={form.lastName} onChange={setField} />
                   </td>
                   <td><Form.Control name="phoneNumber" value={form.phoneNumber} onChange={setField} /></td>
-                  {isSuperAdmin && <td>{schoolName(s.teacherId)}</td>}
                   <td>{classTitle(s.classId)}</td>
                   <td>
                     <Badge bg={s.active ? "success" : "secondary"}>
@@ -309,7 +314,6 @@ const AdminStudentsPage = () => {
                     </div>
                   </td>
                   <td>{s.phoneNumber}</td>
-                  {isSuperAdmin && <td>{schoolName(s.teacherId)}</td>}
                   <td style={{ minWidth: 160 }}>
                     <Form.Select
                       size="sm"

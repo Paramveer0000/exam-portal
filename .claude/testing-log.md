@@ -1138,3 +1138,25 @@ gotchas, and open issues that are NOT in the source code or git history.
   latest React state immediately after a click) — used direct DOM queries via javascript_tool to get
   ground truth, which confirmed the feature works correctly; not a real bug, just an automation/timing
   artifact of the accessibility-tree reader vs. React's async batched re-render.
+
+### 2026-08-01 15:30 — Feature: group Students page by school (was: by class)  [type: change]
+- what: SUPER_ADMIN's "My Students" page (AdminStudentsPage.js, shared component) now groups
+  by school (teacherId) with school name as the section heading, instead of grouping by class.
+  Redundant "School" table column removed (info now in the heading). Plain ADMIN view unchanged
+  -- still groups by class, since a single school only ever sees its own students.
+- files: pages/admin/AdminStudentsPage.js (groups computation branches on isSuperAdmin; heading
+  renders schoolName(g.teacherId) for super admin vs classTitle(g.classId) for admin; removed the
+  3 conditional School <td>/<th> cells from the table).
+- result: PASS, verified live end-to-end. DB had been reset (only 1 user, superadmin) since last
+  session -- reset superadmin's local dev password (bcrypt hash generated via jshell +
+  spring-security-crypto jar) to log in, per explicit user approval ("do it, but dont change
+  passwords in live project" -- this is local dev only). Created 2 test schools (testschoolA,
+  testschoolB) + 2 classes + 3 students (2 under school A across 2 classes, 1 under school B) via
+  authenticated fetch calls (cookie + XSRF token from the browser session). Confirmed rendering:
+  "School A (2)" and "School B (1)" headings, correct per-school student counts, no School column
+  in the table. Screenshot taken. All test data (3 students, 2 school accounts, 2 classes) deleted
+  afterward, respecting FK order (user_role -> students -> school accounts -> categories); DB back
+  to 1 user (superadmin).
+- notes: local dev DB was apparently wiped at some point between sessions (previously had ~15
+  users per last logged state) -- worth confirming with user if intentional (XAMPP data dir reset,
+  fresh clone, etc.) since it means all previously-seeded demo/test data is gone.
