@@ -5,11 +5,13 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "dimensions")
 @Table(name = "questions")
 public class Question {
 
@@ -53,12 +55,19 @@ public class Question {
     @Column(name = "answer")
     private String answer;
 
-    // Psychometric dimension this question measures: an MI name (LOGICAL,
-    // MUSICAL, NATURALIST, VERBAL, INTERPERSONAL, KINESTHETIC, SPATIAL,
-    // INTRAPERSONAL, EXISTENTIAL) or a RIASEC letter (R, I, A, S, E, C).
-    // Falls back to this when an option has no dimension override.
+    // Primary dimension: used for backward compatibility and fast single-dimension queries.
+    // A question can belong to multiple dimensions via the many-to-many relationship below.
     @Column(name = "dimension", nullable = false)
     private String dimension;
+
+    // All dimensions this question measures (includes the primary dimension).
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "question_dimensions",
+            joinColumns = @JoinColumn(name = "question_id", referencedColumnName = "ques_id"),
+            inverseJoinColumns = @JoinColumn(name = "dimension_code", referencedColumnName = "dimension_code")
+    )
+    private Set<Dimension> dimensions = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Quiz quiz;

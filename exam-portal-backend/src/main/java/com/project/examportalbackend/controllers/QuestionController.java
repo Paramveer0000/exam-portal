@@ -1,5 +1,6 @@
 package com.project.examportalbackend.controllers;
 
+import com.project.examportalbackend.dto.QuestionRequest;
 import com.project.examportalbackend.models.Question;
 import com.project.examportalbackend.models.Quiz;
 import com.project.examportalbackend.services.QuestionService;
@@ -22,8 +23,8 @@ public class QuestionController {
     private QuizService quizService;
 
     @PostMapping("/")
-    public ResponseEntity<?> addQuestion(@RequestBody Question question) {
-        return ResponseEntity.ok(questionService.addQuestion(question));
+    public ResponseEntity<?> addQuestion(@RequestBody QuestionRequest request) {
+        return ResponseEntity.ok(questionService.addQuestion(request));
     }
 
     @GetMapping("/")
@@ -48,9 +49,10 @@ public class QuestionController {
     }
 
     @PutMapping("/{questionId}")
-    public ResponseEntity<?> updateQuestion(@PathVariable Long questionId, @RequestBody Question question) {
+    public ResponseEntity<?> updateQuestion(@PathVariable Long questionId, @RequestBody QuestionRequest request) {
         if (questionService.getQuestion(questionId) != null) {
-            return ResponseEntity.ok(questionService.updateQuestion(question));
+            request.setQuesId(questionId);
+            return ResponseEntity.ok(questionService.updateQuestion(request));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Question with id : " + String.valueOf(questionId) + ", doesn't exists");
     }

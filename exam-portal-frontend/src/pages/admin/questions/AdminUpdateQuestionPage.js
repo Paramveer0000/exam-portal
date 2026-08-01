@@ -48,8 +48,10 @@ const AdminUpdateQuestionPage = () => {
     oldQuestion ? oldQuestion.option4 : ""
   );
   const [answer, setAnswer] = useState(oldQuestion ? oldQuestion.answer : null);
-  const [dimension, setDimension] = useState(
-    oldQuestion && oldQuestion.dimension ? oldQuestion.dimension : ""
+  const [dimensionCodes, setDimensionCodes] = useState(
+    oldQuestion && oldQuestion.dimensions
+      ? new Set(oldQuestion.dimensions.map((d) => d.dimensionCode))
+      : new Set()
   );
   const [option1Dimension, setOption1Dimension] = useState(
     oldQuestion ? oldQuestion.option1Dimension || "" : ""
@@ -70,8 +72,8 @@ const AdminUpdateQuestionPage = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (dimension === "" || dimension === "n/a") {
-      alert("Select the dimension this question measures!");
+    if (dimensionCodes.size === 0) {
+      alert("Select at least one dimension!");
       return;
     }
     if (answer !== null && answer !== "n/a") {
@@ -88,10 +90,8 @@ const AdminUpdateQuestionPage = () => {
         option3Dimension: option3Dimension,
         option4Dimension: option4Dimension,
         answer: answer,
-        dimension: dimension,
-        quiz: {
-          quizId: quizId,
-        },
+        dimensionCodes: Array.from(dimensionCodes),
+        quizId: quizId,
       };
 
       updateQuestion(dispatch, question).then((data) => {
@@ -254,12 +254,13 @@ const AdminUpdateQuestionPage = () => {
             </Form.Group>
 
             <div className="my-3">
-              <label htmlFor="dimension-select">Dimension this question measures:</label>
+              <label htmlFor="dimension-select">Dimensions this question measures (select one or more):</label>
               <DimensionSelect
                 id="dimension-select"
-                value={dimension}
-                onChange={(e) => setDimension(e.target.value)}
-                blankLabel="Choose Dimension"
+                value={dimensionCodes}
+                onChange={setDimensionCodes}
+                blankLabel="Choose Dimensions"
+                isMulti={true}
               />
             </div>
 

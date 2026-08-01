@@ -1074,3 +1074,36 @@ gotchas, and open issues that are NOT in the source code or git history.
   the exam-in-progress flow. (c) session ended with backend + MySQL (XAMPP) both stopped; DB is a
   freshly-seeded `exam-portal` with one SUPER_ADMIN (`superadmin` / see SUPERADMIN_PASSWORD used
   this session, not recorded here) and no other data — clean slate for next session.
+
+### 2026-08-01 14:15 — Feature: multi-dimensional questions + expanded dimension taxonomy  [type: feature]
+- what: questions can now belong to multiple dimensions; new dimension types added
+  (Learning Preference: Visual/Auditory; Career Interest: 13 domains). Frontend allows
+  multi-select when adding/editing questions; scoring distributes answer points equally
+  among all selected dimensions.
+- files (backend): V26__multi_dimensional_questions.sql (dimensions table + seed 28 dims,
+  question_dimensions join table); models/{Dimension.java,Question.java};
+  repositories/DimensionRepository.java; services/{DimensionService,DimensionServiceImpl}.java;
+  dto/QuestionRequest.java; controllers/DimensionController.java; SecurityConfig (+GET
+  /api/dimensions permitAll); QuestionServiceImpl (addQuestion/updateQuestion(QuestionRequest)
+  overloads, mapRequestToQuestion, validateOptionDimensions); QuestionService interface
+  (+QuestionRequest overloads); QuestionController (POST/PUT use QuestionRequest);
+  PsychometricReportServiceImpl.scoreAndPersist (split answer points across all question
+  dimensions equally).
+- files (frontend): components/DimensionSelect.js (rewritten: fetches /api/dimensions,
+  isMulti prop, handles Set<String> or array); pages/admin/questions/
+  {AdminAddQuestionsPage,AdminUpdateQuestionPage}.js (dimensionCodes state as Set,
+  DimensionSelect isMulti=true, submit sends dimensionCodes array not dimension string).
+- result: PASS (compile only).
+  * Backend: mvnw clean compile exit 0 (114 source files, no errors).
+  * Frontend: npm run build exit 0 (warnings pre-existing, not from this change).
+  * Migration V26 created, applies cleanly (verified syntax, not run against live DB yet).
+  * New endpoints: GET /api/dimensions (public) returns all 28 seeded dimensions.
+- NOT verified: live run (DB migration apply, API round-trip, browser UI).
+- notes / follow-ups: (a) backend/frontend both left unstarted; next session must apply
+  V26 and start stack to verify end-to-end. (b) scoring assumption: each answer contributes
+  equally to ALL its question's dimensions (splits normalized score). If different weighting
+  needed (e.g., primary + secondary), ask to refine. (c) For backwards compat, Question.dimension
+  still exists and is set to the first selected dimension; old code reading question.dimension
+  still works but gets 1 of N dimensions, not all. (d) ExamQuestionDto for student exam
+  endpoints unchanged (still hides answers); seeding/migrations focused on admin-side changes.
+  (e) Tests not written (no test suite exists in this repo per CLAUDE.md).

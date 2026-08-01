@@ -1,5 +1,6 @@
 package com.project.examportalbackend.services;
 
+import com.project.examportalbackend.dto.QuestionRequest;
 import com.project.examportalbackend.models.Question;
 import com.project.examportalbackend.models.Quiz;
 
@@ -9,11 +10,15 @@ public interface QuestionService {
 
     Question addQuestion(Question question);
 
+    Question addQuestion(QuestionRequest request);
+
     List<Question> getQuestions();
 
     Question getQuestion(Long quesId);
 
     Question updateQuestion(Question question);
+
+    Question updateQuestion(QuestionRequest request);
 
     void deleteQuestion(Long questionId);
 

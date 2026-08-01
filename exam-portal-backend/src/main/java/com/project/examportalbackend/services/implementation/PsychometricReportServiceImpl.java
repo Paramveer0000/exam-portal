@@ -92,11 +92,20 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
             if (ordinal == 0) {
                 continue; // unrecognisable submission
             }
-            String dim = effectiveDimension(q, ordinal);
             // Fraction of this question's own max (2-4 options), not a fixed /4 scale,
             // so a 2-option question and a 4-option question contribute comparably.
-            raw.merge(dim, ordinal / (double) maxOrdinal(q), Double::sum);
-            counts.merge(dim, 1, Integer::sum);
+            double normalizedScore = ordinal / (double) maxOrdinal(q);
+
+            // Score into all dimensions this question belongs to.
+            // If a question has multiple dimensions, split the score equally.
+            java.util.Set<com.project.examportalbackend.models.Dimension> questionDimensions = q.getDimensions();
+            if (questionDimensions != null && !questionDimensions.isEmpty()) {
+                double scorePerDimension = normalizedScore / questionDimensions.size();
+                for (com.project.examportalbackend.models.Dimension d : questionDimensions) {
+                    raw.merge(d.getDimensionCode(), scorePerDimension, Double::sum);
+                    counts.merge(d.getDimensionCode(), 1, Integer::sum);
+                }
+            }
         }
 
         // MI percents: each dimension's share of the total MI points.

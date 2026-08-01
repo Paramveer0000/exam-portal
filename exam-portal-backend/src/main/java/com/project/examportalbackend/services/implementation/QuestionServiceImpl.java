@@ -1,10 +1,13 @@
 package com.project.examportalbackend.services.implementation;
 
+import com.project.examportalbackend.dto.QuestionRequest;
+import com.project.examportalbackend.models.Dimension;
 import com.project.examportalbackend.models.Question;
 import com.project.examportalbackend.models.Quiz;
 import com.project.examportalbackend.repository.QuestionRepository;
 import com.project.examportalbackend.repository.QuizRepository;
 import com.project.examportalbackend.security.AuthFacade;
+import com.project.examportalbackend.services.DimensionService;
 import com.project.examportalbackend.services.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,29 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
     private AuthFacade authFacade;
+
+    @Autowired
+    private DimensionService dimensionService;
+
+    public Question addQuestion(QuestionRequest request) {
+        Question question = mapRequestToQuestion(request);
+        assertQuestionValid(question);
+        Quiz quiz = quizRepository.findById(request.getQuizId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
+        authFacade.assertCanManage(quiz.getCreatedBy());
+        if (questionRepository.existsByQuizAndContentIgnoreCase(quiz, question.getContent().trim())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This question already exists in this quiz");
+        }
+        Set<Dimension> dimensions = dimensionService.validateDimensionCodes(request.getDimensionCodes());
+        question.setDimensions(dimensions);
+        if (!dimensions.isEmpty()) {
+            question.setDimension(dimensions.iterator().next().getDimensionCode());
+        }
+        question.setQuiz(quiz);
+        quiz.setNumOfQuestions(quiz.getNumOfQuestions() + 1);
+        quizRepository.save(quiz);
+        return questionRepository.save(question);
+    }
 
     @Override
     public Question addQuestion(Question question) {
@@ -61,6 +87,27 @@ public class QuestionServiceImpl implements QuestionService {
     public Question getQuestion(Long quesId) {
         // Read building-block used by scoring; no scoping here.
         return questionRepository.findById(quesId).orElse(null);
+    }
+
+    public Question updateQuestion(QuestionRequest request) {
+        Question question = mapRequestToQuestion(request);
+        assertQuestionValid(question);
+        Question existing = questionRepository.findById(request.getQuesId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
+        assertCanManageQuestion(existing);
+        boolean contentChanged = !question.getContent().trim().equalsIgnoreCase(existing.getContent());
+        if (contentChanged
+                && questionRepository.existsByQuizAndContentIgnoreCase(existing.getQuiz(), question.getContent().trim())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This question already exists in this quiz");
+        }
+        Set<Dimension> dimensions = dimensionService.validateDimensionCodes(request.getDimensionCodes());
+        question.setDimensions(dimensions);
+        if (!dimensions.isEmpty()) {
+            question.setDimension(dimensions.iterator().next().getDimensionCode());
+        }
+        question.setQuiz(existing.getQuiz());
+        question.setQuesId(existing.getQuesId());
+        return questionRepository.save(question);
     }
 
     @Override
@@ -103,11 +150,27 @@ public class QuestionServiceImpl implements QuestionService {
         return questionRepository.findByQuiz(quiz);
     }
 
+    private Question mapRequestToQuestion(QuestionRequest request) {
+        Question q = new Question();
+        q.setQuesId(request.getQuesId());
+        q.setContent(request.getContent());
+        q.setImage(request.getImage());
+        q.setOption1(request.getOption1());
+        q.setOption2(request.getOption2());
+        q.setOption3(request.getOption3());
+        q.setOption4(request.getOption4());
+        q.setAnswer(request.getAnswer());
+        q.setOption1Dimension(request.getOption1Dimension());
+        q.setOption2Dimension(request.getOption2Dimension());
+        q.setOption3Dimension(request.getOption3Dimension());
+        q.setOption4Dimension(request.getOption4Dimension());
+        return q;
+    }
+
     private void assertQuestionValid(Question question) {
         if (!StringUtils.hasText(question.getContent())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Question text is required");
         }
-        // At least 2 options (e.g. Yes/No); option3/option4 may be left blank.
         if (!StringUtils.hasText(question.getOption1()) || !StringUtils.hasText(question.getOption2())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "At least two options are required");
         }
@@ -119,23 +182,22 @@ public class QuestionServiceImpl implements QuestionService {
         if (question.getAnswer() == null || !filledOptions.containsKey(question.getAnswer())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The correct option must be one of the filled-in options");
         }
-        // Psychometric-only platform: every question measures one dimension.
-        Set<String> validDimensions = Set.of(
+        validateOptionDimensions(question);
+    }
+
+    private void validateOptionDimensions(Question question) {
+        Set<String> validDimensionCodes = Set.of(
                 "LOGICAL", "MUSICAL", "NATURALIST", "VERBAL", "INTERPERSONAL",
                 "KINESTHETIC", "SPATIAL", "INTRAPERSONAL", "EXISTENTIAL",
-                "R", "I", "A", "S", "E", "C");
-        if (question.getDimension() == null
-                || !validDimensions.contains(question.getDimension().toUpperCase())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "A valid psychometric dimension is required (MI name or RIASEC letter)");
-        }
-        question.setDimension(question.getDimension().toUpperCase());
-
-        // Per-option dimension overrides are optional (most questions don't use them).
-        question.setOption1Dimension(normalizeOptionalDimension(question.getOption1Dimension(), validDimensions));
-        question.setOption2Dimension(normalizeOptionalDimension(question.getOption2Dimension(), validDimensions));
-        question.setOption3Dimension(normalizeOptionalDimension(question.getOption3Dimension(), validDimensions));
-        question.setOption4Dimension(normalizeOptionalDimension(question.getOption4Dimension(), validDimensions));
+                "R", "I", "A", "S", "E", "C",
+                "VISUAL", "AUDITORY",
+                "ENGINEERING", "MEDICAL", "MANAGEMENT", "ARTS", "COMMERCE",
+                "GOVERNMENT", "ENTREPRENEURSHIP", "TEACHING", "PSYCHOLOGY", "DESIGN",
+                "HOSPITALITY", "TECHNOLOGY", "ENVIRONMENT");
+        question.setOption1Dimension(normalizeOptionalDimension(question.getOption1Dimension(), validDimensionCodes));
+        question.setOption2Dimension(normalizeOptionalDimension(question.getOption2Dimension(), validDimensionCodes));
+        question.setOption3Dimension(normalizeOptionalDimension(question.getOption3Dimension(), validDimensionCodes));
+        question.setOption4Dimension(normalizeOptionalDimension(question.getOption4Dimension(), validDimensionCodes));
     }
 
     private String normalizeOptionalDimension(String value, Set<String> validDimensions) {

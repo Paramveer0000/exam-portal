@@ -115,6 +115,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/refresh").permitAll()
                 .antMatchers("/api/me").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/teachers").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/dimensions").permitAll()
 
                 .antMatchers(HttpMethod.GET, "/api/platform/**").permitAll()
                 .antMatchers("/api/platform/**").hasAuthority("SUPER_ADMIN")

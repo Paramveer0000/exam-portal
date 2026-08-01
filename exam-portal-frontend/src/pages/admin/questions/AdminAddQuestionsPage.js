@@ -18,9 +18,9 @@ const AdminAddQuestionsPage = () => {
   const [option3, setOption3] = useState("");
   const [option4, setOption4] = useState("");
   const [answer, setAnswer] = useState(null);
-  const [dimension, setDimension] = useState("");
+  const [dimensionCodes, setDimensionCodes] = useState(new Set());
   // Optional per-option overrides — most questions leave these blank and just
-  // use `dimension` above; set one when different answers measure different traits.
+  // use `dimensionCodes` above; set one when different answers measure different traits.
   const [option1Dimension, setOption1Dimension] = useState("");
   const [option2Dimension, setOption2Dimension] = useState("");
   const [option3Dimension, setOption3Dimension] = useState("");
@@ -41,8 +41,8 @@ const AdminAddQuestionsPage = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (dimension === "" || dimension === "n/a") {
-      alert("Select the dimension this question measures!");
+    if (dimensionCodes.size === 0) {
+      alert("Select at least one dimension!");
       return;
     }
     if (answer !== null && answer !== "n/a") {
@@ -58,10 +58,8 @@ const AdminAddQuestionsPage = () => {
         option3Dimension: option3Dimension,
         option4Dimension: option4Dimension,
         answer: answer,
-        dimension: dimension,
-        quiz: {
-          quizId: quizId,
-        },
+        dimensionCodes: Array.from(dimensionCodes),
+        quizId: quizId,
       };
 
       addQuestion(dispatch, question).then((data) => {
@@ -222,12 +220,13 @@ const AdminAddQuestionsPage = () => {
             </Form.Group>
 
             <div className="my-3">
-              <label htmlFor="dimension-select">Dimension this question measures:</label>
+              <label htmlFor="dimension-select">Dimensions this question measures (select one or more):</label>
               <DimensionSelect
                 id="dimension-select"
-                value={dimension}
-                onChange={(e) => setDimension(e.target.value)}
-                blankLabel="Choose Dimension"
+                value={dimensionCodes}
+                onChange={setDimensionCodes}
+                blankLabel="Choose Dimensions"
+                isMulti={true}
               />
             </div>
 
