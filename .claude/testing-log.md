@@ -1026,3 +1026,51 @@ gotchas, and open issues that are NOT in the source code or git history.
   readings this session. Reliable workarounds: read an untransitioned property instead
   (pointer-events), or set `el.style.transition='none'` before measuring. Do not trust a theme/visibility
   colour reading taken right after a class or attribute change.
+### 2026-08-01 11:15 — Auth security hardening (SameSite/Secure cookies, CSP, brute-force lockout, refresh-token hashing, prod profile, global exception handler)  [type: change]
+- what: fixed 7 critical/high findings from an auth security audit without changing the
+  cookie/JWT/refresh-rotation/single-session/CSRF architecture. See PR description for full list;
+  summary: CookieUtil now uses ResponseCookie with SameSite=Lax (Strict breaks cross-origin
+  frontend↔backend XHR since CORS+credentials implies different origins) and Secure driven by
+  `cookie.secure`; added `spring.profiles.active` (dev/prod) with new `application-dev.properties`
+  (show_sql=true, error messages on) / `application-prod.properties` (show_sql=false,
+  cookie.secure defaults **true** even if COOKIE_SECURE unset, error messages off); added a CSP
+  header in SecurityConfig (`default-src 'self'` + `connect-src 'self'` since the SPA calls `/api`
+  same-origin); added `GlobalExceptionHandler` (@RestControllerAdvice) — ResponseStatusException
+  passes its message through, anything else logs server-side and returns a generic 500 (**note**:
+  CLAUDE.md says "no @ControllerAdvice exists" — that line is now stale, flag for a doc update);
+  added `LoginAttemptService` (in-memory, single-instance — ponytail-tagged for a Redis upgrade if
+  ever scaled to >1 backend node) — 5 failed attempts locks the username 15 min, 429 generic
+  message, resets on success; `RefreshToken.token` now stores SHA-256 hex hash instead of the raw
+  UUID (raw value only lives in a new `@Transient rawToken` field for setting the cookie) —
+  `AuthServiceImpl` and `AdminServiceImpl` (impersonation/session-swap paths) updated to read
+  `getRawToken()` for the cookie and let the service hash-and-compare internally.
+- files: security/CookieUtil.java, security/LoginAttemptService.java (new),
+  configurations/GlobalExceptionHandler.java (new), configurations/SecurityConfig.java (CSP),
+  services/implementation/AuthServiceImpl.java, services/implementation/AdminServiceImpl.java,
+  services/implementation/RefreshTokenService.java, models/RefreshToken.java,
+  resources/application.properties, resources/application-dev.properties (new),
+  resources/application-prod.properties (new)
+- result: PASS — verified live against a fresh DB (see follow-up on why). `mvnw compile` clean.
+  Booted with dev profile + JWT_SECRET + SUPERADMIN_PASSWORD. curl-tested: login sets
+  `access_token`/`refresh_token` with `HttpOnly; SameSite=Lax` (no `Secure` — correct, dev HTTP);
+  CSP header present on every response; refresh rotates both cookies + revokes old refresh token;
+  logout clears both cookies (Max-Age=0); direct DB query confirmed `refresh_tokens.token` is a
+  64-char SHA-256 hex hash, not the raw UUID from the Set-Cookie header; 5x wrong password then a
+  6th attempt returns 429 "Too many failed attempts..." (also true for the *correct* password while
+  locked — confirms lockout isn't bypassed by finally guessing right), log shows
+  `LoginAttemptService: Account locked out after 5 failed login attempts: superadmin`; CORS
+  preflight still returns `Access-Control-Allow-*` correctly; a denyAll route still 403s with no
+  body/stack-trace leak. Did not hit the GlobalExceptionHandler's generic-500 path directly (no
+  easy way to force an unhandled exception via curl) — trust it since the app booted clean with the
+  new `@RestControllerAdvice` wired (Spring fails fast on malformed advice beans).
+- notes / follow-ups: (a) hit a **pre-existing, unrelated** Flyway blocker twice before tests could
+  run: first `target/classes` had a stale `V20__class_subject_quiz_hierarchy.sql` left over from an
+  old build (duplicate V20 vs. the real `V20__refresh_tokens.sql` in `src`) — fixed by deleting
+  `target/classes`; then the DB's `flyway_schema_history` had a checksum mismatch on V20 from an
+  earlier session — fixed by dropping the local `exam-portal` DB (user-approved) and letting it
+  remigrate clean from V1. Neither is caused by this change; worth `mvnw clean` before any future
+  session's first build. (b) JWT access-token expiry (issue 8, optional) was left at 30 min —
+  hardcoded in JwtUtil, not touched; scoped as optional/no-redesign so skipped rather than risking
+  the exam-in-progress flow. (c) session ended with backend + MySQL (XAMPP) both stopped; DB is a
+  freshly-seeded `exam-portal` with one SUPER_ADMIN (`superadmin` / see SUPERADMIN_PASSWORD used
+  this session, not recorded here) and no other data — clean slate for next session.

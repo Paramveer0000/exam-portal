@@ -98,7 +98,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .includeSubDomains(true)
                     .maxAgeInSeconds(31536000)
                     .and()
-                .referrerPolicy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN);
+                .referrerPolicy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                .and()
+                .contentSecurityPolicy("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+                        "img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; " +
+                        "frame-ancestors 'none'; base-uri 'self'");
 
         http.authorizeRequests()
                 .expressionHandler(webExpressionHandler())

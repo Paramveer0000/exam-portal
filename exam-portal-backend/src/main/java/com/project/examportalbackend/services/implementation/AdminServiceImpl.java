@@ -325,7 +325,7 @@ public class AdminServiceImpl implements AdminService {
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(target.getUserId(), false);
         int refreshMaxAge = refreshTokenService.getExpiryDays() * 24 * 60 * 60;
-        cookieUtil.addRefreshTokenCookie(response, refreshToken.getToken(), refreshMaxAge);
+        cookieUtil.addRefreshTokenCookie(response, refreshToken.getRawToken(), refreshMaxAge);
 
         return new LoginResponse(AuthUserDto.from(target));
     }
@@ -346,7 +346,7 @@ public class AdminServiceImpl implements AdminService {
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(original.getUserId(), false);
         int refreshMaxAge = refreshTokenService.getExpiryDays() * 24 * 60 * 60;
-        cookieUtil.addRefreshTokenCookie(response, refreshToken.getToken(), refreshMaxAge);
+        cookieUtil.addRefreshTokenCookie(response, refreshToken.getRawToken(), refreshMaxAge);
 
         return new LoginResponse(AuthUserDto.from(original));
     }

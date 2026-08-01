@@ -10,6 +10,7 @@ import com.project.examportalbackend.repository.UserRepository;
 import com.project.examportalbackend.security.AuthAuditLogger;
 import com.project.examportalbackend.security.AuthFacade;
 import com.project.examportalbackend.security.CookieUtil;
+import com.project.examportalbackend.security.LoginAttemptService;
 import com.project.examportalbackend.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,14 +53,24 @@ public class AuthServiceImpl implements AuthService {
     private CookieUtil cookieUtil;
     @Autowired
     private AuthAuditLogger auditLogger;
+    @Autowired
+    private LoginAttemptService loginAttemptService;
 
     public LoginResponse loginUserService(LoginRequest loginRequest, HttpServletResponse response) throws Exception {
+        if (loginAttemptService.isLocked(loginRequest.getUsername())) {
+            auditLogger.loginFailure(loginRequest.getUsername(), "Account locked");
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
+                    "Too many failed attempts. Try again later.");
+        }
+
         try {
             authenticate(loginRequest.getUsername(), loginRequest.getPassword());
         } catch (ResponseStatusException e) {
+            loginAttemptService.recordFailure(loginRequest.getUsername());
             auditLogger.loginFailure(loginRequest.getUsername(), e.getReason());
             throw e;
         }
+        loginAttemptService.recordSuccess(loginRequest.getUsername());
 
         UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(loginRequest.getUsername());
         User user = userRepository.findByUsername(loginRequest.getUsername());
@@ -82,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
         // Create refresh token (single session for students, multi for admins).
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUserId(), isStudent);
         int refreshMaxAge = refreshTokenService.getExpiryDays() * 24 * 60 * 60;
-        cookieUtil.addRefreshTokenCookie(response, refreshToken.getToken(), refreshMaxAge);
+        cookieUtil.addRefreshTokenCookie(response, refreshToken.getRawToken(), refreshMaxAge);
 
         auditLogger.loginSuccess(user.getUsername());
         return new LoginResponse(AuthUserDto.from(user));
@@ -110,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
 
         // Issue rotated refresh token cookie.
         int refreshMaxAge = refreshTokenService.getExpiryDays() * 24 * 60 * 60;
-        cookieUtil.addRefreshTokenCookie(response, newRefreshToken.getToken(), refreshMaxAge);
+        cookieUtil.addRefreshTokenCookie(response, newRefreshToken.getRawToken(), refreshMaxAge);
 
         auditLogger.tokenRefresh(user.getUsername());
         return new LoginResponse(AuthUserDto.from(user));

@@ -1,10 +1,12 @@
 package com.project.examportalbackend.security;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.time.Duration;
 
 @Component
 public class CookieUtil {
@@ -15,26 +17,33 @@ public class CookieUtil {
     @Value("${cookie.secure:false}")
     private boolean secureCookie;
 
+    // Frontend and backend run on different origins (CORS with credentials), so
+    // SameSite=Strict would drop the cookie on cross-site XHR. Lax still blocks
+    // third-party/CSRF-style requests while allowing the app's own cross-origin calls.
+    @Value("${cookie.samesite:Lax}")
+    private String sameSite;
+
     public void addAccessTokenCookie(HttpServletResponse response, String token, int maxAgeSec) {
-        Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE, token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(secureCookie);
-        cookie.setPath("/api");
-        cookie.setMaxAge(maxAgeSec);
-        response.addCookie(cookie);
+        addCookie(response, ACCESS_TOKEN_COOKIE, token, maxAgeSec);
     }
 
     public void addRefreshTokenCookie(HttpServletResponse response, String token, int maxAgeSec) {
-        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE, token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(secureCookie);
-        cookie.setPath("/api");
-        cookie.setMaxAge(maxAgeSec);
-        response.addCookie(cookie);
+        addCookie(response, REFRESH_TOKEN_COOKIE, token, maxAgeSec);
     }
 
     public void clearAuthCookies(HttpServletResponse response) {
         addAccessTokenCookie(response, "", 0);
         addRefreshTokenCookie(response, "", 0);
+    }
+
+    private void addCookie(HttpServletResponse response, String name, String value, int maxAgeSec) {
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .secure(secureCookie)
+                .path("/api")
+                .maxAge(Duration.ofSeconds(maxAgeSec))
+                .sameSite(sameSite)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 }
