@@ -1123,3 +1123,18 @@ gotchas, and open issues that are NOT in the source code or git history.
   creation not tested live via UI (admin pages have rendering issue), but backend endpoint & DTO
   ready (QuestionRequest accepts dimensionCodes: Set<String>). Scoring logic updated to split 
   answer points across all question dimensions equally (verified in code, not live-tested).
+
+### 2026-08-01 15:05 — Change: dimension picker UX -- one-by-one add with removable chips  [type: change]
+- what: user asked for "add one by one" instead of a multi-select listbox. Replaced DimensionSelect's
+  isMulti mode: dropdown (single choice) + Add button + selected dimensions render as removable
+  Bootstrap Badge chips below (x to remove). Already-added codes disabled in the dropdown to prevent dupes.
+- files: components/DimensionSelect.js (isMulti branch rewritten: new DimensionMultiPicker sub-component).
+- result: PASS, verified live in browser (SUPER_ADMIN session, /adminAddQuestion?quizId=1):
+  * Added LOGICAL, MEDICAL, COMMERCE via dropdown+Add -> all 3 appeared as chips.
+  * Dropdown correctly disabled already-selected options (Commerce/Medical/Logical-Mathematical greyed out).
+  * Clicked chip's x (Remove COMMERCE) -> chip removed, remaining 2 chips (Medical, Logical-Mathematical) persisted.
+  * Frontend build: npm run build exit 0, no new warnings.
+- notes: read_page snapshots during interactive testing were intermittently stale (didn't reflect
+  latest React state immediately after a click) — used direct DOM queries via javascript_tool to get
+  ground truth, which confirmed the feature works correctly; not a real bug, just an automation/timing
+  artifact of the accessibility-tree reader vs. React's async batched re-render.

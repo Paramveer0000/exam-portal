@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form } from "react-bootstrap";
+import { Form, Button, Badge } from "react-bootstrap";
 
 const DimensionSelect = ({ id, value, onChange, blankLabel, isMulti = false }) => {
   const [dimensions, setDimensions] = useState([]);
@@ -59,34 +59,87 @@ const DimensionSelect = ({ id, value, onChange, blankLabel, isMulti = false }) =
     );
   }
 
-  // Multi-select mode for question dimensions
-  const handleMultiChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions, (option) => option.value);
-    onChange(new Set(selected));
+  // Add-one-by-one mode for question dimensions: pick from dropdown, click
+  // Add, chosen dimension shows as a removable chip below.
+  return (
+    <DimensionMultiPicker
+      id={id}
+      value={value}
+      onChange={onChange}
+      dimensions={dimensions}
+      groupByType={groupByType}
+      typeLabels={typeLabels}
+    />
+  );
+};
+
+const DimensionMultiPicker = ({ id, value, onChange, dimensions, groupByType, typeLabels }) => {
+  const [pending, setPending] = useState("");
+  const selectedSet = value instanceof Set ? value : new Set(value || []);
+  const grouped = groupByType(dimensions);
+  const byCode = Object.fromEntries(dimensions.map((d) => [d.dimensionCode, d]));
+
+  const addPending = () => {
+    if (!pending) return;
+    const next = new Set(selectedSet);
+    next.add(pending);
+    onChange(next);
+    setPending("");
   };
 
-  const grouped = groupByType(dimensions);
-  const selectedArray = value instanceof Set ? Array.from(value) : value || [];
+  const removeCode = (code) => {
+    const next = new Set(selectedSet);
+    next.delete(code);
+    onChange(next);
+  };
 
   return (
-    <Form.Select
-      aria-label="Choose Dimensions"
-      id={id}
-      multiple
-      value={selectedArray}
-      onChange={handleMultiChange}
-      size={Math.min(dimensions.length + 1, 10)}
-    >
-      {Object.keys(grouped).map((type) => (
-        <optgroup key={type} label={typeLabels[type] || type}>
-          {grouped[type].map((d) => (
-            <option key={d.dimensionCode} value={d.dimensionCode}>
-              {d.displayName}
-            </option>
+    <div>
+      <div className="d-flex gap-2">
+        <Form.Select
+          aria-label="Choose a dimension to add"
+          id={id}
+          value={pending}
+          onChange={(e) => setPending(e.target.value)}
+        >
+          <option value="">Choose a dimension…</option>
+          {Object.keys(grouped).map((type) => (
+            <optgroup key={type} label={typeLabels[type] || type}>
+              {grouped[type].map((d) => (
+                <option
+                  key={d.dimensionCode}
+                  value={d.dimensionCode}
+                  disabled={selectedSet.has(d.dimensionCode)}
+                >
+                  {d.displayName}
+                </option>
+              ))}
+            </optgroup>
           ))}
-        </optgroup>
-      ))}
-    </Form.Select>
+        </Form.Select>
+        <Button variant="outline-primary" onClick={addPending} disabled={!pending}>
+          Add
+        </Button>
+      </div>
+      <div className="mt-2 d-flex flex-wrap gap-2">
+        {Array.from(selectedSet).map((code) => (
+          <Badge key={code} bg="secondary" className="d-flex align-items-center gap-1 p-2">
+            {byCode[code] ? byCode[code].displayName : code}
+            <span
+              role="button"
+              aria-label={`Remove ${code}`}
+              style={{ cursor: "pointer" }}
+              onClick={() => removeCode(code)}
+            >
+              &times;
+            </span>
+          </Badge>
+        ))}
+        {selectedSet.size === 0 && (
+          <span className="form-text">No dimensions added yet.</span>
+        )}
+      </div>
+    </div>
   );
 };
 
