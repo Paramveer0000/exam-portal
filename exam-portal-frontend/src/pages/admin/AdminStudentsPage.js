@@ -174,6 +174,7 @@ const AdminStudentsPage = () => {
     .sort((a, b) => {
       const dir = sort.dir;
       if (sort.key === "id") return dir * (a.userId - b.userId);
+      if (sort.key === "class") return dir * classTitle(a.classId).localeCompare(classTitle(b.classId));
       return dir * studentName(a).localeCompare(studentName(b));
     });
 
@@ -276,7 +277,9 @@ const AdminStudentsPage = () => {
                 Name {sortIcon("name")}
               </th>
               <th>Phone</th>
-              <th>Class</th>
+              <th className="mt-sort-th" onClick={() => toggleSort("class")}>
+                Class {sortIcon("class")}
+              </th>
               <th>Status</th>
               <th>Actions</th>
             </tr>

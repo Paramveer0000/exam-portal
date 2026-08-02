@@ -1212,3 +1212,17 @@ gotchas, and open issues that are NOT in the source code or git history.
   before each authenticated POST when scripting against this app -- reusing a token fetched
   even one request earlier in the same async function intermittently 403's (not a bug in the
   app, just how the cookie-rotation interacts with manual fetch()-based testing).
+
+### 2026-08-02 12:20 — Feature: sortable Class column on Students page  [type: change]
+- what: "Class" table header on AdminStudentsPage.js is now clickable/sortable, matching
+  the existing ID/Name sort UX (arrow icon, toggles asc/desc). Useful mainly in the
+  SUPER_ADMIN grouped-by-school view where one school group can span multiple classes.
+- files: pages/admin/AdminStudentsPage.js (filtered.sort adds a "class" key -> compares
+  classTitle(a.classId) vs classTitle(b.classId); Class <th> gets mt-sort-th + onClick +
+  sortIcon, same pattern as ID/Name).
+- result: PASS, verified live. Created 2 classes (Alpha Class, Zeta Class) + 1 school +
+  2 students (one per class) under superadmin. Clicked "Class" header: ascending order put
+  aastudent (Alpha Class) before zzstudent (Zeta Class); clicked again: descending reversed
+  it (Zeta before Alpha). Sort icon renders correctly on the Class header. Frontend
+  `npm run build` exit 0. All test data (2 students, 1 school, 2 classes) deleted after;
+  DB back to 1 user (superadmin).
