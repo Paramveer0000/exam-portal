@@ -196,19 +196,6 @@ const AdminUpdateQuestionPage = () => {
                   setOption3(e.target.value);
                 }}
               ></Form.Control>
-              {option3 && (
-                <div className="mt-1">
-                  <label htmlFor="option3-dimension" className="form-text">
-                    Scores as (optional — leave blank to use the dimension below)
-                  </label>
-                  <DimensionSelect
-                    id="option3-dimension"
-                    value={option3Dimension}
-                    onChange={(e) => setOption3Dimension(e.target.value)}
-                    blankLabel="Use question's dimension"
-                  />
-                </div>
-              )}
             </Form.Group>
 
             <Form.Group className="my-3" controlId="option4">
@@ -224,19 +211,6 @@ const AdminUpdateQuestionPage = () => {
                   setOption4(e.target.value);
                 }}
               ></Form.Control>
-              {option4 && (
-                <div className="mt-1">
-                  <label htmlFor="option4-dimension" className="form-text">
-                    Scores as (optional — leave blank to use the dimension below)
-                  </label>
-                  <DimensionSelect
-                    id="option4-dimension"
-                    value={option4Dimension}
-                    onChange={(e) => setOption4Dimension(e.target.value)}
-                    blankLabel="Use question's dimension"
-                  />
-                </div>
-              )}
             </Form.Group>
 
             <Form.Group className="my-3" controlId="option5">
@@ -252,19 +226,6 @@ const AdminUpdateQuestionPage = () => {
                   setOption5(e.target.value);
                 }}
               ></Form.Control>
-              {option5 && (
-                <div className="mt-1">
-                  <label htmlFor="option5-dimension" className="form-text">
-                    Scores as (optional — leave blank to use the dimension below)
-                  </label>
-                  <DimensionSelect
-                    id="option5-dimension"
-                    value={option5Dimension}
-                    onChange={(e) => setOption5Dimension(e.target.value)}
-                    blankLabel="Use question's dimension"
-                  />
-                </div>
-              )}
             </Form.Group>
 
             <div className="my-3">
