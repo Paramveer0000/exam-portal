@@ -164,7 +164,7 @@ public class QuizServiceImpl implements QuizService {
      */
     private void shuffleOptions(ExamQuestionDto dto) {
         List<String> options = new ArrayList<>();
-        for (String o : new String[]{dto.getOption1(), dto.getOption2(), dto.getOption3(), dto.getOption4()}) {
+        for (String o : new String[]{dto.getOption1(), dto.getOption2(), dto.getOption3(), dto.getOption4(), dto.getOption5()}) {
             if (o != null) {
                 options.add(o);
             }
@@ -174,6 +174,7 @@ public class QuizServiceImpl implements QuizService {
         dto.setOption2(options.size() > 1 ? options.get(1) : null);
         dto.setOption3(options.size() > 2 ? options.get(2) : null);
         dto.setOption4(options.size() > 3 ? options.get(3) : null);
+        dto.setOption5(options.size() > 4 ? options.get(4) : null);
     }
 
     private void assertTitlePresent(Quiz quiz) {

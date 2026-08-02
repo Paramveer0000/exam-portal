@@ -180,11 +180,13 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
             case "option2": return 2;
             case "option3": return 3;
             case "option4": return 4;
+            case "option5": return 5;
             default:
                 if (submitted.equals(q.getOption1())) return 1;
                 if (submitted.equals(q.getOption2())) return 2;
                 if (submitted.equals(q.getOption3())) return 3;
                 if (submitted.equals(q.getOption4())) return 4;
+                if (submitted.equals(q.getOption5())) return 5;
                 return 0;
         }
     }
@@ -197,18 +199,20 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
             case 2: override = q.getOption2Dimension(); break;
             case 3: override = q.getOption3Dimension(); break;
             case 4: override = q.getOption4Dimension(); break;
+            case 5: override = q.getOption5Dimension(); break;
             default: override = null;
         }
         return StringUtils.hasText(override) ? override : q.getDimension();
     }
 
-    /** Count of non-blank options (2-4) — a question's own Likert ceiling. */
+    /** Count of non-blank options (2-5) — a question's own Likert ceiling. */
     private int maxOrdinal(Question q) {
         int n = 0;
         if (StringUtils.hasText(q.getOption1())) n++;
         if (StringUtils.hasText(q.getOption2())) n++;
         if (StringUtils.hasText(q.getOption3())) n++;
         if (StringUtils.hasText(q.getOption4())) n++;
+        if (StringUtils.hasText(q.getOption5())) n++;
         return Math.max(n, 1);
     }
 

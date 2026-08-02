@@ -47,6 +47,9 @@ const AdminUpdateQuestionPage = () => {
   const [option4, setOption4] = useState(
     oldQuestion ? oldQuestion.option4 : ""
   );
+  const [option5, setOption5] = useState(
+    oldQuestion ? oldQuestion.option5 : ""
+  );
   const [answer, setAnswer] = useState(oldQuestion ? oldQuestion.answer : null);
   const [dimensionCodes, setDimensionCodes] = useState(
     oldQuestion && oldQuestion.dimensions
@@ -64,6 +67,9 @@ const AdminUpdateQuestionPage = () => {
   );
   const [option4Dimension, setOption4Dimension] = useState(
     oldQuestion ? oldQuestion.option4Dimension || "" : ""
+  );
+  const [option5Dimension, setOption5Dimension] = useState(
+    oldQuestion ? oldQuestion.option5Dimension || "" : ""
   );
 
   const onSelectAnswerHandler = (e) => {
@@ -85,10 +91,12 @@ const AdminUpdateQuestionPage = () => {
         option2: option2,
         option3: option3,
         option4: option4,
+        option5: option5,
         option1Dimension: option1Dimension,
         option2Dimension: option2Dimension,
         option3Dimension: option3Dimension,
         option4Dimension: option4Dimension,
+        option5Dimension: option5Dimension,
         answer: answer,
         dimensionCodes: Array.from(dimensionCodes),
         quizId: quizId,
@@ -231,6 +239,34 @@ const AdminUpdateQuestionPage = () => {
               )}
             </Form.Group>
 
+            <Form.Group className="my-3" controlId="option5">
+              <Form.Label>Option 5 (optional)</Form.Label>
+              <Form.Control
+                style={{ textAlign: "top" }}
+                as="textarea"
+                rows="2"
+                type="text"
+                placeholder="Enter Option 5"
+                value={option5}
+                onChange={(e) => {
+                  setOption5(e.target.value);
+                }}
+              ></Form.Control>
+              {option5 && (
+                <div className="mt-1">
+                  <label htmlFor="option5-dimension" className="form-text">
+                    Scores as (optional — leave blank to use the dimension below)
+                  </label>
+                  <DimensionSelect
+                    id="option5-dimension"
+                    value={option5Dimension}
+                    onChange={(e) => setOption5Dimension(e.target.value)}
+                    blankLabel="Use question's dimension"
+                  />
+                </div>
+              )}
+            </Form.Group>
+
             <div className="my-3">
               <label htmlFor="dimension-select">Dimensions this question measures (select one or more):</label>
               <DimensionSelect
@@ -255,6 +291,7 @@ const AdminUpdateQuestionPage = () => {
                 <option value="option2">Option 2</option>
                 {option3 && <option value="option3">Option 3</option>}
                 {option4 && <option value="option4">Option 4</option>}
+                {option5 && <option value="option5">Option 5</option>}
                 {/* {categories ? (
                   categories.map((cat, index) => (
                     <option key={index} value={cat.catId}>

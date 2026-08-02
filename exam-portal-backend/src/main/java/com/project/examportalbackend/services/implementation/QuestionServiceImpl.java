@@ -159,11 +159,13 @@ public class QuestionServiceImpl implements QuestionService {
         q.setOption2(request.getOption2());
         q.setOption3(request.getOption3());
         q.setOption4(request.getOption4());
+        q.setOption5(request.getOption5());
         q.setAnswer(request.getAnswer());
         q.setOption1Dimension(request.getOption1Dimension());
         q.setOption2Dimension(request.getOption2Dimension());
         q.setOption3Dimension(request.getOption3Dimension());
         q.setOption4Dimension(request.getOption4Dimension());
+        q.setOption5Dimension(request.getOption5Dimension());
         return q;
     }
 
@@ -179,6 +181,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (StringUtils.hasText(question.getOption2())) filledOptions.put("option2", question.getOption2());
         if (StringUtils.hasText(question.getOption3())) filledOptions.put("option3", question.getOption3());
         if (StringUtils.hasText(question.getOption4())) filledOptions.put("option4", question.getOption4());
+        if (StringUtils.hasText(question.getOption5())) filledOptions.put("option5", question.getOption5());
         if (question.getAnswer() == null || !filledOptions.containsKey(question.getAnswer())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The correct option must be one of the filled-in options");
         }
@@ -198,6 +201,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setOption2Dimension(normalizeOptionalDimension(question.getOption2Dimension(), validDimensionCodes));
         question.setOption3Dimension(normalizeOptionalDimension(question.getOption3Dimension(), validDimensionCodes));
         question.setOption4Dimension(normalizeOptionalDimension(question.getOption4Dimension(), validDimensionCodes));
+        question.setOption5Dimension(normalizeOptionalDimension(question.getOption5Dimension(), validDimensionCodes));
     }
 
     private String normalizeOptionalDimension(String value, Set<String> validDimensions) {

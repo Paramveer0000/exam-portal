@@ -20,6 +20,7 @@ public class ExamQuestionDto {
     private String option2;
     private String option3;
     private String option4;
+    private String option5;
 
     public static ExamQuestionDto from(Question q) {
         ExamQuestionDto dto = new ExamQuestionDto();
@@ -30,6 +31,7 @@ public class ExamQuestionDto {
         dto.option2 = q.getOption2();
         dto.option3 = q.getOption3();
         dto.option4 = q.getOption4();
+        dto.option5 = q.getOption5();
         return dto;
     }
 }

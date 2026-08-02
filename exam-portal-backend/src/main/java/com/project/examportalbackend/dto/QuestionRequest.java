@@ -11,12 +11,14 @@ public class QuestionRequest {
     private String option2;
     private String option3;
     private String option4;
+    private String option5;
     private String answer;
     private Set<String> dimensionCodes;
     private String option1Dimension;
     private String option2Dimension;
     private String option3Dimension;
     private String option4Dimension;
+    private String option5Dimension;
 
     // Getters and Setters
     public Long getQuesId() {
@@ -83,6 +85,14 @@ public class QuestionRequest {
         this.option4 = option4;
     }
 
+    public String getOption5() {
+        return option5;
+    }
+
+    public void setOption5(String option5) {
+        this.option5 = option5;
+    }
+
     public String getAnswer() {
         return answer;
     }
@@ -129,5 +139,13 @@ public class QuestionRequest {
 
     public void setOption4Dimension(String option4Dimension) {
         this.option4Dimension = option4Dimension;
+    }
+
+    public String getOption5Dimension() {
+        return option5Dimension;
+    }
+
+    public void setOption5Dimension(String option5Dimension) {
+        this.option5Dimension = option5Dimension;
     }
 }

@@ -1168,3 +1168,47 @@ gotchas, and open issues that are NOT in the source code or git history.
 - result: PASS. Working tree clean (all session commits pushed to origin/main:
   multi-dimensional questions feature + 2 fixes, add-one-by-one dimension picker UI,
   hide Option1/2 dimension override, group Students page by school). No uncommitted changes.
+
+### 2026-08-02 12:00 — Feature: optional 5th answer option (option5)  [type: change]
+- what: (1) questions can now have a 5th optional answer option, matching the option1-4
+  pattern (own optional dimension override, participates in shuffle/scoring/exam display);
+  (2) the "Choose Correct Option" dropdown in Add/Update Question already showed all FILLED
+  options conditionally (option3/4 were always correctly conditional) -- the perceived "not
+  showing all options" was just option5 not existing yet; fixed by adding it end-to-end.
+- files: V27__question_option5.sql (new: option5 + option5_dimension columns, positioned
+  after option4/option4_dimension); models/Question.java (+option5, +option5Dimension);
+  dto/QuestionRequest.java (+option5, +option5Dimension incl. getters/setters);
+  dto/ExamQuestionDto.java (+option5, copied in from()); services/implementation/
+  QuestionServiceImpl.java (mapRequestToQuestion copies option5; assertQuestionValid adds
+  option5 to filledOptions; validateOptionDimensions normalizes option5Dimension);
+  services/implementation/PsychometricReportServiceImpl.java (resolveOrdinal handles
+  "option5"/ordinal 5; effectiveDimension resolves option5Dimension; maxOrdinal counts
+  option5 -- so a 5-option question isn't capped at /4); services/implementation/
+  QuizServiceImpl.java (shuffleOptions includes option5 in the shuffle pool and output);
+  frontend: pages/admin/questions/{AdminAddQuestionsPage,AdminUpdateQuestionPage}.js
+  (Option 5 (optional) field + its own dimension-override select, same conditional pattern
+  as option3/4; answer dropdown gets an option5 entry when filled);
+  components/Question.js (student exam view renders option5 as a 5th radio when present).
+- result: PASS end-to-end, verified live (backend :8081, frontend :3000, MySQL, superadmin
+  login). V27 applied cleanly (flyway_schema_history confirms version 27 success=1).
+  * Add Question form: option5 field renders, its dimension-override select appears once
+    filled, "Choose Correct Option" dropdown correctly lists Option 1-5 as each fills in.
+  * Created a real 5-option question (Alpha/Beta/Gamma/Delta/Epsilon) with answer=option5,
+    dimension=LOGICAL via the live form -- DB confirms all 5 options + answer + dimension
+    stored correctly.
+  * GET /api/quiz/{id}/exam (student-facing, ExamQuestionDto) correctly serves option5,
+    still strips the answer.
+  * POST /api/quizResult/submit with the student choosing option5 -> 200,
+    totalObtainedMarks=10.0/10.0, passed=true (scoring correctly matched option5="Epsilon").
+  * psychometric_reports.mi_logical=100 for that attempt -- confirms resolveOrdinal(5) and
+    effectiveDimension both worked through the full scoring pipeline, not just validation.
+  Backend `mvnw -o clean compile` exit 0. Frontend `npm run build` exit 0 (only pre-existing
+  warnings). All test data (question, quiz result, psychometric report, quiz, class, student,
+  school) deleted after verification; DB back to 1 user (superadmin).
+- notes: 5-option questions are opt-in per-question (option5 nullable) -- existing 2-4 option
+  questions are completely unaffected (maxOrdinal/filledOptions only count what's actually
+  filled). Superadmin's local dev password remains reset to `super123` from the prior session
+  (approved for local-dev-only use); a fresh XSRF-TOKEN cookie must be re-read immediately
+  before each authenticated POST when scripting against this app -- reusing a token fetched
+  even one request earlier in the same async function intermittently 403's (not a bug in the
+  app, just how the cookie-rotation interacts with manual fetch()-based testing).

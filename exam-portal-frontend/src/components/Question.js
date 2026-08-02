@@ -165,6 +165,21 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
               )}
             </div>
           )}
+
+          {question.option5 && (
+            <div className="question__options--2">
+              <div className="question__options--optionDiv">
+                <InputGroup.Radio
+                  value={question.option5}
+                  name={number}
+                  aria-label="option 5"
+                />
+                <span className="question__options--optionText">
+                  {question.option5}
+                </span>
+              </div>
+            </div>
+          )}
         </InputGroup>
       </div>
       )}

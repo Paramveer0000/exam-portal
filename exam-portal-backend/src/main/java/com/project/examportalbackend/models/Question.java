@@ -37,6 +37,9 @@ public class Question {
     @Column(name = "option4")
     private String option4;
 
+    @Column(name = "option5")
+    private String option5;
+
     // Optional per-option dimension override: NULL means "score into the
     // question's own dimension" (the default/normal case). Set only on
     // questions where different answers measure different traits.
@@ -51,6 +54,9 @@ public class Question {
 
     @Column(name = "option4_dimension")
     private String option4Dimension;
+
+    @Column(name = "option5_dimension")
+    private String option5Dimension;
 
     @Column(name = "answer")
     private String answer;
