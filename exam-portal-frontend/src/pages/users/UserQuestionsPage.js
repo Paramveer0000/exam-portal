@@ -207,43 +207,45 @@ const UserQuestionsPage = () => {
   return (
     <div className="userQuestionsPage__container">
       <div className="userQuestionsPage__content">
-        <h2 style={{ color: "var(--mt-primary)" }}>{`Questions : ${quizTitle}`}</h2>
-        {questions.length > 0 && (
-          <div style={{ margin: "10px 0" }}>
-            <ProgressBar
-              now={(answeredCount / questions.length) * 100}
-              label={`${answeredCount} / ${questions.length} answered`}
-              variant="success"
-              style={{ height: "22px" }}
-            />
-          </div>
-        )}
-        <div className="userQuestionsPage__content--options">
-          <Button
-            variant="outline-danger"
-            className="userQuestionsPage__content--button"
-            onClick={exitQuizHandler}
-          >
-            Exit Quiz
-          </Button>
-          <div className="userQuestionsPage__content--spinner">
-            {quiz && quiz.timerEnabled && quiz.timerMinutes ? (
-              <>
-                <ReactSpinnerTimer
-                  timeInSeconds={timeRemaining || 1}
-                  totalLaps={1}
-                  onLapInteraction={() => {}}
-                  isRefresh={false}
-                  isPause={false}
-                />
-                <h4 style={{ marginTop: "18px" }}>{`${parseInt(
-                  timeRemaining / 60
-                ).zeroPad()} : ${(timeRemaining % 60).zeroPad()}`}</h4>
-                Timer
-              </>
-            ) : (
-              <h4 style={{ margin: 0 }}>No time limit</h4>
-            )}
+        <div className="userQuestionsPage__stickyHeader">
+          <h2 style={{ color: "var(--mt-primary)" }}>{`Questions : ${quizTitle}`}</h2>
+          {questions.length > 0 && (
+            <div style={{ margin: "10px 0" }}>
+              <ProgressBar
+                now={(answeredCount / questions.length) * 100}
+                label={`${answeredCount} / ${questions.length} answered`}
+                variant="success"
+                style={{ height: "22px" }}
+              />
+            </div>
+          )}
+          <div className="userQuestionsPage__content--options">
+            <Button
+              variant="outline-danger"
+              className="userQuestionsPage__content--button"
+              onClick={exitQuizHandler}
+            >
+              Exit Quiz
+            </Button>
+            <div className="userQuestionsPage__content--spinner">
+              {quiz && quiz.timerEnabled && quiz.timerMinutes ? (
+                <div className="userQuestionsPage__content--spinnerScale">
+                  <ReactSpinnerTimer
+                    timeInSeconds={timeRemaining || 1}
+                    totalLaps={1}
+                    onLapInteraction={() => {}}
+                    isRefresh={false}
+                    isPause={false}
+                  />
+                  <h4 style={{ marginTop: "18px" }}>{`${parseInt(
+                    timeRemaining / 60
+                  ).zeroPad()} : ${(timeRemaining % 60).zeroPad()}`}</h4>
+                  Timer
+                </div>
+              ) : (
+                <h4 style={{ margin: 0 }}>No time limit</h4>
+              )}
+            </div>
           </div>
         </div>
         {questions && questions.length > 0 ? (

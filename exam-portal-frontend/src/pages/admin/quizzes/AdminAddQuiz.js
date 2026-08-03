@@ -19,7 +19,6 @@ const AdminAddQuiz = () => {
   const [selectedClassId, setSelectedClassId] = useState(null);
   const [questionsPerExam, setQuestionsPerExam] = useState("");
   const [randomizeQuestions, setRandomizeQuestions] = useState(false);
-  const [randomizeOptions, setRandomizeOptions] = useState(false);
   const [timerEnabled, setTimerEnabled] = useState(false);
   const [timerMinutes, setTimerMinutes] = useState("");
   const [allQuestionsMandatory, setAllQuestionsMandatory] = useState(false);
@@ -50,7 +49,8 @@ const AdminAddQuiz = () => {
       questionsPerExam:
         questionsPerExam === "" ? null : Number(questionsPerExam),
       randomizeQuestions: randomizeQuestions,
-      randomizeOptions: randomizeOptions,
+      // Answer-option randomization is not exposed in the UI; always off.
+      randomizeOptions: false,
       timerEnabled: timerEnabled,
       timerMinutes:
         timerEnabled && timerMinutes !== "" ? Number(timerMinutes) : null,
@@ -165,15 +165,6 @@ const AdminAddQuiz = () => {
               label="Randomize question order"
               onChange={() => setRandomizeQuestions(!randomizeQuestions)}
               checked={randomizeQuestions}
-            />
-
-            <Form.Check
-              className="my-3"
-              type="switch"
-              id="randomize-options-switch"
-              label="Randomize answer options"
-              onChange={() => setRandomizeOptions(!randomizeOptions)}
-              checked={randomizeOptions}
             />
 
             <Form.Check

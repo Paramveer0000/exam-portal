@@ -234,8 +234,8 @@ const PsychometricReportPage = () => {
       <div className="psychReport__section">
         <h2>Career Interest Profile (RIASEC)</h2>
         <p>
-          Six work-personality types scored out of 10. Your three strongest
-          (highlighted) form your interest code:{" "}
+          Six work-personality types scored as a percentage. Your three
+          strongest (highlighted) form your interest code:{" "}
           <strong>{report.hollandCode}</strong>.
         </p>
         <Table bordered size="sm">
@@ -243,7 +243,7 @@ const PsychometricReportPage = () => {
             <tr>
               <th>Type</th>
               <th style={{ width: "40%" }}>Score</th>
-              <th>/10</th>
+              <th>Percent</th>
             </tr>
           </thead>
           <tbody>
@@ -260,7 +260,7 @@ const PsychometricReportPage = () => {
                     <div style={{ width: `${r.score * 10}%` }} />
                   </div>
                 </td>
-                <td>{r.score}</td>
+                <td>{r.score * 10}%</td>
               </tr>
             ))}
           </tbody>

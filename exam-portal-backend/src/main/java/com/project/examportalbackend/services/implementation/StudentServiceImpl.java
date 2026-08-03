@@ -130,6 +130,11 @@ public class StudentServiceImpl implements StudentService {
     @Override
     @Transactional
     public void deleteStudent(Long studentId) {
+        // Schools may disable a student but not erase them (and their results);
+        // only the platform owner can delete.
+        if (!authFacade.isSuperAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only a super admin can delete students");
+        }
         User student = loadStudent(studentId);
         // A student's exam results are theirs alone; remove them with the account.
         quizResultRepository.deleteByUserId(studentId);

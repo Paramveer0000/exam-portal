@@ -37,9 +37,6 @@ const AdminUpdateQuiz = () => {
   const [randomizeQuestions, setRandomizeQuestions] = useState(
     oldQuiz.randomizeQuestions || false
   );
-  const [randomizeOptions, setRandomizeOptions] = useState(
-    oldQuiz.randomizeOptions || false
-  );
   const [timerEnabled, setTimerEnabled] = useState(
     oldQuiz.timerEnabled || false
   );
@@ -74,7 +71,9 @@ const AdminUpdateQuiz = () => {
       questionsPerExam:
         questionsPerExam === "" ? null : Number(questionsPerExam),
       randomizeQuestions: randomizeQuestions,
-      randomizeOptions: randomizeOptions,
+      // Not exposed in the UI; keep whatever the quiz already had rather than
+      // silently flipping it on every edit.
+      randomizeOptions: oldQuiz.randomizeOptions || false,
       timerEnabled: timerEnabled,
       timerMinutes:
         timerEnabled && timerMinutes !== "" ? Number(timerMinutes) : null,
@@ -189,15 +188,6 @@ const AdminUpdateQuiz = () => {
               label="Randomize question order"
               onChange={() => setRandomizeQuestions(!randomizeQuestions)}
               checked={randomizeQuestions}
-            />
-
-            <Form.Check
-              className="my-3"
-              type="switch"
-              id="randomize-options-switch"
-              label="Randomize answer options"
-              onChange={() => setRandomizeOptions(!randomizeOptions)}
-              checked={randomizeOptions}
             />
 
             <Form.Check

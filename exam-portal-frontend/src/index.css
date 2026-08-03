@@ -27,6 +27,9 @@
   --mt-text-muted: #6B7280;
   --mt-text-on-primary: #FFFFFF;
 
+  /* Layout */
+  --mt-header-h: 66px; /* app navbar height — sidebars offset by this */
+
   /* Radius */
   --mt-radius-sm: 8px;
   --mt-radius-md: 14px;

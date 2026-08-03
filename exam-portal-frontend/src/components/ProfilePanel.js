@@ -5,7 +5,7 @@ import Image from "react-bootstrap/Image";
 import swal from "sweetalert";
 import profileServices from "../services/profileServices";
 import authServices from "../services/authServices";
-import { BOARDS, GRADES } from "../pages/users/OnboardingPage";
+import { BOARDS } from "../pages/users/OnboardingPage";
 
 // Age is derived from the date of birth, never stored separately, so the two
 // can't drift apart. Returns null when the DOB is unset or unparseable.
@@ -45,11 +45,7 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
   const [teacherId, setTeacherId] = useState(
     user && user.teacherId ? String(user.teacherId) : ""
   );
-  const [grade, setGrade] = useState(user ? user.grade || "" : "");
   const [board, setBoard] = useState(user ? user.board || "" : "");
-  const [schoolName, setSchoolName] = useState(
-    user ? user.schoolName || "" : ""
-  );
   const [guardianName, setGuardianName] = useState(
     user ? user.guardianName || "" : ""
   );
@@ -77,9 +73,7 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
     const payload = { firstName, lastName, username, phoneNumber };
     if (showSchool) {
       if (teacherId) payload.teacherId = Number(teacherId);
-      payload.grade = grade;
       payload.board = board;
-      payload.schoolName = schoolName;
       payload.guardianName = guardianName;
       payload.gender = gender;
       payload.dob = dob;
@@ -238,16 +232,8 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
           <Table bordered>
             <tbody>
               <tr>
-                <td>Grade</td>
-                <td>{user.grade ? `Class ${user.grade}` : "—"}</td>
-              </tr>
-              <tr>
                 <td>Board</td>
                 <td>{user.board || "—"}</td>
-              </tr>
-              <tr>
-                <td>School name</td>
-                <td>{user.schoolName || "—"}</td>
               </tr>
             </tbody>
           </Table>
@@ -347,20 +333,6 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
                     </Form.Select>
                   </Col>
                   <Col md={6} className="mb-2">
-                    <Form.Label>Grade / Class</Form.Label>
-                    <Form.Select
-                      value={grade}
-                      onChange={(e) => setGrade(e.target.value)}
-                    >
-                      <option value="">Choose your grade</option>
-                      {GRADES.map((g) => (
-                        <option key={g} value={g}>
-                          Class {g}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Col>
-                  <Col md={6} className="mb-2">
                     <Form.Label>Board</Form.Label>
                     <Form.Select
                       value={board}
@@ -373,14 +345,6 @@ const ProfilePanel = ({ showRole = false, showSchool = false, showLogo = false }
                         </option>
                       ))}
                     </Form.Select>
-                  </Col>
-                  <Col md={6} className="mb-2">
-                    <Form.Label>School name</Form.Label>
-                    <Form.Control
-                      value={schoolName}
-                      placeholder="Your actual school's name"
-                      onChange={(e) => setSchoolName(e.target.value)}
-                    />
                   </Col>
                 </Row>
 

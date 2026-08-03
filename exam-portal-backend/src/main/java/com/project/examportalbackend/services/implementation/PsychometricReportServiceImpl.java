@@ -321,7 +321,7 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
                 .append(": ").append(d.getPercent()).append("%\n"));
         sb.append("\nRIASEC interest code: ").append(dto.getHollandCode()).append('\n');
         dto.getRiasec().forEach(r -> sb.append("- ").append(r.getLetter()).append(' ')
-                .append(r.getName()).append(": ").append(r.getScore()).append("/10\n"));
+                .append(r.getName()).append(": ").append(r.getScore() * 10).append("%\n"));
         sb.append("\nQuotients:\n");
         dto.getQuotients().forEach(q -> sb.append("- ").append(q.getCode())
                 .append(": ").append(q.getPercent()).append("%\n"));
