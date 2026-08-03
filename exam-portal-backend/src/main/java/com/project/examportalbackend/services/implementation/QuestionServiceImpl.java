@@ -196,7 +196,12 @@ public class QuestionServiceImpl implements QuestionService {
                 "VISUAL", "AUDITORY",
                 "ENGINEERING", "MEDICAL", "MANAGEMENT", "ARTS", "COMMERCE",
                 "GOVERNMENT", "ENTREPRENEURSHIP", "TEACHING", "PSYCHOLOGY", "DESIGN",
-                "HOSPITALITY", "TECHNOLOGY", "ENVIRONMENT");
+                "HOSPITALITY", "TECHNOLOGY", "ENVIRONMENT",
+                "ANGER_MGMT", "RESILIENCE", "RESPONSE_CTRL", "EMPATHY", "RELATIONSHIP_MGMT",
+                "CONFLICT_CTRL", "ENCOURAGEMENT", "FEEDBACK_ACCEPT", "STRESS_MGMT",
+                "IMPULSE_CTRL", "SELF_MOTIVATION",
+                "OWNERSHIP", "COMMUNICATION", "TEAMWORK", "DECISION_CONF", "ADAPTABILITY",
+                "CONFLICT_RES");
         question.setOption1Dimension(normalizeOptionalDimension(question.getOption1Dimension(), validDimensionCodes));
         question.setOption2Dimension(normalizeOptionalDimension(question.getOption2Dimension(), validDimensionCodes));
         question.setOption3Dimension(normalizeOptionalDimension(question.getOption3Dimension(), validDimensionCodes));
