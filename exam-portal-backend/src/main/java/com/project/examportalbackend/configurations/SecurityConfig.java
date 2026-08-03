@@ -122,6 +122,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers("/api/profile/**").authenticated()
 
+                // Called while impersonating, so the token's authority is the
+                // impersonated (non-SUPER_ADMIN) role; AdminServiceImpl.stopImpersonation
+                // itself verifies originalUserId resolves to a real super admin.
+                .antMatchers(HttpMethod.POST, "/api/admin/stop-impersonation").authenticated()
                 .antMatchers("/api/admin/**").hasAuthority("SUPER_ADMIN")
 
                 .antMatchers("/api/reports/**").hasAuthority("ADMIN")

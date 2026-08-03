@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Badge, Button, Form, Table } from "react-bootstrap";
-import { BsSearch, BsSortDown, BsSortUp } from "react-icons/bs";
+import {
+  BsChevronDown,
+  BsChevronRight,
+  BsSearch,
+  BsSortDown,
+  BsSortUp,
+} from "react-icons/bs";
 import swal from "sweetalert";
 import RoleSidebar from "../../components/RoleSidebar";
 import studentsServices from "../../services/studentsServices";
@@ -27,6 +33,8 @@ const AdminStudentsPage = () => {
   const [schoolsById, setSchoolsById] = useState({});
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState({ key: "name", dir: 1 });
+  // Collapsed group keys. Groups start expanded, so absence means "open".
+  const [collapsed, setCollapsed] = useState({});
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   const isSuperAdmin =
@@ -168,8 +176,19 @@ const AdminStudentsPage = () => {
     .filter((s) => {
       const q = search.trim().toLowerCase();
       if (!q) return true;
-      const name = `${s.firstName || ""} ${s.lastName || ""} ${s.username || ""}`.toLowerCase();
-      return name.includes(q);
+      // Match the school and class too — with everything grouped by school, a
+      // super admin's first instinct is to type the school's name.
+      const haystack = [
+        s.firstName,
+        s.lastName,
+        s.username,
+        s.phoneNumber,
+        classTitle(s.classId),
+        isSuperAdmin ? schoolName(s.teacherId) : "",
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
     })
     .sort((a, b) => {
       const dir = sort.dir;
@@ -220,7 +239,20 @@ const AdminStudentsPage = () => {
       <RoleSidebar />
       <div className="mt-page">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h2 style={{ color: "var(--mt-primary)" }}>My Students</h2>
+          <div>
+            <h2 style={{ color: "var(--mt-primary)", marginBottom: 2 }}>
+              {isSuperAdmin ? "All Students" : "My Students"}
+            </h2>
+            <div className="text-muted" style={{ fontSize: "0.9rem" }}>
+              {search.trim()
+                ? `${filtered.length} of ${students.length} student${
+                    students.length === 1 ? "" : "s"
+                  } matching "${search.trim()}"`
+                : `${students.length} student${students.length === 1 ? "" : "s"}`}
+              {isSuperAdmin && groups.length > 0 &&
+                ` in ${groups.length} school${groups.length === 1 ? "" : "s"}`}
+            </div>
+          </div>
           {!isSuperAdmin && (
             <Button variant="success" onClick={() => setShowCreate((v) => !v)}>
               {showCreate ? "Close" : "+ Add Student"}
@@ -229,13 +261,35 @@ const AdminStudentsPage = () => {
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
 
-        <div className="mt-search mt-3" style={{ maxWidth: 300 }}>
-          <BsSearch />
-          <Form.Control
-            placeholder="Search by student name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div
+          className="mt-3"
+          style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}
+        >
+          <div className="mt-search" style={{ maxWidth: 320, flex: "1 1 240px" }}>
+            <BsSearch />
+            <Form.Control
+              placeholder={
+                isSuperAdmin ? "Search student, school or class" : "Search student or class"
+              }
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          {groups.length > 1 && (
+            <Button
+              size="sm"
+              variant="outline-secondary"
+              onClick={() =>
+                setCollapsed((prev) =>
+                  groups.every((g) => prev[g.key])
+                    ? {}
+                    : Object.fromEntries(groups.map((g) => [g.key, true]))
+                )
+              }
+            >
+              {groups.every((g) => collapsed[g.key]) ? "Expand all" : "Collapse all"}
+            </Button>
+          )}
         </div>
 
         {showCreate && (
@@ -260,13 +314,8 @@ const AdminStudentsPage = () => {
           </Form>
         )}
 
-        {groups.map((g) => (
-        <div key={g.key} className="mt-4">
-          <h5>
-            {isSuperAdmin ? schoolName(g.teacherId) : classTitle(g.classId)}{" "}
-            <span className="text-muted">({g.students.length})</span>
-          </h5>
-          <Table striped bordered hover responsive>
+        {groups.length > 0 && (
+        <Table bordered hover responsive className="mt-3 align-middle">
           <thead>
             <tr>
               <th className="mt-sort-th" onClick={() => toggleSort("id")}>
@@ -284,8 +333,27 @@ const AdminStudentsPage = () => {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            {g.students.map((s) =>
+          {groups.map((g) => (
+          <tbody key={g.key}>
+            <tr
+              className="mt-group-row"
+              onClick={() =>
+                setCollapsed((prev) => ({ ...prev, [g.key]: !prev[g.key] }))
+              }
+              style={{ cursor: "pointer" }}
+            >
+              <td colSpan={7} style={{ background: "#eef3fb", fontWeight: 600 }}>
+                {collapsed[g.key] ? <BsChevronRight /> : <BsChevronDown />}{" "}
+                {isSuperAdmin ? schoolName(g.teacherId) : classTitle(g.classId)}{" "}
+                <span className="text-muted" style={{ fontWeight: 400 }}>
+                  · {g.students.length} student{g.students.length === 1 ? "" : "s"}
+                  {g.students.some((s) => !s.active) &&
+                    ` · ${g.students.filter((s) => !s.active).length} disabled`}
+                </span>
+              </td>
+            </tr>
+            {!collapsed[g.key] &&
+             g.students.map((s) =>
               editingId === s.userId ? (
                 <tr key={s.userId}>
                   <td>{s.userId}</td>
@@ -335,22 +403,22 @@ const AdminStudentsPage = () => {
                     </Badge>
                   </td>
                   <td style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-                    <Button size="sm" variant="primary" onClick={() => startEdit(s)}>Edit</Button>
-                    <Button size="sm" variant="secondary" onClick={() => toggleStatus(s)}>
+                    <Button size="sm" variant="outline-primary" onClick={() => startEdit(s)}>Edit</Button>
+                    <Button size="sm" variant="outline-secondary" onClick={() => toggleStatus(s)}>
                       {s.active ? "Disable" : "Enable"}
                     </Button>
-                    <Button size="sm" variant="warning" onClick={() => resetHandler(s)}>Reset PW</Button>
+                    <Button size="sm" variant="outline-warning" onClick={() => resetHandler(s)}>Reset PW</Button>
                     {isSuperAdmin && (
-                      <Button size="sm" variant="danger" onClick={() => deleteHandler(s)}>Delete</Button>
+                      <Button size="sm" variant="outline-danger" onClick={() => deleteHandler(s)}>Delete</Button>
                     )}
                   </td>
                 </tr>
               )
             )}
           </tbody>
-          </Table>
-        </div>
-        ))}
+          ))}
+        </Table>
+        )}
         {groups.length === 0 && (
           <p className="text-center text-muted mt-4">
             {students.length === 0

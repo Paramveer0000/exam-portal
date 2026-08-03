@@ -24,6 +24,8 @@ public class AdminController {
     private AdminService adminService;
     @Autowired
     private AiService aiService;
+    @Autowired
+    private com.project.examportalbackend.configurations.JwtUtil jwtUtil;
 
     // Platform LLM config (SUPER_ADMIN only, inherits this class's guards).
     @GetMapping("/ai-settings")
@@ -108,10 +110,25 @@ public class AdminController {
         return ResponseEntity.ok(adminService.impersonate(adminId, response));
     }
 
+    // Called while impersonating, so the caller's authority is the impersonated
+    // (non-SUPER_ADMIN) role — overrides the class-level guard. The impersonator's
+    // id is read from the CURRENT session's own signed JWT claim, never from a
+    // request param: a param can be forged to name any user id, which would let
+    // any account restore itself into an arbitrary super admin session.
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/stop-impersonation")
-    public ResponseEntity<?> stopImpersonation(@RequestParam Long originalUserId,
+    public ResponseEntity<?> stopImpersonation(javax.servlet.http.HttpServletRequest request,
                                                javax.servlet.http.HttpServletResponse response) {
-        return ResponseEntity.ok(adminService.stopImpersonation(originalUserId, response));
+        Long impersonatorId = null;
+        if (request.getCookies() != null) {
+            for (javax.servlet.http.Cookie cookie : request.getCookies()) {
+                if (com.project.examportalbackend.security.CookieUtil.ACCESS_TOKEN_COOKIE.equals(cookie.getName())) {
+                    impersonatorId = jwtUtil.extractImpersonatorId(cookie.getValue());
+                    break;
+                }
+            }
+        }
+        return ResponseEntity.ok(adminService.stopImpersonation(impersonatorId, response));
     }
 
     // --- Legacy ownership reassignment ---

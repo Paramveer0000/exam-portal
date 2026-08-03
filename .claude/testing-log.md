@@ -1246,3 +1246,165 @@ gotchas, and open issues that are NOT in the source code or git history.
   is correctly blocked in that view.
 - files: pages/admin/AdminStudentsPage.js, services/implementation/StudentServiceImpl.java
 - result: NOT verified live (backend not running). Schools still have Disable/Enable.
+
+### 2026-08-03 22:20 — Fix: answers appear lost when paging back in a quiz  [type: fix]
+- symptom: student answers questions on page 1, clicks Next, comes back with Previous --
+  every radio is blank again, so the answer looks unsaved.
+- root cause: the answers WERE saved. Question.js saveAnswer() writes to
+  localStorage.answers on every change, and UserQuestionsPage.recomputeAnswered() reads it
+  back, so the progress counter and the eventual submission were always correct. The bug is
+  purely visual: paging slices the question list (QUESTIONS_PER_PAGE = 6), so off-screen
+  Question components unmount, and the radios had no checked/defaultChecked -- on remount
+  the DOM inputs render unselected regardless of what was stored.
+- files: components/Question.js -- derives `savedAnswer` from localStorage.answers for the
+  current quesId (skipped when isAdmin, since the admin view does not use that store), and
+  each of the five radios gets `defaultChecked={savedAnswer === question.optionN}`.
+  defaultChecked (uncontrolled) rather than checked: the onChange lives on the InputGroup
+  wrapper, not the inputs, so a controlled `checked` would make them read-only in React.
+  defaultChecked applies at mount -- exactly the remount case -- and leaves clicking free.
+- result: PASS, verified live (XAMPP MySQL, backend :8081, frontend :3000, teststudent).
+  Seeded an 8-question quiz (2 pages at 6/page) on "Sample Test Quiz".
+  * Answered Q1="Yes", Q2="No" on page 1 -> localStorage {"3":"Yes","4":"No"}, radios
+    [0,3] checked.
+  * Next (page 2 = Q7/Q8, all blank), then Previous -> back on page 1 with radios [0,3]
+    still checked. This is the reported bug, now fixed.
+  * Clicked Q1 "No" to confirm defaultChecked does not lock the input: localStorage
+    updated to {"3":"No","4":"No"}, checked moved to [1,3], progress read "2 / 8 answered".
+  * Paged away and back once more -> [1,3] persisted. No console errors.
+  Frontend `npm run build` exit 0 (pre-existing warnings only). Seeded questions deleted
+  after; quiz left at 0 questions.
+- notes:
+  * Answers still live only in localStorage and are cleared on a fresh attempt, so this is
+    within-attempt persistence only -- a reload or a different device still starts empty.
+    Server-side answer persistence would be a separate feature.
+  * Onboarding step 2 and the instructions list were incidentally re-confirmed live during
+    this run: step 2 shows Board only, and the instructions list no longer carries the
+    MCQ/marks or pass-percentage lines.
+
+### 2026-08-03 22:40 — Improve: students list grouping and readability  [type: change]
+- what: the grouped Students page (SUPER_ADMIN groups by school, ADMIN by class) rendered
+  a SEPARATE <Table> per group, so the 7-column header repeated for every school and the
+  columns did not line up between groups. Reworked into one table.
+- files: pages/admin/AdminStudentsPage.js
+  * one <Table> with a single <thead>; each group is now its own <tbody> with a
+    colSpan={7} header row, so all groups share one set of column widths
+  * group header rows are clickable to collapse/expand (chevron via BsChevronDown/Right),
+    plus a "Collapse all"/"Expand all" button that appears only when >1 group. Collapsed
+    state defaults to empty = everything expanded
+  * group header shows "<name> · N students" and appends "· N disabled" when any are
+    inactive, so a disabled student is visible without expanding
+  * title is "All Students" for SUPER_ADMIN (it lists every school's students, so
+    "My Students" was wrong for that role) and stays "My Students" for a school
+  * summary line under the title: "6 students in 2 schools", or
+    "2 of 6 students matching "x" in 1 school" while searching
+  * search now also matches school name, class title and phone, not just student name --
+    with everything grouped by school, typing the school name is the obvious move
+  * row action buttons switched to outline variants; four solid buttons per row made the
+    table very heavy
+- result: PASS, verified live (MySQL, backend :8081, frontend :3000).
+  Seeded 2 schools (Test School Demo, Greenwood High) + 6 students, 1 disabled.
+  * SUPER_ADMIN view: header "All Students" / "6 students in 2 schools"; DOM confirmed
+    1 <thead> and 2 <tbody>; group rows read "Greenwood High · 2 students" and
+    "Test School Demo · 4 students · 1 disabled".
+  * Class dropdowns still preselect correctly after the restructure (read back
+    Class 6A/7B/7B/6A/6A/6A matching the DB).
+  * Clicking a group row collapsed just that school (6 data rows -> 4). "Collapse all"
+    took it to 0 rows and the button flipped to "Expand all".
+  * Search "greenwood" -> 1 group, 2 rows, summary "2 of 6 students matching "greenwood"
+    in 1 school".
+  * ADMIN (testschool) view: title stayed "My Students", summary "4 students" with no
+    school count, grouped by class ("Class 6A · 3 students · 1 disabled", "Class 7B ·
+    1 student"), "+ Add Student" present, and 0 Delete buttons -- the SUPER_ADMIN-only
+    delete restriction still holds.
+  No console errors. `npm run build` exit 0 (pre-existing warnings only). All seeded
+  schools/students/classes deleted after; DB back to superadmin + testschool + teststudent.
+- notes: caught and fixed mid-review -- the first summary line read "6 students across
+  1 school" while searching, mixing the unfiltered student total with the filtered group
+  count. Now the filtered and unfiltered wordings are separate branches.
+
+### 2026-08-03 22:58 — Fix: privilege escalation via stop-impersonation  [type: fix, SECURITY]
+- source: production server log the user pasted for review (thementalist.co.in, 2026-08-03
+  16:46-17:18 UTC). Two 403s stood out: POST /api/students/ (turned out to be legitimate --
+  school hit its student_limit cap, surfaced correctly by the frontend swal) and
+  POST /api/admin/stop-impersonation?originalUserId=1 (this one was a real bug).
+- symptom: clicking "Return to Super Admin" while impersonating a school always 403'd in
+  production. Every super admin session that used impersonation was stuck impersonating
+  until they logged out and back in manually.
+- root cause (2 layers, both had to be found):
+  1. SecurityConfig had `.antMatchers("/api/admin/**").hasAuthority("SUPER_ADMIN")` covering
+     stop-impersonation too. But AdminServiceImpl.impersonate() mints the target's own JWT
+     (ADMIN authority) for the impersonated session -- so by the time "Return to Super
+     Admin" is clicked, the caller's token authority is ADMIN, not SUPER_ADMIN. The endpoint
+     was unreachable by the only caller who could ever legitimately use it.
+  2. AdminController also carries a class-level @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+     as defence-in-depth -- loosening only the SecurityConfig matcher turned the 403 into
+     a 500 (AccessDeniedException past the point a controller-level advice expected).
+- CRITICAL finding while fixing #1: naively loosening the gate to "any authenticated user"
+  (matching how the endpoint is actually used) exposed that
+  AdminServiceImpl.stopImpersonation(originalUserId, ...) validates NOTHING about the
+  caller -- it only checks that the CLIENT-SUPPLIED originalUserId resolves to some super
+  admin account, then unconditionally mints a fresh access+refresh token pair for that
+  account. Verified live: logged in as testschool (plain ADMIN, never impersonated) and
+  called POST /api/admin/stop-impersonation?originalUserId=1 directly -- got back HTTP 200
+  with a valid superadmin session (confirmed via GET /api/me). Full privilege escalation,
+  reachable by ANY admin account that knows or guesses the super admin's user id (id=1 on
+  a fresh install, which is exactly the default seeded account). This was only *masked*
+  before, not prevented -- the old SecurityConfig rule blocked it by accident as a side
+  effect of also blocking the legitimate case.
+- fix: the client-supplied id must never be trusted for this decision at all.
+  * configurations/JwtUtil.java -- new generateImpersonationToken(UserDetails, Long
+    impersonatorId) mints the impersonated session's access token with a signed
+    "impersonatorId" claim (the real super admin's id). New extractImpersonatorId(token)
+    reads it back; null when the token isn't an impersonation session.
+  * services/implementation/AdminServiceImpl.java -- impersonate() now calls
+    generateImpersonationToken(target, authFacade.getCurrentUserId()) instead of the plain
+    generateToken(target). stopImpersonation(Long impersonatorId, ...) now takes the id
+    that the CONTROLLER derived from the current request's own JWT claim (see below), 403s
+    with "Not currently impersonating" if that claim is null, then proceeds with the
+    existing is-this-user-really-a-super-admin check.
+  * services/AdminService.java -- signature updated to match (impersonatorId, not
+    originalUserId).
+  * controllers/AdminController.java -- stopImpersonation no longer takes @RequestParam
+    Long originalUserId at all. It reads the access_token cookie off the current request,
+    extracts the impersonatorId claim via JwtUtil, and passes THAT to the service -- the
+    query param is gone, there is nothing left for a client to forge. Method also gets
+    @PreAuthorize("isAuthenticated()") to override the class-level SUPER_ADMIN guard (fixes
+    layer #2), with a comment explaining why.
+  * SecurityConfig.java -- added `.antMatchers(POST, "/api/admin/stop-impersonation")
+    .authenticated()` ahead of the blanket `/api/admin/**` SUPER_ADMIN rule (fixes layer #1).
+  * frontend: services/adminServices.js stopImpersonation() no longer takes or sends an
+    originalUserId param. components/Header.js returnToSuperAdmin() updated to match (still
+    reads impersonatorBackup from localStorage to decide WHETHER to call the endpoint and
+    to gate the "Return to Super Admin" link's visibility -- that part was always
+    client-side UX only, never the security boundary).
+- result: PASS, verified live end-to-end (MySQL, backend :8081, frontend :3000).
+  * Legit flow via raw API: login superadmin -> impersonate testschool (200) -> GET /api/me
+    shows "testschool"/ADMIN -> POST stop-impersonation with NO param (200) -> GET /api/me
+    shows "superadmin"/SUPER_ADMIN again. Confirmed via UI too: clicked "Login as this
+    school" on /superadmin/admins -> landed on the school's Profile page -> clicked
+    "Return to Super Admin" in the header -> landed back on Super Admin Dashboard. No
+    console errors either time.
+  * Abuse attempt re-verified AFTER the fix: logged in as testschool (never impersonated),
+    called stop-impersonation with originalUserId=1 in the query string (a stale/forged
+    param) -> 403 "Not currently impersonating". The param is now fully inert.
+  * Also tried claiming originalUserId=13 (a plain student, not a super admin) as an
+    already-impersonating session's target -- correctly 403 "Only Super Admin sessions can
+    be restored" (this check was already correct; only the "is the caller actually
+    impersonating" gate was missing).
+  Backend `mvnw -o compile` exit 0. Frontend `npm run build` exit 0 (pre-existing warnings
+  only). No test data left over -- this fix touched only auth/token code, no DB rows
+  created.
+- notes:
+  * KNOWN LIMITATION, not fixed here: the impersonatorId claim lives only in the access
+    token (30 min validity). AuthServiceImpl.refreshTokens() calls the plain
+    jwtUtil.generateToken(user) on refresh, which does NOT carry the claim forward. If an
+    admin's access token expires mid-impersonation and refresh fires, the next
+    stop-impersonation call will 403 "Not currently impersonating" even though
+    impersonatorBackup is still in localStorage -- the fix fails CLOSED (blocks a legitimate
+    restore) rather than open, so it is not a security issue, but it is a UX rough edge for
+    impersonation sessions longer than ~30 minutes. Properly carrying this through refresh
+    would mean persisting the impersonator id on the RefreshToken row, which needs a Flyway
+    migration -- out of scope for this fix; flagged rather than done unasked.
+  * This was found only because the user asked for a server-log review, not because it was
+    reported as a bug. Worth periodically reviewing other endpoints that mint tokens or
+    trust client-supplied ids for anything security-relevant.

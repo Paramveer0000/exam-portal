@@ -132,9 +132,11 @@ const impersonate = async (adminId) => {
   }
 };
 
-const stopImpersonation = async (originalUserId) => {
+// Which super admin to restore is derived server-side from the current
+// session's own token, not from anything the client sends.
+const stopImpersonation = async () => {
   try {
-    const { data } = await api.post(`/api/admin/stop-impersonation?originalUserId=${originalUserId}`);
+    const { data } = await api.post(`/api/admin/stop-impersonation`);
     return { data, error: null };
   } catch (error) {
     return { data: null, error: errText(error) };
