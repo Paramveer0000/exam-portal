@@ -8,15 +8,13 @@ import profileServices from "../../services/profileServices";
 import authServices from "../../services/authServices";
 import "./OnboardingPage.css";
 
-export const GRADES = ["6", "7", "8", "9", "10", "11", "12"];
 export const BOARDS = ["CBSE", "ICSE", "State Board", "IB", "Other"];
 
 // A student's basic info is complete once name/phone/school are set; academics
-// once grade/board/schoolName are set. Same rule the route gate uses.
+// once board is set. Same rule the route gate uses.
 export const isBasicComplete = (u) =>
   !!(u && u.firstName && u.lastName && u.phoneNumber && u.teacherId);
-export const isAcademicsComplete = (u) =>
-  !!(u && u.grade && u.board && u.schoolName);
+export const isAcademicsComplete = (u) => !!(u && u.board);
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
@@ -28,9 +26,7 @@ const OnboardingPage = () => {
   const [teacherId, setTeacherId] = useState(
     user?.teacherId ? String(user.teacherId) : ""
   );
-  const [grade, setGrade] = useState(user?.grade || "");
   const [board, setBoard] = useState(user?.board || "");
-  const [schoolName, setSchoolName] = useState(user?.schoolName || "");
   const [teachers, setTeachers] = useState([]);
   const [saving, setSaving] = useState(false);
 
@@ -81,15 +77,13 @@ const OnboardingPage = () => {
       username: user.username,
       phoneNumber,
       teacherId: Number(teacherId),
-      grade: user.grade,
       board: user.board,
-      schoolName: user.schoolName,
     });
   };
 
   const submitAcademics = (e) => {
     e.preventDefault();
-    if (!grade || !board || !schoolName.trim()) {
+    if (!board) {
       swal("Missing info", "Please fill in every field.", "info");
       return;
     }
@@ -99,9 +93,7 @@ const OnboardingPage = () => {
       username: user.username,
       phoneNumber: user.phoneNumber,
       teacherId: user.teacherId,
-      grade,
       board,
-      schoolName,
     });
   };
 
@@ -170,21 +162,6 @@ const OnboardingPage = () => {
           <Form onSubmit={submitAcademics}>
             <h4>Step 2: Academic details</h4>
             <Form.Group className="my-3">
-              <Form.Label>Grade / Class</Form.Label>
-              <Form.Select
-                value={grade}
-                required
-                onChange={(e) => setGrade(e.target.value)}
-              >
-                <option value="">Choose your grade</option>
-                {GRADES.map((g) => (
-                  <option key={g} value={g}>
-                    Class {g}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-            <Form.Group className="my-3">
               <Form.Label>Board</Form.Label>
               <Form.Select
                 value={board}
@@ -198,15 +175,6 @@ const OnboardingPage = () => {
                   </option>
                 ))}
               </Form.Select>
-            </Form.Group>
-            <Form.Group className="my-3">
-              <Form.Label>School name</Form.Label>
-              <Form.Control
-                value={schoolName}
-                required
-                placeholder="Your actual school's name"
-                onChange={(e) => setSchoolName(e.target.value)}
-              />
             </Form.Group>
             <Button type="submit" variant="success" disabled={saving}>
               {saving ? "Saving..." : "Finish"}
