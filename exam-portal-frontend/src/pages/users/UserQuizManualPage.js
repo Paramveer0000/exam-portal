@@ -77,15 +77,7 @@ const UserQuizManualPage = () => {
                 {questionsCount === 1 ? "question" : "questions"}.
               </li>
               <li>
-                Every question is multiple-choice (MCQ) and carries{" "}
-                <strong>1 mark</strong>, so the total is{" "}
-                <strong>{questionsCount} marks</strong>.
-              </li>
-              <li>
                 Time limit: <strong>{timeLimit}</strong>.
-              </li>
-              <li>
-                You need <strong>{quiz.passingPercentage}%</strong> to pass.
               </li>
               <li>You can attempt this quiz any number of times.</li>
               <li>
