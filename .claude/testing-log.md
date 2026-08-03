@@ -1321,3 +1321,90 @@ gotchas, and open issues that are NOT in the source code or git history.
 - notes: caught and fixed mid-review -- the first summary line read "6 students across
   1 school" while searching, mixing the unfiltered student total with the filtered group
   count. Now the filtered and unfiltered wordings are separate branches.
+
+### 2026-08-03 22:58 — Fix: privilege escalation via stop-impersonation  [type: fix, SECURITY]
+- source: production server log the user pasted for review (thementalist.co.in, 2026-08-03
+  16:46-17:18 UTC). Two 403s stood out: POST /api/students/ (turned out to be legitimate --
+  school hit its student_limit cap, surfaced correctly by the frontend swal) and
+  POST /api/admin/stop-impersonation?originalUserId=1 (this one was a real bug).
+- symptom: clicking "Return to Super Admin" while impersonating a school always 403'd in
+  production. Every super admin session that used impersonation was stuck impersonating
+  until they logged out and back in manually.
+- root cause (2 layers, both had to be found):
+  1. SecurityConfig had `.antMatchers("/api/admin/**").hasAuthority("SUPER_ADMIN")` covering
+     stop-impersonation too. But AdminServiceImpl.impersonate() mints the target's own JWT
+     (ADMIN authority) for the impersonated session -- so by the time "Return to Super
+     Admin" is clicked, the caller's token authority is ADMIN, not SUPER_ADMIN. The endpoint
+     was unreachable by the only caller who could ever legitimately use it.
+  2. AdminController also carries a class-level @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+     as defence-in-depth -- loosening only the SecurityConfig matcher turned the 403 into
+     a 500 (AccessDeniedException past the point a controller-level advice expected).
+- CRITICAL finding while fixing #1: naively loosening the gate to "any authenticated user"
+  (matching how the endpoint is actually used) exposed that
+  AdminServiceImpl.stopImpersonation(originalUserId, ...) validates NOTHING about the
+  caller -- it only checks that the CLIENT-SUPPLIED originalUserId resolves to some super
+  admin account, then unconditionally mints a fresh access+refresh token pair for that
+  account. Verified live: logged in as testschool (plain ADMIN, never impersonated) and
+  called POST /api/admin/stop-impersonation?originalUserId=1 directly -- got back HTTP 200
+  with a valid superadmin session (confirmed via GET /api/me). Full privilege escalation,
+  reachable by ANY admin account that knows or guesses the super admin's user id (id=1 on
+  a fresh install, which is exactly the default seeded account). This was only *masked*
+  before, not prevented -- the old SecurityConfig rule blocked it by accident as a side
+  effect of also blocking the legitimate case.
+- fix: the client-supplied id must never be trusted for this decision at all.
+  * configurations/JwtUtil.java -- new generateImpersonationToken(UserDetails, Long
+    impersonatorId) mints the impersonated session's access token with a signed
+    "impersonatorId" claim (the real super admin's id). New extractImpersonatorId(token)
+    reads it back; null when the token isn't an impersonation session.
+  * services/implementation/AdminServiceImpl.java -- impersonate() now calls
+    generateImpersonationToken(target, authFacade.getCurrentUserId()) instead of the plain
+    generateToken(target). stopImpersonation(Long impersonatorId, ...) now takes the id
+    that the CONTROLLER derived from the current request's own JWT claim (see below), 403s
+    with "Not currently impersonating" if that claim is null, then proceeds with the
+    existing is-this-user-really-a-super-admin check.
+  * services/AdminService.java -- signature updated to match (impersonatorId, not
+    originalUserId).
+  * controllers/AdminController.java -- stopImpersonation no longer takes @RequestParam
+    Long originalUserId at all. It reads the access_token cookie off the current request,
+    extracts the impersonatorId claim via JwtUtil, and passes THAT to the service -- the
+    query param is gone, there is nothing left for a client to forge. Method also gets
+    @PreAuthorize("isAuthenticated()") to override the class-level SUPER_ADMIN guard (fixes
+    layer #2), with a comment explaining why.
+  * SecurityConfig.java -- added `.antMatchers(POST, "/api/admin/stop-impersonation")
+    .authenticated()` ahead of the blanket `/api/admin/**` SUPER_ADMIN rule (fixes layer #1).
+  * frontend: services/adminServices.js stopImpersonation() no longer takes or sends an
+    originalUserId param. components/Header.js returnToSuperAdmin() updated to match (still
+    reads impersonatorBackup from localStorage to decide WHETHER to call the endpoint and
+    to gate the "Return to Super Admin" link's visibility -- that part was always
+    client-side UX only, never the security boundary).
+- result: PASS, verified live end-to-end (MySQL, backend :8081, frontend :3000).
+  * Legit flow via raw API: login superadmin -> impersonate testschool (200) -> GET /api/me
+    shows "testschool"/ADMIN -> POST stop-impersonation with NO param (200) -> GET /api/me
+    shows "superadmin"/SUPER_ADMIN again. Confirmed via UI too: clicked "Login as this
+    school" on /superadmin/admins -> landed on the school's Profile page -> clicked
+    "Return to Super Admin" in the header -> landed back on Super Admin Dashboard. No
+    console errors either time.
+  * Abuse attempt re-verified AFTER the fix: logged in as testschool (never impersonated),
+    called stop-impersonation with originalUserId=1 in the query string (a stale/forged
+    param) -> 403 "Not currently impersonating". The param is now fully inert.
+  * Also tried claiming originalUserId=13 (a plain student, not a super admin) as an
+    already-impersonating session's target -- correctly 403 "Only Super Admin sessions can
+    be restored" (this check was already correct; only the "is the caller actually
+    impersonating" gate was missing).
+  Backend `mvnw -o compile` exit 0. Frontend `npm run build` exit 0 (pre-existing warnings
+  only). No test data left over -- this fix touched only auth/token code, no DB rows
+  created.
+- notes:
+  * KNOWN LIMITATION, not fixed here: the impersonatorId claim lives only in the access
+    token (30 min validity). AuthServiceImpl.refreshTokens() calls the plain
+    jwtUtil.generateToken(user) on refresh, which does NOT carry the claim forward. If an
+    admin's access token expires mid-impersonation and refresh fires, the next
+    stop-impersonation call will 403 "Not currently impersonating" even though
+    impersonatorBackup is still in localStorage -- the fix fails CLOSED (blocks a legitimate
+    restore) rather than open, so it is not a security issue, but it is a UX rough edge for
+    impersonation sessions longer than ~30 minutes. Properly carrying this through refresh
+    would mean persisting the impersonator id on the RefreshToken row, which needs a Flyway
+    migration -- out of scope for this fix; flagged rather than done unasked.
+  * This was found only because the user asked for a server-log review, not because it was
+    reported as a bug. Worth periodically reviewing other endpoints that mint tokens or
+    trust client-supplied ids for anything security-relevant.

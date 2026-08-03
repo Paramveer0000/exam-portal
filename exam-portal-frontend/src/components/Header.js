@@ -45,7 +45,7 @@ const Header = () => {
   const returnToSuperAdmin = async () => {
     const backup = JSON.parse(localStorage.getItem("impersonatorBackup"));
     if (backup) {
-      const { data } = await adminServices.stopImpersonation(backup.userId);
+      const { data } = await adminServices.stopImpersonation();
       if (data) {
         localStorage.setItem("user", JSON.stringify(data.user));
       }

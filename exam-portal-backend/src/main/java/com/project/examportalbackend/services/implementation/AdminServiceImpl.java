@@ -318,8 +318,10 @@ public class AdminServiceImpl implements AdminService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Cannot sign in as a disabled account");
         }
-        // Mint access token and refresh token, set cookies.
-        String accessToken = jwtUtil.generateToken(target);
+        // Mint access token and refresh token, set cookies. The access token carries
+        // who is REALLY behind this session, so stopImpersonation can trust the
+        // token instead of a client-supplied id.
+        String accessToken = jwtUtil.generateImpersonationToken(target, authFacade.getCurrentUserId());
         int accessMaxAge = (int) (jwtUtil.getAccessTokenValidityMs() / 1000);
         cookieUtil.addAccessTokenCookie(response, accessToken, accessMaxAge);
 
@@ -331,8 +333,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public LoginResponse stopImpersonation(Long originalUserId, javax.servlet.http.HttpServletResponse response) {
-        User original = userRepository.findById(originalUserId)
+    public LoginResponse stopImpersonation(Long impersonatorId, javax.servlet.http.HttpServletResponse response) {
+        // impersonatorId is read by the controller from the CURRENT session's own
+        // JWT claim, never from client-supplied input -- a request body/param id
+        // can be forged to name any user, so it must never be trusted for this.
+        if (impersonatorId == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not currently impersonating");
+        }
+        User original = userRepository.findById(impersonatorId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Original user not found"));
         boolean isSA = original.getRoles().stream()
                 .anyMatch(r -> AuthFacade.ROLE_SUPER_ADMIN.equals(r.getRoleName()));

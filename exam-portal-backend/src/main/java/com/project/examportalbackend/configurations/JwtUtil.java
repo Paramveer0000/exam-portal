@@ -68,6 +68,28 @@ public class JwtUtil {
         return createToken(claims, userDetails.getUsername());
     }
 
+    private static final String IMPERSONATOR_ID_CLAIM = "impersonatorId";
+
+    /**
+     * A token minted for an impersonated session carries the real super admin's
+     * user id as a signed claim. This is the only trustworthy record of "who is
+     * really behind this session" — a client-supplied id in a stop-impersonation
+     * request body/param can be forged to claim any user id, so it must never be
+     * used for authorization on its own.
+     */
+    public String generateImpersonationToken(org.springframework.security.core.userdetails.UserDetails userDetails,
+                                              Long impersonatorId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(IMPERSONATOR_ID_CLAIM, impersonatorId);
+        return createToken(claims, userDetails.getUsername());
+    }
+
+    /** Null when the token is not an impersonation session (claim absent). */
+    public Long extractImpersonatorId(String token) {
+        Object raw = extractAllClaims(token).get(IMPERSONATOR_ID_CLAIM);
+        return raw == null ? null : Long.valueOf(raw.toString());
+    }
+
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
