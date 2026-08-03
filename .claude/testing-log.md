@@ -1246,3 +1246,37 @@ gotchas, and open issues that are NOT in the source code or git history.
   is correctly blocked in that view.
 - files: pages/admin/AdminStudentsPage.js, services/implementation/StudentServiceImpl.java
 - result: NOT verified live (backend not running). Schools still have Disable/Enable.
+
+### 2026-08-03 22:20 — Fix: answers appear lost when paging back in a quiz  [type: fix]
+- symptom: student answers questions on page 1, clicks Next, comes back with Previous --
+  every radio is blank again, so the answer looks unsaved.
+- root cause: the answers WERE saved. Question.js saveAnswer() writes to
+  localStorage.answers on every change, and UserQuestionsPage.recomputeAnswered() reads it
+  back, so the progress counter and the eventual submission were always correct. The bug is
+  purely visual: paging slices the question list (QUESTIONS_PER_PAGE = 6), so off-screen
+  Question components unmount, and the radios had no checked/defaultChecked -- on remount
+  the DOM inputs render unselected regardless of what was stored.
+- files: components/Question.js -- derives `savedAnswer` from localStorage.answers for the
+  current quesId (skipped when isAdmin, since the admin view does not use that store), and
+  each of the five radios gets `defaultChecked={savedAnswer === question.optionN}`.
+  defaultChecked (uncontrolled) rather than checked: the onChange lives on the InputGroup
+  wrapper, not the inputs, so a controlled `checked` would make them read-only in React.
+  defaultChecked applies at mount -- exactly the remount case -- and leaves clicking free.
+- result: PASS, verified live (XAMPP MySQL, backend :8081, frontend :3000, teststudent).
+  Seeded an 8-question quiz (2 pages at 6/page) on "Sample Test Quiz".
+  * Answered Q1="Yes", Q2="No" on page 1 -> localStorage {"3":"Yes","4":"No"}, radios
+    [0,3] checked.
+  * Next (page 2 = Q7/Q8, all blank), then Previous -> back on page 1 with radios [0,3]
+    still checked. This is the reported bug, now fixed.
+  * Clicked Q1 "No" to confirm defaultChecked does not lock the input: localStorage
+    updated to {"3":"No","4":"No"}, checked moved to [1,3], progress read "2 / 8 answered".
+  * Paged away and back once more -> [1,3] persisted. No console errors.
+  Frontend `npm run build` exit 0 (pre-existing warnings only). Seeded questions deleted
+  after; quiz left at 0 questions.
+- notes:
+  * Answers still live only in localStorage and are cleared on a fresh attempt, so this is
+    within-attempt persistence only -- a reload or a different device still starts empty.
+    Server-side answer persistence would be a separate feature.
+  * Onboarding step 2 and the instructions list were incidentally re-confirmed live during
+    this run: step 2 shows Board only, and the instructions list no longer carries the
+    MCQ/marks or pass-percentage lines.

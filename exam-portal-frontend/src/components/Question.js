@@ -15,6 +15,13 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
   // are reachable without scrolling past every option block.
   const [expanded, setExpanded] = useState(!isAdmin);
 
+  // Paging unmounts the off-screen questions, so a radio that was ticked earlier
+  // comes back blank on return even though the answer is still in localStorage.
+  // Seed each radio from the saved answer (defaultChecked, so clicking still works).
+  const savedAnswer = isAdmin
+    ? undefined
+    : (JSON.parse(localStorage.getItem("answers")) || {})[question.quesId];
+
   const saveAnswer = (quesId, ans) => {
     const newAns = {};
     newAns[quesId] = ans;
@@ -119,6 +126,7 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
               <InputGroup.Radio
                 value={question.option1}
                 name={number}
+                defaultChecked={savedAnswer === question.option1}
                 aria-label="option 1"
               />
               <span className="question__options--optionText">
@@ -129,6 +137,7 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
               <InputGroup.Radio
                 value={question.option2}
                 name={number}
+                defaultChecked={savedAnswer === question.option2}
                 aria-label="option 2"
               />
               <span className="question__options--optionText">
@@ -144,6 +153,7 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
                   <InputGroup.Radio
                     value={question.option3}
                     name={number}
+                    defaultChecked={savedAnswer === question.option3}
                     aria-label="option 3"
                   />
                   <span className="question__options--optionText">
@@ -156,6 +166,7 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
                   <InputGroup.Radio
                     value={question.option4}
                     name={number}
+                    defaultChecked={savedAnswer === question.option4}
                     aria-label="option 4"
                   />
                   <span className="question__options--optionText">
@@ -172,6 +183,7 @@ const Question = ({ number, answers, question, isAdmin = false, canEdit = true, 
                 <InputGroup.Radio
                   value={question.option5}
                   name={number}
+                  defaultChecked={savedAnswer === question.option5}
                   aria-label="option 5"
                 />
                 <span className="question__options--optionText">
