@@ -34,6 +34,8 @@ const DimensionSelect = ({ id, value, onChange, blankLabel, isMulti = false }) =
     RIASEC: "Career Interest (RIASEC)",
     LEARNING_PREF: "Learning Preference",
     CAREER_INTEREST: "Career Interest Assessment",
+    EQ: "EQ",
+    LEADERSHIP: "Leadership & Soft Skills",
   };
 
   if (loading) {

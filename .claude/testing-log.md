@@ -1408,3 +1408,37 @@ gotchas, and open issues that are NOT in the source code or git history.
   * This was found only because the user asked for a server-log review, not because it was
     reported as a bug. Worth periodically reviewing other endpoints that mint tokens or
     trust client-supplied ids for anything security-relevant.
+
+### 2026-08-04 00:30 — Feature: EQ and Leadership & Soft Skills dimensions  [type: change]
+- what: added 17 new question dimensions across two new groups requested from a pasted
+  list (numeric ids in the source list were NOT used as codes or names -- only the
+  descriptive text was stored):
+  * EQ (11): Self-Regulation / Anger Management, Self-Motivation / Resilience,
+    Self-Regulation / Response Control, Empathy / Social Awareness, Accountability /
+    Relationship Management, Emotional Regulation / Conflict Control, Social Skills /
+    Encouraging Others, Self-Awareness / Feedback Acceptance, Stress Management, Impulse
+    Control / Thoughtful Communication, Self-Motivation
+  * Leadership & Soft Skills (6): Responsibility / Ownership, Communication, Teamwork,
+    Decision-Making Confidence, Adaptability, Conflict Resolution
+- files: db/migration/V28__eq_leadership_dimensions.sql (new: 17 INSERTs into the
+  `dimensions` table, dimension_type='EQ'/'LEADERSHIP', short mnemonic codes e.g.
+  ANGER_MGMT, RESILIENCE, OWNERSHIP -- never the source list's numbers);
+  services/implementation/QuestionServiceImpl.java (validateOptionDimensions' hardcoded
+  validDimensionCodes Set extended with the 17 new codes -- this is the ONE place that
+  isn't DB-driven, so a migration alone wasn't enough for per-option dimension overrides);
+  components/DimensionSelect.js (typeLabels map: EQ -> "EQ", LEADERSHIP -> "Leadership &
+  Soft Skills", for the optgroup headers).
+- result: PASS, verified live (MySQL, backend :8081, frontend :3000).
+  Flyway applied V28 cleanly on top of V27 (log: "Successfully applied 1 migration to
+  schema `exam-portal`, now at version v28"). GET /api/dimensions confirmed exactly 11 EQ
+  + 6 LEADERSHIP rows with the right codes and display names (48 dimensions total).
+  Opened the live Add Question multi-dimension picker (logged in as superadmin, quiz 3)
+  and read the actual <optgroup> DOM: "EQ" and "Leadership & Soft Skills" groups render
+  with all display names verbatim, no numeric ids anywhere in the option text. No console
+  errors. Backend `mvnw -o compile` exit 0.
+- notes: the multi-dimension "Add" picker (question-level, screenshot-shown UI) is fully
+  DB-driven via DimensionServiceImpl.validateDimensionCodes and needed no code change
+  besides the migration + frontend label map. The single-select per-OPTION dimension
+  override is the one path with a hardcoded Set in QuestionServiceImpl -- had to touch
+  that too or the option-level dropdown would 400 on the new codes despite the group
+  showing up fine in the question-level picker.
