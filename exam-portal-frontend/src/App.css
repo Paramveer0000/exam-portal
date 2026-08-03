@@ -4,7 +4,15 @@
    No JSX/markup changes required to pick this up.
    ============================================================ */
 
-/* Navbar */
+/* Navbar — app header stays pinned on every panel */
+header > .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  /* fixed height so sidebars can offset by --mt-header-h regardless of
+     whether branding resolves to a logo image or the text brand */
+  min-height: var(--mt-header-h);
+}
 .navbar.bg-dark {
   background-color: var(--mt-primary) !important;
   box-shadow: var(--mt-shadow-sm);

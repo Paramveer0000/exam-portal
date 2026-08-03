@@ -340,7 +340,9 @@ const AdminStudentsPage = () => {
                       {s.active ? "Disable" : "Enable"}
                     </Button>
                     <Button size="sm" variant="warning" onClick={() => resetHandler(s)}>Reset PW</Button>
-                    <Button size="sm" variant="danger" onClick={() => deleteHandler(s)}>Delete</Button>
+                    {isSuperAdmin && (
+                      <Button size="sm" variant="danger" onClick={() => deleteHandler(s)}>Delete</Button>
+                    )}
                   </td>
                 </tr>
               )

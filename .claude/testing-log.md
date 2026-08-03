@@ -1226,3 +1226,23 @@ gotchas, and open issues that are NOT in the source code or git history.
   it (Zeta before Alpha). Sort icon renders correctly on the Class header. Frontend
   `npm run build` exit 0. All test data (2 students, 1 school, 2 classes) deleted after;
   DB back to 1 user (superadmin).
+
+### 2026-08-03 — Sticky app header + SUPER_ADMIN-only student delete  [type: change]
+- what (1): app navbar is now sticky on every panel. `header > .navbar` gets
+  position:sticky; top:0; z-index:1030 plus min-height:var(--mt-header-h) so the height is
+  deterministic whether branding resolves to a logo image (66px) or the text brand (was 56px).
+  Sidebars (.sidebar, shared by Sidebar/SidebarUser/SuperAdminSidebar) now stick at
+  top:var(--mt-header-h) with height:calc(100vh - var(--mt-header-h)) so they no longer
+  scroll under the header. New token --mt-header-h: 66px in index.css.
+- files: App.css, index.css, components/Sidebar.css
+- result: PARTIAL verify. Measured live on /login via the running dev server (port 3000 was
+  held by another chat's server; opened it as a browser tab instead of starting my own):
+  navbar height 66px, position sticky, z-index 1030, matches --mt-header-h exactly. Sidebar
+  offset NOT verified live -- needs a logged-in panel and the backend was not up this session.
+- what (2): Delete button removed from the Students page for school (ADMIN) accounts;
+  SUPER_ADMIN keeps it. Backend enforces it too -- StudentServiceImpl.deleteStudent now
+  throws 403 "Only a super admin can delete students" unless authFacade.isSuperAdmin().
+  Note: while a super admin is impersonating a school, the token is the school's, so delete
+  is correctly blocked in that view.
+- files: pages/admin/AdminStudentsPage.js, services/implementation/StudentServiceImpl.java
+- result: NOT verified live (backend not running). Schools still have Disable/Enable.
