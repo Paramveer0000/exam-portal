@@ -1280,3 +1280,44 @@ gotchas, and open issues that are NOT in the source code or git history.
   * Onboarding step 2 and the instructions list were incidentally re-confirmed live during
     this run: step 2 shows Board only, and the instructions list no longer carries the
     MCQ/marks or pass-percentage lines.
+
+### 2026-08-03 22:40 — Improve: students list grouping and readability  [type: change]
+- what: the grouped Students page (SUPER_ADMIN groups by school, ADMIN by class) rendered
+  a SEPARATE <Table> per group, so the 7-column header repeated for every school and the
+  columns did not line up between groups. Reworked into one table.
+- files: pages/admin/AdminStudentsPage.js
+  * one <Table> with a single <thead>; each group is now its own <tbody> with a
+    colSpan={7} header row, so all groups share one set of column widths
+  * group header rows are clickable to collapse/expand (chevron via BsChevronDown/Right),
+    plus a "Collapse all"/"Expand all" button that appears only when >1 group. Collapsed
+    state defaults to empty = everything expanded
+  * group header shows "<name> · N students" and appends "· N disabled" when any are
+    inactive, so a disabled student is visible without expanding
+  * title is "All Students" for SUPER_ADMIN (it lists every school's students, so
+    "My Students" was wrong for that role) and stays "My Students" for a school
+  * summary line under the title: "6 students in 2 schools", or
+    "2 of 6 students matching "x" in 1 school" while searching
+  * search now also matches school name, class title and phone, not just student name --
+    with everything grouped by school, typing the school name is the obvious move
+  * row action buttons switched to outline variants; four solid buttons per row made the
+    table very heavy
+- result: PASS, verified live (MySQL, backend :8081, frontend :3000).
+  Seeded 2 schools (Test School Demo, Greenwood High) + 6 students, 1 disabled.
+  * SUPER_ADMIN view: header "All Students" / "6 students in 2 schools"; DOM confirmed
+    1 <thead> and 2 <tbody>; group rows read "Greenwood High · 2 students" and
+    "Test School Demo · 4 students · 1 disabled".
+  * Class dropdowns still preselect correctly after the restructure (read back
+    Class 6A/7B/7B/6A/6A/6A matching the DB).
+  * Clicking a group row collapsed just that school (6 data rows -> 4). "Collapse all"
+    took it to 0 rows and the button flipped to "Expand all".
+  * Search "greenwood" -> 1 group, 2 rows, summary "2 of 6 students matching "greenwood"
+    in 1 school".
+  * ADMIN (testschool) view: title stayed "My Students", summary "4 students" with no
+    school count, grouped by class ("Class 6A · 3 students · 1 disabled", "Class 7B ·
+    1 student"), "+ Add Student" present, and 0 Delete buttons -- the SUPER_ADMIN-only
+    delete restriction still holds.
+  No console errors. `npm run build` exit 0 (pre-existing warnings only). All seeded
+  schools/students/classes deleted after; DB back to superadmin + testschool + teststudent.
+- notes: caught and fixed mid-review -- the first summary line read "6 students across
+  1 school" while searching, mixing the unfiltered student total with the filtered group
+  count. Now the filtered and unfiltered wordings are separate branches.
