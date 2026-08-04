@@ -1507,3 +1507,39 @@ gotchas, and open issues that are NOT in the source code or git history.
   deleted after verification; DB back to its prior baseline (superadmin, testschool,
   teststudent, Class 6A, Sample Test Quiz -- all pre-existing from earlier sessions, untouched).
 - notes: no frontend changes in this fix -- both vulnerabilities and both fixes are backend-only.
+
+### 2026-08-04 16:07 — Fix: remaining medium/low findings from the vuln assessment  [type: security-fix]
+- context: follow-up to the 15:57 entry. User confirmed the accounts in that entry's original
+  plaintext (dalveer, etc.) were created before the real live/production setup and are likely
+  stale -- doesn't eliminate the exposure risk (password/secret reuse is still possible) but
+  lowers urgency. User then explicitly chose to proceed with the medium/low fixes.
+- security/CookieUtil.java: added a @PostConstruct warnIfInsecure() that logs a WARN if
+  cookie.secure resolves false, mirroring the existing log.warn pattern in
+  bootstrap/SuperAdminInitializer.java. Default behavior UNCHANGED (still false, since a
+  Secure cookie is simply dropped by the browser over local HTTP dev) -- this only adds
+  visibility so a real deployment forgetting COOKIE_SECURE=true doesn't fail silently.
+- controllers/MentalistReportController.java: removed the stray bare `@CrossOrigin` (allow-all).
+  Verified live it was genuinely inert -- GET /api/mentalist-report/99999 with
+  Origin: http://localhost:3000 still returned Access-Control-Allow-Origin:
+  http://localhost:3000 (correctly scoped, from the SecurityConfig CorsConfigurationSource
+  bean) after removal, confirming zero behavior change.
+- services/implementation/StudentServiceImpl.java: added a 6-character minimum on student
+  passwords in both createStudent and resetPassword. Scoped to exactly what was reported
+  (student passwords only, impact bounded to a school's own students) -- did not touch
+  admin/school or self-service password paths, which have the same gap but weren't part of
+  the assessed finding.
+- result: PASS, verified live (MySQL, backend :8081).
+  * Startup log confirmed: "cookie.secure is false: auth cookies will be sent without the
+    Secure flag..." WARN fires on every boot with the local dev default.
+  * POST /api/students/ with a 5-char password -> 400 "Password must be at least 6
+    characters". Same request with a 6-char password -> 200, student created.
+  * POST /api/students/{id}/reset-password with a 5-char password -> 400. With 6 chars -> 200.
+  * Confirmed the @CrossOrigin removal via the Origin-header check above.
+  Backend `mvnw -o compile` exit 0. Test student (zzok_len) deleted after verification; DB
+  back to baseline (superadmin, testschool, teststudent).
+- notes: NOT done (out of scope for this pass, left for a separate decision): jjwt 0.9.1 /
+  Spring Security 5.7.3 / Spring Boot 2.7.3 upgrade (a dependency-version bump, higher risk of
+  breaking changes than the other items here); AI provider API key still stored plaintext at
+  rest (already an accepted tradeoff per an earlier entry). The critical (committed secrets)
+  and both high (cross-school IDORs) items from the same assessment were already fixed in the
+  15:57 entry above.
