@@ -357,7 +357,7 @@ gotchas, and open issues that are NOT in the source code or git history.
 - result: PASS. Verified via API as dalveer (SUPER_ADMIN): 3 schools returned —
   Cambridge (2 students), Psy School (1), Psycho Bank (1) — with correct per-student attempt counts.
   Frontend compiles clean.
-- notes: reset dalveer's password to `super123` (hash-copy method) so a SUPER_ADMIN account is usable
+- notes: reset dalveer's password to `[REDACTED]` (hash-copy method) so a SUPER_ADMIN account is usable
   for the new super-admin-only features (content mgmt, AI settings, all-results). Students with no
   school (teacherId null) would group under schoolId=null "No school". Report link reuses the existing
   ownership-scoped /psychometricReport/{quizResId} (super admin sees all).
@@ -519,7 +519,7 @@ gotchas, and open issues that are NOT in the source code or git history.
   admin students page still has the old multi-class assign panel (its assign/unassign endpoints are
   now 404). Next session: wire frontend. (b) Existing quizzes all live under an auto-created "General"
   subject per class — SUPER_ADMIN can rename/reorganize. (c) backend left RUNNING on :8081, MySQL
-  (XAMPP mysqld) running. (d) dalveer/super123 still valid.
+  (XAMPP mysqld) running. (d) dalveer/[REDACTED] still valid.
 
 ### 2026-07-23 12:10 — Frontend for Class->Subject->Quiz + admin-created students  [type: change]
 - what: wired the frontend to the V20 backend restructure.
@@ -536,7 +536,7 @@ gotchas, and open issues that are NOT in the source code or git history.
   subject, filter by class via subject.classId); AdminQuizResultPage/AdminReportsPage/UserQuizResultPage
   (quiz.category.title -> quiz.subject.title; fixed an unguarded crash in UserQuizResultPage).
 - result: PASS. Frontend compiles clean (1 pre-existing array-callback-return warning in
-  UserQuizzesPage, not from this change). Browser-verified live (dalveer/super123): /register shows
+  UserQuizzesPage, not from this change). Browser-verified live (dalveer/[REDACTED]): /register shows
   school-only signup (no student mode), no console errors; logged in and /adminSubjects renders the 3
   auto-created "General" subjects (one per class) with the class dropdown populated (Class 6-8/9-10/
   11-12), no console errors.
@@ -596,7 +596,7 @@ gotchas, and open issues that are NOT in the source code or git history.
   exam-portal-frontend/src/pages/admin/quizzes/{AdminAddQuiz,AdminUpdateQuiz,AdminQuizzesPage}.js;
   exam-portal-frontend/src/components/SuperAdminSidebar.js; exam-portal-frontend/src/App.js;
   deleted exam-portal-frontend/src/pages/superadmin/SuperAdminSubjectsPage.js.
-- result: PASS. All verified live in-browser (dalveer/super123): limit-below-active rejected with
+- result: PASS. All verified live in-browser (dalveer/[REDACTED]): limit-below-active rejected with
   correct message; search boxes filter correctly; class grouping renders; /adminSubjects route and
   sidebar link gone, no console errors; Add-Quiz form's class dropdown resolves the right subject
   (test quiz created under Class 6-8 → General, confirmed in list, then deleted); Quizzes list now
@@ -684,7 +684,7 @@ gotchas, and open issues that are NOT in the source code or git history.
   violation (hook not called on every render). Moved the memo + its dependent data prep above the
   guard. Remaining ESLint warnings after the full pass are pre-existing (`==` vs `===` in untouched
   reducers, missing-deps on `useEffect`s that predate this session) — not introduced here. Live
-  browser spot-checks (dalveer/super123, no console errors on any): /superadmin/admins (Schools),
+  browser spot-checks (dalveer/[REDACTED], no console errors on any): /superadmin/admins (Schools),
   /superadmin (Dashboard), /adminDashboard, /adminStudents, /adminQuizzes.
 - notes / follow-ups: (a) `UserDashboardPage.js` exists on disk but is empty and unreferenced
   anywhere (checked via grep) — dead file, left alone (out of scope, nobody asked to delete it).
@@ -748,7 +748,7 @@ gotchas, and open issues that are NOT in the source code or git history.
   `Successfully applied 1 migration ... now at version v23`. `SHOW COLUMNS FROM users LIKE '%name%'`
   now shows `guardian_name varchar(100)` and no father_name/mother_name. Hibernate validate passed.
 - Backend: `./mvnw spring-boot:run "-Dspring-boot.run.arguments=--spring.datasource.password="` with
-  JAVA_HOME=jdk-17.0.19.10-hotspot, JWT_SECRET=local-dev-secret, SUPERADMIN_PASSWORD=super123.
+  JAVA_HOME=jdk-17.0.19.10-hotspot, JWT_SECRET=[REDACTED], SUPERADMIN_PASSWORD=[REDACTED].
   `Started ExamPortalBackendApplication in 21.475 seconds`. Smoke test `GET /api/teachers` = 200 with
   a real teacher list.
 - Frontend: started through the preview tool (`.claude/launch.json` entry `exam-portal-frontend`),
@@ -768,7 +768,7 @@ gotchas, and open issues that are NOT in the source code or git history.
   background shell (no Windows service). `mysql -u root -h 127.0.0.1 -e "SELECT 1"` = 1, empty root
   password. InnoDB crash recovery from last session's forced kill was harmless as predicted.
 - Backend: JAVA_HOME=jdk-17.0.19.10-hotspot (java -version confirmed 17.0.19), JWT_SECRET=
-  local-dev-secret, SUPERADMIN_PASSWORD=super123,
+  [REDACTED], SUPERADMIN_PASSWORD=[REDACTED],
   `./mvnw spring-boot:run "-Dspring-boot.run.arguments=--spring.datasource.password="`.
   `Started ExamPortalBackendApplication in 18.952 seconds`. No Flyway migration applied — schema
   already at v23 from the previous run; Hibernate validate passed. SuperAdminInitializer logged
@@ -1207,7 +1207,7 @@ gotchas, and open issues that are NOT in the source code or git history.
   school) deleted after verification; DB back to 1 user (superadmin).
 - notes: 5-option questions are opt-in per-question (option5 nullable) -- existing 2-4 option
   questions are completely unaffected (maxOrdinal/filledOptions only count what's actually
-  filled). Superadmin's local dev password remains reset to `super123` from the prior session
+  filled). Superadmin's local dev password remains reset to `[REDACTED]` from the prior session
   (approved for local-dev-only use); a fresh XSRF-TOKEN cookie must be re-read immediately
   before each authenticated POST when scripting against this app -- reusing a token fetched
   even one request earlier in the same async function intermittently 403's (not a bug in the
@@ -1442,3 +1442,68 @@ gotchas, and open issues that are NOT in the source code or git history.
   override is the one path with a hardcoded Set in QuestionServiceImpl -- had to touch
   that too or the option-level dropdown would 400 on the new codes despite the group
   showing up fine in the question-level picker.
+
+### 2026-08-04 15:57 — Fix: two cross-school IDORs + scrub committed secrets  [type: security-fix]
+- context: a read-only vulnerability assessment (no code touched during the review itself)
+  found 3 critical/high issues; this entry covers fixing the critical and the two highs only,
+  per explicit instruction ("fix critical and high immediately... dont change project function").
+  Medium/low items from the same assessment (EOL Spring Security 5.7.3/jjwt 0.9.1, cookie.secure
+  defaulting false, plaintext-stored AI API key, stray @CrossOrigin, no password-strength floor)
+  were NOT touched -- reported only, left for a separate decision.
+- CRITICAL -- real credentials committed to a tracked, already-pushed file:
+  .claude/testing-log.md had plaintext `dalveer/super123` (a real SUPER_ADMIN account),
+  `SUPERADMIN_PASSWORD=super123`, and `JWT_SECRET=local-dev-secret` across 8 lines, despite the
+  file's own header rule against it. Redacted all 8 occurrences to `[REDACTED]` in place (kept
+  every surrounding sentence intact -- narrative meaning unchanged, only the secret values
+  removed). This is a deliberate one-time exception to the file's normal append-only convention,
+  done for the secret itself, not the surrounding record.
+  NOT done: git history still contains the plaintext (this file was already pushed in earlier
+  commits this session) -- redacting the current file does not erase it from history. Rewriting
+  history (BFG/filter-repo + force-push) is destructive to a shared remote and was not attempted
+  without separate explicit confirmation. The real fix that IS needed and that I cannot do from
+  here: rotate `dalveer`'s password and the real JWT signing secret wherever those accounts
+  actually run today -- I have no access to that environment from this session.
+- HIGH #1 -- cross-school IDOR on quiz results: GET /api/quizResult/?userId=X let any ADMIN read
+  any student's scores regardless of school, because the controller's existing check let ADMIN
+  through unconditionally and QuizResultServiceImpl.getQuizResultsByUser had no ownership filter
+  (unlike its sibling getResultsForTeacher, which correctly scopes via findByTeacherId).
+  Fix: services/implementation/QuizResultServiceImpl.java -- getQuizResultsByUser now verifies,
+  for any caller who isn't a super admin and isn't reading their own userId, that the target
+  student's teacherId equals the caller's id; throws 403 otherwise.
+- HIGH #2 -- cross-school IDOR on questions/answers: GET /api/question/{id} returned the full
+  Question entity (answer + option1-5Dimension, neither @JsonIgnore'd) to any ADMIN with zero
+  ownership check -- the method was commented "no scoping here" because it was written as an
+  internal scoring helper, but the controller wired it straight to a public endpoint.
+  Fix: services/QuestionService.java + QuestionServiceImpl.java (new getQuestionScoped(Long) --
+  fetches, 404s if missing, then enforces the same ownership check as update/delete before
+  returning); controllers/QuestionController.java (GET /{questionId} now calls the new scoped
+  method). The pre-existing getQuestion(Long) is untouched and still used internally by
+  QuizResultController's scoring path, which must remain unscoped by design.
+  Bug caught during verification: assertCanManage()/assertCanManageQuestion() throw
+  AccessDeniedException, which this codebase has no handler for (no @ControllerAdvice) --
+  access was still correctly denied, but as a 500, not a 403. Reworked getQuestionScoped to use
+  the boolean authFacade.canManage(ownerId) form and throw ResponseStatusException(FORBIDDEN)
+  directly instead, scoped to just this new method (did not touch the shared AuthFacade or
+  assertCanManageQuestion, so PUT/DELETE's existing 500-on-violation behavior elsewhere is
+  unchanged -- out of scope for this fix).
+- result: PASS, verified live (MySQL, backend :8081). Seeded two real schools (schoolA/schoolB),
+  a student under each (studentA/22 under schoolA, studentB/23 under schoolB), and a quiz +
+  question + quiz_result owned by studentA/superadmin.
+  * BEFORE the QuizResult fix would have been 200; AFTER: schoolB GET
+    /api/quizResult/?userId=22 (studentA, cross-school) -> 403 "Cannot view another school's
+    student results". schoolB GET ?userId=23 (own student, empty list) -> 200. superadmin
+    ?userId=22 -> 200. studentA self-view ?userId=22 -> 200. All four cases correct.
+  * BEFORE the Question fix would have been 200 with the answer; AFTER: schoolB GET
+    /api/question/11 -> 403 (not 500 -- confirmed after the AccessDeniedException rework).
+    schoolA GET /api/question/11 -> 403 too (this app's model has no school ever owning quiz
+    content directly, only super admins do -- verified this doesn't regress anything since the
+    frontend never calls this single-GET endpoint at all, confirmed via grep). superadmin GET
+    /api/question/11 -> 200 with the full answer, unchanged.
+  * Regression check: studentA POST /api/quizResult/submit?quizId=4 with the correct answer
+    still scored 10/10 -- confirms the untouched internal getQuestion(Long) path (used for
+    scoring) still works exactly as before.
+  Backend `mvnw -o compile` exit 0 both before and after the AccessDeniedException rework.
+  All seeded test data (2 schools, 2 students, 1 quiz, 1 question, 2 quiz_results, 1 category)
+  deleted after verification; DB back to its prior baseline (superadmin, testschool,
+  teststudent, Class 6A, Sample Test Quiz -- all pre-existing from earlier sessions, untouched).
+- notes: no frontend changes in this fix -- both vulnerabilities and both fixes are backend-only.
