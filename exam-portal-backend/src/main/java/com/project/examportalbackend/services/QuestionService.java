@@ -16,6 +16,9 @@ public interface QuestionService {
 
     Question getQuestion(Long quesId);
 
+    /** Same lookup, but enforces the caller can manage the question's quiz. */
+    Question getQuestionScoped(Long quesId);
+
     Question updateQuestion(Question question);
 
     Question updateQuestion(QuestionRequest request);

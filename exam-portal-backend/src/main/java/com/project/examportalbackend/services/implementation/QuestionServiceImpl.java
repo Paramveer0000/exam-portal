@@ -89,6 +89,25 @@ public class QuestionServiceImpl implements QuestionService {
         return questionRepository.findById(quesId).orElse(null);
     }
 
+    @Override
+    public Question getQuestionScoped(Long quesId) {
+        // Public single-question read (GET /api/question/{id}): unlike getQuestion(),
+        // this is reachable directly by any ADMIN, so it must enforce the same
+        // ownership check as update/delete -- otherwise one school can read another
+        // school's questions, correct answers, and dimension overrides by id.
+        Question question = questionRepository.findById(quesId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
+        // authFacade.assertCanManage() throws AccessDeniedException, which has no
+        // handler in this codebase (no @ControllerAdvice) and degrades to a generic
+        // 500 -- access is still denied either way, but use the boolean form here so
+        // a rejected read reports 403, not 500.
+        Long ownerId = question.getQuiz() != null ? question.getQuiz().getCreatedBy() : null;
+        if (!authFacade.canManage(ownerId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to access this resource");
+        }
+        return question;
+    }
+
     public Question updateQuestion(QuestionRequest request) {
         Question question = mapRequestToQuestion(request);
         assertQuestionValid(question);

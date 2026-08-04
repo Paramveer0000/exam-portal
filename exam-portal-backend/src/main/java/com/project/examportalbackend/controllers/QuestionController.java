@@ -34,7 +34,7 @@ public class QuestionController {
 
     @GetMapping("/{questionId}")
     public ResponseEntity<?> getQuestion(@PathVariable Long questionId) {
-        return ResponseEntity.ok(questionService.getQuestion(questionId));
+        return ResponseEntity.ok(questionService.getQuestionScoped(questionId));
     }
 
     @GetMapping(value = "/", params = "quizId")
