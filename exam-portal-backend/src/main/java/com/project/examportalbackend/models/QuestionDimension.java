@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 /**
  * Explicit mapping over the {@code question_dimensions} join table (the same
@@ -34,6 +35,8 @@ public class QuestionDimension {
     @Column(name = "dimension_code")
     private String dimensionCode;
 
-    @Column(name = "weight")
-    private Double weight;
+    // Column is DECIMAL(4,3) in the DB (see V30) -- must map to BigDecimal,
+    // not Double/DOUBLE, or Hibernate schema validation fails at startup.
+    @Column(name = "weight", precision = 4, scale = 3)
+    private BigDecimal weight;
 }

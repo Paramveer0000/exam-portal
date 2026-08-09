@@ -117,7 +117,7 @@ class PsychometricReportServiceImplWeightedScoringTest {
         QuestionDimension qd = new QuestionDimension();
         qd.setQuesId(quesId);
         qd.setDimensionCode(code);
-        qd.setWeight(weight);
+        qd.setWeight(weight == null ? null : java.math.BigDecimal.valueOf(weight));
         return qd;
     }
 

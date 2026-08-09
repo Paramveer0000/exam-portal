@@ -324,7 +324,7 @@ public class QuestionServiceImpl implements QuestionService {
                     .findById(new QuestionDimensionId(quesId, entry.getKey()))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                             "Dimension mapping missing after save"));
-            qd.setWeight(entry.getValue());
+            qd.setWeight(entry.getValue() == null ? null : java.math.BigDecimal.valueOf(entry.getValue()));
             questionDimensionRepository.save(qd);
         }
     }
@@ -334,7 +334,7 @@ public class QuestionServiceImpl implements QuestionService {
         Map<String, Double> weights = new LinkedHashMap<>();
         for (QuestionDimension qd : questionDimensionRepository.findByQuesId(quesId)) {
             if (qd.getWeight() != null) {
-                weights.put(qd.getDimensionCode(), qd.getWeight());
+                weights.put(qd.getDimensionCode(), qd.getWeight().doubleValue());
             }
         }
         return weights;
