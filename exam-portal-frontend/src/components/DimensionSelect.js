@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Badge } from "react-bootstrap";
 
-const DimensionSelect = ({ id, value, onChange, blankLabel, isMulti = false }) => {
+const DimensionSelect = ({ id, value, onChange, blankLabel, isMulti = false, weights, onWeightsChange }) => {
   const [dimensions, setDimensions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -71,11 +71,22 @@ const DimensionSelect = ({ id, value, onChange, blankLabel, isMulti = false }) =
       dimensions={dimensions}
       groupByType={groupByType}
       typeLabels={typeLabels}
+      weights={weights}
+      onWeightsChange={onWeightsChange}
     />
   );
 };
 
-const DimensionMultiPicker = ({ id, value, onChange, dimensions, groupByType, typeLabels }) => {
+const DimensionMultiPicker = ({
+  id,
+  value,
+  onChange,
+  dimensions,
+  groupByType,
+  typeLabels,
+  weights,
+  onWeightsChange,
+}) => {
   const [pending, setPending] = useState("");
   const selectedSet = value instanceof Set ? value : new Set(value || []);
   const grouped = groupByType(dimensions);
@@ -93,7 +104,30 @@ const DimensionMultiPicker = ({ id, value, onChange, dimensions, groupByType, ty
     const next = new Set(selectedSet);
     next.delete(code);
     onChange(next);
+    if (onWeightsChange && weights) {
+      const nextWeights = { ...weights };
+      delete nextWeights[code];
+      onWeightsChange(nextWeights);
+    }
   };
+
+  const weightsEnabled = !!onWeightsChange;
+  const setWeight = (code, raw) => {
+    const next = { ...(weights || {}) };
+    if (raw === "") {
+      delete next[code];
+    } else {
+      next[code] = Number(raw) / 100;
+    }
+    onWeightsChange(next);
+  };
+
+  const codes = Array.from(selectedSet);
+  const anyWeightEntered = weightsEnabled && codes.some((c) => weights && weights[c] !== undefined);
+  const totalPercent = anyWeightEntered
+    ? Math.round(codes.reduce((sum, c) => sum + ((weights && weights[c]) || 0), 0) * 1000) / 10
+    : null;
+  const totalValid = totalPercent !== null && Math.abs(totalPercent - 100) < 0.1;
 
   return (
     <div>
@@ -123,10 +157,23 @@ const DimensionMultiPicker = ({ id, value, onChange, dimensions, groupByType, ty
           Add
         </Button>
       </div>
-      <div className="mt-2 d-flex flex-wrap gap-2">
-        {Array.from(selectedSet).map((code) => (
+      <div className="mt-2 d-flex flex-wrap gap-2 align-items-center">
+        {codes.map((code) => (
           <Badge key={code} bg="secondary" className="d-flex align-items-center gap-1 p-2">
             {byCode[code] ? byCode[code].displayName : code}
+            {weightsEnabled && (
+              <Form.Control
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                aria-label={`Weight for ${code}`}
+                placeholder="%"
+                value={weights && weights[code] !== undefined ? Math.round(weights[code] * 100) : ""}
+                onChange={(e) => setWeight(code, e.target.value)}
+                style={{ width: "60px", height: "24px", padding: "0 4px", fontSize: "0.8rem" }}
+              />
+            )}
             <span
               role="button"
               aria-label={`Remove ${code}`}
@@ -137,10 +184,24 @@ const DimensionMultiPicker = ({ id, value, onChange, dimensions, groupByType, ty
             </span>
           </Badge>
         ))}
-        {selectedSet.size === 0 && (
+        {codes.length === 0 && (
           <span className="form-text">No dimensions added yet.</span>
         )}
       </div>
+      {anyWeightEntered && (
+        <div className={`mt-1 ${totalValid ? "text-success" : "text-danger"}`}>
+          Total: {totalPercent}% {totalValid ? "✓" : "✕"}
+          {!totalValid && (
+            <div className="form-text text-danger">Dimension weights must total 100%.</div>
+          )}
+        </div>
+      )}
+      {weightsEnabled && !anyWeightEntered && codes.length > 0 && (
+        <div className="form-text">
+          No weights set — this question splits its score equally across the {codes.length} dimension
+          {codes.length > 1 ? "s" : ""} above. Enter a % per dimension to weight them instead (must total 100%).
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 package com.project.examportalbackend.dto;
 
+import java.util.Map;
 import java.util.Set;
 
 public class QuestionRequest {
@@ -14,6 +15,9 @@ public class QuestionRequest {
     private String option5;
     private String answer;
     private Set<String> dimensionCodes;
+    // Optional explicit per-dimension weight (code -> weight, must sum to 1.000).
+    // Null/empty = legacy equal split across dimensionCodes.
+    private Map<String, Double> dimensionWeights;
     private String option1Dimension;
     private String option2Dimension;
     private String option3Dimension;
@@ -107,6 +111,14 @@ public class QuestionRequest {
 
     public void setDimensionCodes(Set<String> dimensionCodes) {
         this.dimensionCodes = dimensionCodes;
+    }
+
+    public Map<String, Double> getDimensionWeights() {
+        return dimensionWeights;
+    }
+
+    public void setDimensionWeights(Map<String, Double> dimensionWeights) {
+        this.dimensionWeights = dimensionWeights;
     }
 
     public String getOption1Dimension() {

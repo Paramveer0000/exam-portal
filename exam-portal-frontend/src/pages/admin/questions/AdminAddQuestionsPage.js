@@ -20,6 +20,9 @@ const AdminAddQuestionsPage = () => {
   const [option5, setOption5] = useState("");
   const [answer, setAnswer] = useState(null);
   const [dimensionCodes, setDimensionCodes] = useState(new Set());
+  // Optional explicit per-dimension weight (code -> fraction, e.g. 0.5 = 50%).
+  // Empty = legacy equal split across dimensionCodes.
+  const [dimensionWeights, setDimensionWeights] = useState({});
   // Optional per-option overrides — most questions leave these blank and just
   // use `dimensionCodes` above; set one when different answers measure different traits.
   const [option1Dimension, setOption1Dimension] = useState("");
@@ -47,6 +50,16 @@ const AdminAddQuestionsPage = () => {
       alert("Select at least one dimension!");
       return;
     }
+    const enteredCodes = Object.keys(dimensionWeights);
+    const anyWeightEntered = enteredCodes.length > 0;
+    if (anyWeightEntered) {
+      const allCovered = Array.from(dimensionCodes).every((c) => dimensionWeights[c] !== undefined);
+      const total = Array.from(dimensionCodes).reduce((sum, c) => sum + (dimensionWeights[c] || 0), 0);
+      if (!allCovered || Math.abs(total - 1) > 0.001) {
+        alert("Dimension weights must total 100%.");
+        return;
+      }
+    }
     if (answer !== null && answer !== "n/a") {
       const question = {
         content: content,
@@ -63,6 +76,7 @@ const AdminAddQuestionsPage = () => {
         option5Dimension: option5Dimension,
         answer: answer,
         dimensionCodes: Array.from(dimensionCodes),
+        dimensionWeights: anyWeightEntered ? dimensionWeights : undefined,
         quizId: quizId,
       };
 
@@ -198,6 +212,8 @@ const AdminAddQuestionsPage = () => {
                 onChange={setDimensionCodes}
                 blankLabel="Choose Dimensions"
                 isMulti={true}
+                weights={dimensionWeights}
+                onWeightsChange={setDimensionWeights}
               />
             </div>
 

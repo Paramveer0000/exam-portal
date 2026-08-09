@@ -56,6 +56,12 @@ const AdminUpdateQuestionPage = () => {
       ? new Set(oldQuestion.dimensions.map((d) => d.dimensionCode))
       : new Set()
   );
+  // Optional explicit per-dimension weight (code -> fraction), preloaded from
+  // the GET response's dimensionWeights map. Empty object = legacy question
+  // (equal split) -- never guessed/derived, only what the server returns.
+  const [dimensionWeights, setDimensionWeights] = useState(
+    oldQuestion && oldQuestion.dimensionWeights ? { ...oldQuestion.dimensionWeights } : {}
+  );
   const [option1Dimension, setOption1Dimension] = useState(
     oldQuestion ? oldQuestion.option1Dimension || "" : ""
   );
@@ -82,6 +88,16 @@ const AdminUpdateQuestionPage = () => {
       alert("Select at least one dimension!");
       return;
     }
+    const enteredCodes = Object.keys(dimensionWeights);
+    const anyWeightEntered = enteredCodes.length > 0;
+    if (anyWeightEntered) {
+      const allCovered = Array.from(dimensionCodes).every((c) => dimensionWeights[c] !== undefined);
+      const total = Array.from(dimensionCodes).reduce((sum, c) => sum + (dimensionWeights[c] || 0), 0);
+      if (!allCovered || Math.abs(total - 1) > 0.001) {
+        alert("Dimension weights must total 100%.");
+        return;
+      }
+    }
     if (answer !== null && answer !== "n/a") {
       const question = {
         quesId: quesId,
@@ -99,6 +115,7 @@ const AdminUpdateQuestionPage = () => {
         option5Dimension: option5Dimension,
         answer: answer,
         dimensionCodes: Array.from(dimensionCodes),
+        dimensionWeights: anyWeightEntered ? dimensionWeights : undefined,
         quizId: quizId,
       };
 
@@ -236,6 +253,8 @@ const AdminUpdateQuestionPage = () => {
                 onChange={setDimensionCodes}
                 blankLabel="Choose Dimensions"
                 isMulti={true}
+                weights={dimensionWeights}
+                onWeightsChange={setDimensionWeights}
               />
             </div>
 

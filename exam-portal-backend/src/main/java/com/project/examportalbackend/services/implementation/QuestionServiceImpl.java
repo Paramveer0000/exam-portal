@@ -3,7 +3,10 @@ package com.project.examportalbackend.services.implementation;
 import com.project.examportalbackend.dto.QuestionRequest;
 import com.project.examportalbackend.models.Dimension;
 import com.project.examportalbackend.models.Question;
+import com.project.examportalbackend.models.QuestionDimension;
+import com.project.examportalbackend.models.QuestionDimensionId;
 import com.project.examportalbackend.models.Quiz;
+import com.project.examportalbackend.repository.QuestionDimensionRepository;
 import com.project.examportalbackend.repository.QuestionRepository;
 import com.project.examportalbackend.repository.QuizRepository;
 import com.project.examportalbackend.security.AuthFacade;
@@ -37,6 +40,9 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private DimensionService dimensionService;
 
+    @Autowired
+    private QuestionDimensionRepository questionDimensionRepository;
+
     public Question addQuestion(QuestionRequest request) {
         Question question = mapRequestToQuestion(request);
         assertQuestionValid(question);
@@ -47,6 +53,7 @@ public class QuestionServiceImpl implements QuestionService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "This question already exists in this quiz");
         }
         Set<Dimension> dimensions = dimensionService.validateDimensionCodes(request.getDimensionCodes());
+        assertValidWeights(dimensions, request.getDimensionWeights());
         question.setDimensions(dimensions);
         if (!dimensions.isEmpty()) {
             question.setDimension(dimensions.iterator().next().getDimensionCode());
@@ -54,7 +61,10 @@ public class QuestionServiceImpl implements QuestionService {
         question.setQuiz(quiz);
         quiz.setNumOfQuestions(quiz.getNumOfQuestions() + 1);
         quizRepository.save(quiz);
-        return questionRepository.save(question);
+        Question saved = questionRepository.saveAndFlush(question);
+        persistDimensionWeights(saved.getQuesId(), request.getDimensionWeights());
+        attachWeights(saved);
+        return saved;
     }
 
     @Override
@@ -74,13 +84,15 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public List<Question> getQuestions() {
         List<Question> all = questionRepository.findAll();
+        List<Question> scoped = all;
         if (authFacade.hasRole(AuthFacade.ROLE_ADMIN)) {
             Long me = authFacade.getCurrentUserId();
-            return all.stream()
+            scoped = all.stream()
                     .filter(q -> q.getQuiz() != null && me.equals(q.getQuiz().getCreatedBy()))
                     .collect(Collectors.toList());
         }
-        return all;
+        scoped.forEach(this::attachWeights);
+        return scoped;
     }
 
     @Override
@@ -105,6 +117,7 @@ public class QuestionServiceImpl implements QuestionService {
         if (!authFacade.canManage(ownerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to access this resource");
         }
+        attachWeights(question);
         return question;
     }
 
@@ -120,13 +133,51 @@ public class QuestionServiceImpl implements QuestionService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "This question already exists in this quiz");
         }
         Set<Dimension> dimensions = dimensionService.validateDimensionCodes(request.getDimensionCodes());
+        assertValidWeights(dimensions, request.getDimensionWeights());
+
+        // Hibernate recreates the question_dimensions rows on every save of this
+        // collection (merge diffs Dimension by identity, not equals -- see
+        // QuestionServiceImpl class notes), which wipes the weight column back
+        // to NULL. If the caller didn't resend weights (e.g. an older client
+        // that hasn't been updated to round-trip them), fall back to whatever
+        // was there before, rather than silently downgrading a weighted
+        // question to equal-split.
+        Map<String, Double> weightsToApply = request.getDimensionWeights();
+        if (weightsToApply == null || weightsToApply.isEmpty()) {
+            weightsToApply = priorWeightsIfStillValid(existing.getQuesId(), dimensions);
+        }
+
         question.setDimensions(dimensions);
         if (!dimensions.isEmpty()) {
             question.setDimension(dimensions.iterator().next().getDimensionCode());
         }
         question.setQuiz(existing.getQuiz());
         question.setQuesId(existing.getQuesId());
-        return questionRepository.save(question);
+        Question saved = questionRepository.saveAndFlush(question);
+        persistDimensionWeights(saved.getQuesId(), weightsToApply);
+        attachWeights(saved);
+        return saved;
+    }
+
+    /**
+     * The previous explicit weights, but only if every dimension in the new
+     * mapping still has one (a changed dimension set with no matching prior
+     * weight would produce an invalid partial-weight state) -- otherwise
+     * empty, i.e. stay legacy/equal-split rather than guess.
+     */
+    private Map<String, Double> priorWeightsIfStillValid(Long quesId, Set<Dimension> newDimensions) {
+        Map<String, Double> prior = weightsFor(quesId);
+        if (prior.isEmpty()) {
+            return prior;
+        }
+        Set<String> newCodes = newDimensions.stream().map(Dimension::getDimensionCode).collect(Collectors.toSet());
+        Map<String, Double> filtered = new LinkedHashMap<>();
+        for (Map.Entry<String, Double> e : prior.entrySet()) {
+            if (newCodes.contains(e.getKey())) {
+                filtered.put(e.getKey(), e.getValue());
+            }
+        }
+        return filtered.keySet().equals(newCodes) ? filtered : java.util.Collections.emptyMap();
     }
 
     @Override
@@ -166,7 +217,9 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public List<Question> getQuestionsByQuiz(Quiz quiz) {
         authFacade.assertCanManage(quiz.getCreatedBy());
-        return questionRepository.findByQuiz(quiz);
+        List<Question> questions = questionRepository.findByQuiz(quiz);
+        questions.forEach(this::attachWeights);
+        return questions;
     }
 
     private Question mapRequestToQuestion(QuestionRequest request) {
@@ -236,6 +289,60 @@ public class QuestionServiceImpl implements QuestionService {
                     "Invalid option dimension override: " + value);
         }
         return upper;
+    }
+
+    /**
+     * NULL weight (no map, or empty map) means the legacy equal split -- valid.
+     * Otherwise every mapped dimension must have an explicit, non-null weight,
+     * and the weights must sum to 1.000 within a small tolerance. Partial
+     * weighting (some dimensions weighted, some not) is rejected: it has no
+     * well-defined split.
+     */
+    private void assertValidWeights(Set<Dimension> dimensions, Map<String, Double> weights) {
+        if (weights == null || weights.isEmpty()) {
+            return; // legacy equal split
+        }
+        Set<String> dimensionCodes = dimensions.stream().map(Dimension::getDimensionCode).collect(Collectors.toSet());
+        boolean anyNull = weights.values().stream().anyMatch(w -> w == null);
+        if (anyNull || !weights.keySet().equals(dimensionCodes)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Dimension weights must either all be empty or all be specified.");
+        }
+        double sum = weights.values().stream().mapToDouble(Double::doubleValue).sum();
+        if (Math.abs(sum - 1.0) > 0.001) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dimension weights must total 100%.");
+        }
+    }
+
+    /** Writes explicit weights after the question's dimension rows exist; no-op for legacy (NULL) mode. */
+    private void persistDimensionWeights(Long quesId, Map<String, Double> weights) {
+        if (weights == null || weights.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Double> entry : weights.entrySet()) {
+            QuestionDimension qd = questionDimensionRepository
+                    .findById(new QuestionDimensionId(quesId, entry.getKey()))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                            "Dimension mapping missing after save"));
+            qd.setWeight(entry.getValue());
+            questionDimensionRepository.save(qd);
+        }
+    }
+
+    /** Explicit (non-NULL) weights for a question, code -> weight; empty when legacy/equal-split. */
+    private Map<String, Double> weightsFor(Long quesId) {
+        Map<String, Double> weights = new LinkedHashMap<>();
+        for (QuestionDimension qd : questionDimensionRepository.findByQuesId(quesId)) {
+            if (qd.getWeight() != null) {
+                weights.put(qd.getDimensionCode(), qd.getWeight());
+            }
+        }
+        return weights;
+    }
+
+    /** Populates the transient dimensionWeights field for a GET response; empty map for legacy questions. */
+    private void attachWeights(Question question) {
+        question.setDimensionWeights(weightsFor(question.getQuesId()));
     }
 
     private void assertCanManageQuestion(Question question) {

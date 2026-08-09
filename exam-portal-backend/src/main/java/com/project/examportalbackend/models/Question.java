@@ -6,6 +6,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -77,5 +78,14 @@ public class Question {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Quiz quiz;
+
+    // Not persisted here (weight lives in question_dimensions, written via the
+    // separate QuestionDimension entity) -- populated on read by
+    // QuestionServiceImpl so GET responses expose existing weights for the
+    // admin UI to preload. Code -> weight; only codes with an explicit
+    // (non-NULL) weight are included, so an empty/absent map means "legacy
+    // equal split", never a converted 1/n value.
+    @Transient
+    private Map<String, Double> dimensionWeights;
 }
 

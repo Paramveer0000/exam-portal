@@ -10,6 +10,7 @@ import com.project.examportalbackend.dto.MentalistReportDto.SwotBlock;
 import com.project.examportalbackend.dto.MentalistReportDto.TraitScore;
 import com.project.examportalbackend.dto.PsychometricReportDto;
 import com.project.examportalbackend.dto.PsychometricReportDto.CareerRow;
+import com.project.examportalbackend.dto.PsychometricReportDto.DimensionRow;
 import com.project.examportalbackend.dto.PsychometricReportDto.MiRow;
 import com.project.examportalbackend.dto.PsychometricReportDto.QuotientRow;
 import com.project.examportalbackend.dto.PsychometricReportDto.RiasecRow;
@@ -90,6 +91,13 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
                 .collect(Collectors.toMap(RiasecRow::getLetter, r -> r.getScore() * 10, (a, b) -> a, LinkedHashMap::new));
         Map<String, Double> quot = psych.getQuotients().stream()
                 .collect(Collectors.toMap(QuotientRow::getCode, QuotientRow::getPercent, (a, b) -> a, LinkedHashMap::new));
+        // Real EQ/Leadership dimension_results, when present (Phase A). Empty
+        // for attempts scored before this migration -- traits below fall back
+        // to the existing MI/RIASEC/quotient proxies unchanged.
+        Map<String, Double> eq = safeList(psych.getEqScores()).stream()
+                .collect(Collectors.toMap(DimensionRow::getCode, DimensionRow::getPercent, (a, b) -> a, LinkedHashMap::new));
+        Map<String, Double> leadership = safeList(psych.getLeadershipScores()).stream()
+                .collect(Collectors.toMap(DimensionRow::getCode, DimensionRow::getPercent, (a, b) -> a, LinkedHashMap::new));
 
         MentalistReportDto dto = new MentalistReportDto();
         MentalistReport existing = mentalistReportRepository.findByQuizResId(quizResId);
@@ -113,11 +121,11 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
         dto.setPersonality(personality);
 
         dto.setEmotionalIntelligence(buildSection("Emotional Intelligence", Arrays.asList(
-                TraitScore.of("Emotional Awareness", mi.get("INTRAPERSONAL"), null),
-                TraitScore.of("Stress Handling", quot.get("AQ"), null),
-                TraitScore.of("Self Control", avg(mi.get("INTRAPERSONAL"), quot.get("AQ")), null),
-                TraitScore.of("Empathy", mi.get("INTERPERSONAL"), null),
-                TraitScore.of("Positive Thinking", quot.get("EQ"), null),
+                traitOrReal("Emotional Awareness", mi.get("INTRAPERSONAL"), eq, "FEEDBACK_ACCEPT"),
+                traitOrReal("Stress Handling", quot.get("AQ"), eq, "STRESS_MGMT"),
+                traitOrReal("Self Control", avg(mi.get("INTRAPERSONAL"), quot.get("AQ")), eq, "RESPONSE_CTRL"),
+                traitOrReal("Empathy", mi.get("INTERPERSONAL"), eq, "EMPATHY"),
+                traitOrReal("Positive Thinking", quot.get("EQ"), eq, "RESILIENCE"),
                 TraitScore.of("Decision Making", quot.get("IQ"), null))));
 
         dto.setLearningStyle(buildSection("Learning Style", Arrays.asList(
@@ -134,12 +142,12 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
         dto.setMultipleIntelligence(buildSection("Multiple Intelligence", miTraits));
 
         dto.setCommunicationLeadership(buildSection("Communication & Leadership", Arrays.asList(
-                TraitScore.of("Communication", mi.get("VERBAL"), null),
+                traitOrReal("Communication", mi.get("VERBAL"), leadership, "COMMUNICATION"),
                 TraitScore.of("Presentation", avg(mi.get("VERBAL"), ri.get("E")), null),
-                TraitScore.of("Leadership", ri.get("E"), null),
+                traitOrReal("Leadership", ri.get("E"), leadership, "OWNERSHIP"),
                 TraitScore.of("Public Speaking", avg(mi.get("VERBAL"), quot.get("EQ")), null),
-                TraitScore.of("Decision Making", quot.get("IQ"), null),
-                TraitScore.of("Team Work", mi.get("INTERPERSONAL"), null),
+                traitOrReal("Decision Making", quot.get("IQ"), leadership, "DECISION_CONF"),
+                traitOrReal("Team Work", mi.get("INTERPERSONAL"), leadership, "TEAMWORK"),
                 TraitScore.of("Confidence", quot.get("EQ"), null))));
 
         dto.setCareers(psych.getCareers());
@@ -320,6 +328,16 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
         Map<String, Double> m = new LinkedHashMap<>();
         rows.forEach(r -> m.put(r.getDimension(), r.getPercent()));
         return m;
+    }
+
+    /** Real dimension_results value for {@code dimensionCode} when present, else the existing proxy score. */
+    private TraitScore traitOrReal(String name, double proxyScore, Map<String, Double> real, String dimensionCode) {
+        Double actual = real.get(dimensionCode);
+        return TraitScore.of(name, actual != null ? actual : proxyScore, null);
+    }
+
+    private List<DimensionRow> safeList(List<DimensionRow> rows) {
+        return rows != null ? rows : new ArrayList<>();
     }
 
     private double avg(double a, double b) {
