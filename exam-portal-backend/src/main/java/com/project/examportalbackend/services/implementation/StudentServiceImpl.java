@@ -53,6 +53,9 @@ public class StudentServiceImpl implements StudentService {
         if (!StringUtils.hasText(request.getUsername()) || !StringUtils.hasText(request.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username and password are required");
         }
+        if (request.getPassword().length() < 6) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters");
+        }
         if (request.getClassId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A class is required");
         }
@@ -114,6 +117,9 @@ public class StudentServiceImpl implements StudentService {
     public void resetPassword(Long studentId, String newPassword) {
         if (!StringUtils.hasText(newPassword)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password is required");
+        }
+        if (newPassword.length() < 6) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters");
         }
         User student = loadStudent(studentId);
         student.setPassword(passwordEncoder.encode(newPassword));

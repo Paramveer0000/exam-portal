@@ -79,6 +79,21 @@ public class PsychometricReportDto {
     }
 
     @Getter @Setter @NoArgsConstructor
+    public static class DimensionRow {
+        private String code;
+        private String name;
+        private double percent;
+
+        public static DimensionRow of(String code, String name, double percent) {
+            DimensionRow r = new DimensionRow();
+            r.code = code;
+            r.name = name;
+            r.percent = percent;
+            return r;
+        }
+    }
+
+    @Getter @Setter @NoArgsConstructor
     public static class CareerRow {
         private String field;
         private String label;
@@ -108,6 +123,11 @@ public class PsychometricReportDto {
     private List<QuotientRow> quotients;
     private List<CareerRow> careers;
 
+    // Phase A: EQ/Leadership dimension_results, empty for reports scored
+    // before this migration (no fallback data was recomputed for them).
+    private List<DimensionRow> eqScores;
+    private List<DimensionRow> leadershipScores;
+
     public static PsychometricReportDto from(PsychometricReport report,
                                              QuizResult result,
                                              User student,
@@ -116,7 +136,9 @@ public class PsychometricReportDto {
                                              List<RiasecRow> riasec,
                                              String hollandCode,
                                              List<QuotientRow> quotients,
-                                             List<CareerRow> careers) {
+                                             List<CareerRow> careers,
+                                             List<DimensionRow> eqScores,
+                                             List<DimensionRow> leadershipScores) {
         PsychometricReportDto dto = new PsychometricReportDto();
         dto.quizResId = report.getQuizResId();
         dto.studentName = (student.getFirstName() + " "
@@ -130,6 +152,8 @@ public class PsychometricReportDto {
         dto.hollandCode = hollandCode;
         dto.quotients = quotients;
         dto.careers = careers;
+        dto.eqScores = eqScores;
+        dto.leadershipScores = leadershipScores;
         return dto;
     }
 }

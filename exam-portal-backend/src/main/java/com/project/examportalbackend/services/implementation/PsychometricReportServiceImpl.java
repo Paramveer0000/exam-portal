@@ -7,11 +7,15 @@ import com.project.examportalbackend.dto.PsychometricReportDto.MiRow;
 import com.project.examportalbackend.dto.PsychometricReportDto.QuotientRow;
 import com.project.examportalbackend.dto.PsychometricReportDto.RiasecRow;
 import com.project.examportalbackend.models.CareerSuggestion;
+import com.project.examportalbackend.models.Dimension;
+import com.project.examportalbackend.models.DimensionResult;
 import com.project.examportalbackend.models.PsychometricReport;
 import com.project.examportalbackend.models.Question;
 import com.project.examportalbackend.models.QuizResult;
 import com.project.examportalbackend.models.User;
 import com.project.examportalbackend.repository.CareerSuggestionRepository;
+import com.project.examportalbackend.repository.DimensionRepository;
+import com.project.examportalbackend.repository.DimensionResultRepository;
 import com.project.examportalbackend.repository.PsychometricReportRepository;
 import com.project.examportalbackend.repository.QuestionRepository;
 import com.project.examportalbackend.repository.QuizResultRepository;
@@ -65,6 +69,8 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
         RIASEC_NAMES.put("C", "Conventional");
     }
 
+    static final List<String> DIMENSION_RESULT_TYPES = Arrays.asList("EQ", "LEADERSHIP");
+
     @Autowired private PsychometricReportRepository reportRepository;
     @Autowired private CareerSuggestionRepository careerSuggestionRepository;
     @Autowired private QuestionRepository questionRepository;
@@ -72,6 +78,9 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
     @Autowired private UserRepository userRepository;
     @Autowired private AuthFacade authFacade;
     @Autowired private AiService aiService;
+    @Autowired private DimensionRepository dimensionRepository;
+    @Autowired private DimensionResultRepository dimensionResultRepository;
+    @Autowired private com.project.examportalbackend.repository.QuestionDimensionRepository questionDimensionRepository;
 
     // ------------------------------------------------------------------ score
 
@@ -79,9 +88,13 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
     public void scoreAndPersist(QuizResult quizResult, Map<String, String> answers) {
         Long quizId = quizResult.getQuiz().getQuizId();
 
-        // Raw Likert sums per dimension, and per-dimension answer counts.
+        // Raw Likert sums per dimension, per-dimension answer counts, and each
+        // dimension's max attainable sum (mirrors raw's accumulation, using
+        // normalizedScore's ceiling of 1.0 in place of the actual ordinal
+        // fraction, so max is computed under the exact same equal-split rule).
         Map<String, Double> raw = new HashMap<>();
         Map<String, Integer> counts = new HashMap<>();
+        Map<String, Double> maxPossible = new HashMap<>();
 
         for (Map.Entry<String, String> entry : answers.entrySet()) {
             Question q = questionRepository.findById(Long.valueOf(entry.getKey())).orElse(null);
@@ -96,14 +109,21 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
             // so a 2-option question and a 4-option question contribute comparably.
             double normalizedScore = ordinal / (double) maxOrdinal(q);
 
-            // Score into all dimensions this question belongs to.
-            // If a question has multiple dimensions, split the score equally.
+            // Score into all dimensions this question belongs to. Explicit
+            // per-dimension weights (Phase B) override the legacy equal split
+            // when present; NULL weight (no rows, or a legacy question) keeps
+            // splitting the score equally, unchanged from before.
             java.util.Set<com.project.examportalbackend.models.Dimension> questionDimensions = q.getDimensions();
             if (questionDimensions != null && !questionDimensions.isEmpty()) {
-                double scorePerDimension = normalizedScore / questionDimensions.size();
+                Map<String, Double> weightByCode = weightsFor(q.getQuesId());
+                boolean weighted = !weightByCode.isEmpty();
                 for (com.project.examportalbackend.models.Dimension d : questionDimensions) {
-                    raw.merge(d.getDimensionCode(), scorePerDimension, Double::sum);
+                    double weight = weighted
+                            ? weightByCode.getOrDefault(d.getDimensionCode(), 0.0)
+                            : 1.0 / questionDimensions.size();
+                    raw.merge(d.getDimensionCode(), normalizedScore * weight, Double::sum);
                     counts.merge(d.getDimensionCode(), 1, Integer::sum);
+                    maxPossible.merge(d.getDimensionCode(), 1.0 * weight, Double::sum);
                 }
             }
         }
@@ -147,6 +167,42 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
 
         applyQuotients(report, miPercent);
         reportRepository.save(report);
+
+        persistDimensionResults(quizResult.getQuizResId(), raw, maxPossible);
+    }
+
+    /**
+     * Phase A: persist a generic dimension_results row for every EQ/LEADERSHIP
+     * dimension actually answered. MI/RIASEC/quotients are untouched -- they
+     * keep writing to psychometric_reports exactly as before. percentage here
+     * uses the same formula as the rest of this class: raw / max * 100, with
+     * max accumulated under the identical equal-split rule as raw (see the
+     * maxPossible accumulation above), so it is mathematically consistent.
+     */
+    private void persistDimensionResults(Long quizResId, Map<String, Double> raw, Map<String, Double> maxPossible) {
+        if (raw.isEmpty()) {
+            return;
+        }
+        Map<String, Dimension> dimensionsByCode = new HashMap<>();
+        dimensionRepository.findAllById(raw.keySet()).forEach(d -> dimensionsByCode.put(d.getDimensionCode(), d));
+
+        for (Map.Entry<String, Double> entry : raw.entrySet()) {
+            String code = entry.getKey();
+            Dimension dimension = dimensionsByCode.get(code);
+            if (dimension == null || !DIMENSION_RESULT_TYPES.contains(dimension.getDimensionType())) {
+                continue; // MI/RIASEC codes stay on the existing columns only
+            }
+            double rawScore = entry.getValue();
+            double maxScore = maxPossible.getOrDefault(code, 0.0);
+
+            DimensionResult dr = new DimensionResult();
+            dr.setQuizResId(quizResId);
+            dr.setDimensionCode(code);
+            dr.setRawScore(rawScore);
+            dr.setMaxScore(maxScore);
+            dr.setPercentage(maxScore == 0 ? 0 : round1(rawScore / maxScore * 100));
+            dimensionResultRepository.save(dr);
+        }
     }
 
     /**
@@ -170,6 +226,21 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
         r.setQuotAq(round1(aq / max * 100));
         r.setQuotCq(round1(cq / max * 100));
         r.setQuotSq(round1(sq / max * 100));
+    }
+
+    /**
+     * Explicit dimension weights for this question (code -> weight), or an
+     * empty map when the question uses the legacy equal split (no explicit
+     * weights were ever set -- the normal, pre-Phase-B case).
+     */
+    private Map<String, Double> weightsFor(Long quesId) {
+        Map<String, Double> weights = new HashMap<>();
+        for (com.project.examportalbackend.models.QuestionDimension qd : questionDimensionRepository.findByQuesId(quesId)) {
+            if (qd.getWeight() != null) {
+                weights.put(qd.getDimensionCode(), qd.getWeight());
+            }
+        }
+        return weights;
     }
 
     /** Chosen option's ordinal 1..4; accepts "optionN" labels or option text. 0 = unknown. */
@@ -277,8 +348,24 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
                 QuotientRow.of("CQ", "Creativity Quotient", report.getQuotCq()),
                 QuotientRow.of("SQ", "Spiritual Quotient", report.getQuotSq()));
 
+        List<DimensionResult> dimensionResults = dimensionResultRepository.findByQuizResId(quizResId);
+        List<PsychometricReportDto.DimensionRow> eqScores = dimensionRowsOfType(dimensionResults, "EQ");
+        List<PsychometricReportDto.DimensionRow> leadershipScores = dimensionRowsOfType(dimensionResults, "LEADERSHIP");
+
         return PsychometricReportDto.from(report, result, student, miRows, domains,
-                riasecRows, hollandCode, quotients, rankCareers(mi, ri));
+                riasecRows, hollandCode, quotients, rankCareers(mi, ri), eqScores, leadershipScores);
+    }
+
+    /** EQ/Leadership rows for the given type; empty for attempts scored before dimension_results existed. */
+    private List<PsychometricReportDto.DimensionRow> dimensionRowsOfType(List<DimensionResult> results, String type) {
+        List<PsychometricReportDto.DimensionRow> rows = new ArrayList<>();
+        for (DimensionResult dr : results) {
+            Dimension d = dimensionRepository.findById(dr.getDimensionCode()).orElse(null);
+            if (d != null && type.equals(d.getDimensionType())) {
+                rows.add(PsychometricReportDto.DimensionRow.of(d.getDimensionCode(), d.getDisplayName(), dr.getPercentage()));
+            }
+        }
+        return rows;
     }
 
     // -------------------------------------------------------------- AI summary
