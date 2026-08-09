@@ -237,7 +237,7 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
         Map<String, Double> weights = new HashMap<>();
         for (com.project.examportalbackend.models.QuestionDimension qd : questionDimensionRepository.findByQuesId(quesId)) {
             if (qd.getWeight() != null) {
-                weights.put(qd.getDimensionCode(), qd.getWeight());
+                weights.put(qd.getDimensionCode(), qd.getWeight().doubleValue());
             }
         }
         return weights;

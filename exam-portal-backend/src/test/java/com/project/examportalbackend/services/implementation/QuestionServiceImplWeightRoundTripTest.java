@@ -168,7 +168,7 @@ class QuestionServiceImplWeightRoundTripTest {
         simulateHibernateRecreate(quesId, codes);
         if (initialWeights != null) {
             for (Map.Entry<String, Double> e : initialWeights.entrySet()) {
-                store.get(new QuestionDimensionId(quesId, e.getKey())).setWeight(e.getValue());
+                store.get(new QuestionDimensionId(quesId, e.getKey())).setWeight(java.math.BigDecimal.valueOf(e.getValue()));
             }
         }
     }
@@ -197,6 +197,37 @@ class QuestionServiceImplWeightRoundTripTest {
         Question result = service.getQuestionScoped(1L);
 
         assertTrue(result.getDimensionWeights().isEmpty()); // NULL stays NULL, never converted to 1/n
+    }
+
+    /** BigDecimal migration regression: DECIMAL(4,3) round-trips 0.500/0.300/0.200 exactly through save+read. */
+    @Test
+    void bigDecimalWeight_roundTripsExactly_forStandardValues() {
+        Map<String, Double> weights = new HashMap<>();
+        weights.put("LOGICAL", 0.500);
+        weights.put("MUSICAL", 0.300);
+        weights.put("SPATIAL", 0.200);
+        Set<Dimension> dims = new LinkedHashSet<>(Arrays.asList(logical, creativity, problemSolving));
+        setupQuestion(1L, dims, weights);
+
+        for (Dimension d : dims) {
+            com.project.examportalbackend.models.QuestionDimension qd =
+                    store.get(new QuestionDimensionId(1L, d.getDimensionCode()));
+            assertEquals(weights.get(d.getDimensionCode()), qd.getWeight().doubleValue(), 0.0001);
+        }
+
+        Question result = service.getQuestionScoped(1L);
+        assertEquals(0.500, result.getDimensionWeights().get("LOGICAL"), 0.0001);
+        assertEquals(0.300, result.getDimensionWeights().get("MUSICAL"), 0.0001);
+        assertEquals(0.200, result.getDimensionWeights().get("SPATIAL"), 0.0001);
+    }
+
+    /** NULL weight (legacy) must still be NULL as a BigDecimal, not e.g. BigDecimal.ZERO. */
+    @Test
+    void bigDecimalWeight_nullStaysNull() {
+        setupQuestion(1L, new LinkedHashSet<>(Arrays.asList(logical, creativity)), null);
+        com.project.examportalbackend.models.QuestionDimension qd =
+                store.get(new QuestionDimensionId(1L, "LOGICAL"));
+        assertEquals(null, qd.getWeight());
     }
 
     // ------------------------------------------------------------ round-trip
