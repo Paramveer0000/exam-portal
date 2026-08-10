@@ -2,262 +2,739 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8"/>
-<title>The Mentalist Report</title>
+<title>Student Psychometric Assessment Report</title>
 <style>
   head, title, style, script, meta { display: none; }
-  @page { size: A4; margin: 0; }
+
+  /* openhtmltopdf 1.0.10 renders CSS 2.1: no flexbox, no grid.
+     Every multi-column layout below is a table or a float. Only WinAnsi-safe
+     glyphs are used because the base-14 Helvetica face is not subsetted. */
+
+  @page {
+    size: A4;
+    margin: 20mm 16mm 16mm;
+    @bottom-left  { content: element(footerLeft); }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages);
+                    font-family: Helvetica, Arial, sans-serif; font-size: 7.5pt; color: #8A97A6; }
+    @top-right    { content: element(headerRight); }
+  }
+  @page cover { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } @top-right { content: none; } }
+
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1f2a37; font-size: 11pt; }
-  .page { width: 210mm; height: 297mm; padding: 16mm 16mm 14mm; position: relative; page-break-after: always; overflow: hidden; }
-  .page:last-child { page-break-after: auto; }
+  body { margin: 0; font-family: Helvetica, Arial, sans-serif; color: #23303D; font-size: 10pt; line-height: 1.5; }
 
-  :root {}
-  .primary { color: #0F4C81; }
-  .secondary { color: #3BAFDA; }
-  .accent { color: #00B4D8; }
-  .bg-primary { background: #0F4C81; }
-  .bg-soft { background: #EAF5FB; }
+  /* ---- brand palette (from the company logo: navy + teal) ---------------- */
+  /* navy #16365A, teal #1F6B5E, ink #23303D, mist #F4F7FA, line #E3E9F0 */
 
-  h1, h2, h3, h4 { margin: 0; font-weight: 700; color: #0F4C81; }
-  p { margin: 0 0 6px; line-height: 1.5; }
-  .muted { color: #64748b; }
+  h1, h2, h3, h4 { margin: 0; font-weight: bold; color: #16365A; }
+  p { margin: 0 0 7px; }
+  .muted { color: #6B7A8C; }
+  .small { font-size: 8.5pt; }
 
-  .footer { position: absolute; bottom: 8mm; left: 16mm; right: 16mm; display: flex; justify-content: space-between;
-            font-size: 8pt; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 3mm; }
-  .footer .brand { color: #0F4C81; font-weight: 700; }
+  /* ---- running header / footer ------------------------------------------ */
+  #headerRight { position: running(headerRight); font-size: 7.5pt; color: #8A97A6; text-align: right; }
+  #footerLeft  { position: running(footerLeft);  font-size: 7.5pt; color: #8A97A6; }
 
-  /* Cover page */
-  .cover { background: linear-gradient(160deg, #0F4C81 0%, #17679f 55%, #00B4D8 100%); color: #fff; text-align: center;
-           display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .cover .logo-badge { width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.15);
-                        border: 2px solid rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center;
-                        font-size: 30px; font-weight: 800; margin-bottom: 18px; }
-  .cover h1 { color: #fff; font-size: 30pt; letter-spacing: 4px; margin-bottom: 4px; }
-  .cover h2 { color: #eaf5fb; font-weight: 400; font-size: 13pt; margin-bottom: 40px; }
-  .cover .tagline { font-size: 11pt; color: #d7ecf7; max-width: 420px; margin-bottom: 50px; }
-  .cover .confidential { margin-top: 60px; font-size: 9pt; letter-spacing: 2px; text-transform: uppercase; color: #d7ecf7; }
-  .cover .meta-row { display: flex; gap: 40px; margin-top: 14px; font-size: 10pt; }
-  .cover .meta-row div span { display: block; font-size: 8pt; text-transform: uppercase; letter-spacing: 1px; color: #bfe3f3; }
+  /* ---- cover ------------------------------------------------------------- */
+  .cover { page: cover; height: 297mm; width: 210mm; padding: 26mm 22mm; text-align: center; }
+  .cover-rule { height: 6mm; background: #16365A; margin: -26mm -22mm 0; }
+  .cover-logo { width: 62mm; height: auto; margin: 22mm auto 0; display: block; }
+  .cover-wordmark { margin: 30mm 0 0; font-size: 26pt; letter-spacing: 3px; color: #16365A; }
+  .cover h1 { font-size: 25pt; line-height: 1.25; letter-spacing: 1px; margin-top: 16mm; }
+  .cover .quote { font-size: 12pt; color: #1F6B5E; font-style: italic; margin-top: 7mm; line-height: 1.6; }
+  .cover-meta { margin-top: 22mm; border-top: 1px solid #E3E9F0; border-bottom: 1px solid #E3E9F0; padding: 7mm 0; }
+  .cover-meta table { width: 100%; }
+  .cover-meta td { text-align: center; padding: 0 4mm; }
+  .cover-meta .k { font-size: 7.5pt; letter-spacing: 1.5px; text-transform: uppercase; color: #8A97A6; padding-bottom: 2mm; }
+  .cover-meta .v { font-size: 12pt; font-weight: bold; color: #16365A; }
+  .cover .programme { margin-top: 10mm; font-size: 10pt; color: #6B7A8C; }
+  .cover .confidential { margin-top: 16mm; font-size: 8pt; letter-spacing: 2.5px; text-transform: uppercase; color: #8A97A6; }
 
-  /* Section header used on content pages */
-  .page-head { display: flex; align-items: center; gap: 10px; border-bottom: 3px solid #00B4D8; padding-bottom: 10px; margin-bottom: 16px; }
-  .page-head .num { width: 34px; height: 34px; border-radius: 50%; background: #0F4C81; color: #fff; display: flex;
-                     align-items: center; justify-content: center; font-weight: 700; font-size: 12pt; }
-  .page-head h2 { font-size: 18pt; }
-  .page-head .sub { font-size: 9pt; color: #3BAFDA; text-transform: uppercase; letter-spacing: 1px; }
+  /* ---- section scaffolding ---------------------------------------------- */
+  .section { page-break-before: always; }
+  .section-head { border-bottom: 2px solid #1F6B5E; padding-bottom: 4mm; margin-bottom: 6mm; page-break-after: avoid; }
+  .section-head .eyebrow { font-size: 8pt; letter-spacing: 2px; text-transform: uppercase; color: #1F6B5E; margin-bottom: 1.5mm; }
+  .section-head h2 { font-size: 19pt; letter-spacing: 0.5px; }
+  h3 { font-size: 12.5pt; margin-bottom: 3mm; page-break-after: avoid; }
 
-  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(15,76,129,0.08); }
-  .grid-2 { display: flex; gap: 12px; flex-wrap: wrap; }
-  .grid-2 > div { flex: 1 1 45%; }
+  /* One dimension's detailed write-up, sized to sit on a single page */
+  .dimpage { page-break-before: always; font-size: 9pt; }
+  .dim-head { border-bottom: 2px solid #1F6B5E; padding-bottom: 3mm; margin-bottom: 4mm; page-break-after: avoid; }
+  .dim-head h2 { letter-spacing: 0.3px; }
+  .dimpage h3 { font-size: 10.5pt; margin-bottom: 1.4mm; }
+  .dimpage .card { padding: 2.6mm; page-break-inside: avoid; }
+  .dimpage p { margin-bottom: 2mm; line-height: 1.4; }
+  .dimpage .bar-track { margin-top: 1mm; }
+  .dimpage ul.tight li { font-size: 8.3pt; margin-bottom: 1.2mm; line-height: 1.32; }
+  .dimpage .pill { font-size: 7pt; }
+  .dimpage .tips p { font-size: 8.3pt; line-height: 1.38; }
 
-  /* Trait bars */
-  .trait { margin-bottom: 11px; }
-  .trait-top { display: flex; justify-content: space-between; font-size: 9.5pt; margin-bottom: 3px; }
-  .trait-top .name { font-weight: 600; color: #1f2a37; }
-  .trait-top .band { font-size: 8pt; padding: 1px 8px; border-radius: 8px; background: #EAF5FB; color: #0F4C81; font-weight: 600; }
-  .bar-track { height: 8px; background: #eef2f6; border-radius: 5px; overflow: hidden; }
-  .bar-fill { height: 100%; background: linear-gradient(90deg, #0F4C81, #00B4D8); border-radius: 5px; }
+  /* Cards flow across pages by default. Forcing every card to stay whole
+     pushed long blocks onto near-empty pages; the small atomic units that
+     genuinely must not split declare it themselves below. */
+  .card { border: 1px solid #E3E9F0; border-radius: 3mm; padding: 5mm; background: #fff; }
+  .card + .card { margin-top: 4mm; }
+  .tint { background: #F4F7FA; }
+  .lead { font-size: 10.5pt; color: #3C4A5A; margin-bottom: 5mm; }
 
-  .content-block { margin-top: 14px; }
-  .content-block .status { background: #EAF5FB; border-left: 4px solid #0F4C81; padding: 10px 12px; border-radius: 6px; font-size: 9.7pt; margin-bottom: 12px; }
-  .cols3 { display: flex; gap: 10px; }
-  .cols3 .col { flex: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
-  .cols3 .col h4 { font-size: 9.5pt; margin-bottom: 6px; }
-  .cols3 .col.strengths h4 { color: #0F4C81; }
-  .cols3 .col.challenges h4 { color: #b45309; }
-  .cols3 .col.suggestions h4 { color: #0f766e; }
-  ul.tight { margin: 0; padding-left: 14px; font-size: 8.7pt; }
-  ul.tight li { margin-bottom: 4px; line-height: 1.35; }
+  /* ---- score bars -------------------------------------------------------- */
+  .bar-track { height: 3.2mm; background: #EDF1F6; border-radius: 2mm; margin-top: 1.5mm; }
+  .bar-fill { height: 3.2mm; border-radius: 2mm; background: #16365A; }
+  .b-EXCELLENT .bar-fill, .b-STRONG .bar-fill { background: #1F6B5E; }
+  .b-AVERAGE .bar-fill { background: #16365A; }
+  .b-NEEDS_IMPROVEMENT .bar-fill { background: #B4762A; }
+  .b-CRITICAL .bar-fill { background: #9B3A34; }
 
-  .badge-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .pill { background: #EAF5FB; color: #0F4C81; border-radius: 12px; padding: 3px 10px; font-size: 8.3pt; font-weight: 600; }
+  .pill { font-size: 7.5pt; font-weight: bold; padding: 0.8mm 2.5mm; border-radius: 6mm;
+          background: #EDF1F6; color: #16365A; }
+  .b-EXCELLENT .pill, .b-STRONG .pill { background: #E6F1EE; color: #1F6B5E; }
+  .b-NEEDS_IMPROVEMENT .pill { background: #FBF1E3; color: #8A5A1D; }
+  .b-CRITICAL .pill { background: #F9E9E8; color: #8C302A; }
 
-  table.profile-table { width: 100%; border-collapse: collapse; font-size: 9.7pt; }
-  table.profile-table td { padding: 6px 4px; border-bottom: 1px solid #eef2f6; }
-  table.profile-table td.label { color: #64748b; width: 40%; }
-  table.profile-table td.value { font-weight: 600; }
+  /* one dimension row: name | score, then bar */
+  .dim { margin-bottom: 4.5mm; page-break-inside: avoid; }
+  .dim table { width: 100%; }
+  .dim .nm { font-size: 9.5pt; font-weight: bold; color: #23303D; }
+  .dim .sc { text-align: right; font-size: 9.5pt; font-weight: bold; color: #16365A; width: 30mm; white-space: nowrap; }
+  .dim .desc { font-size: 8.5pt; color: #6B7A8C; margin-top: 1.2mm; }
 
-  .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .swot-grid .box { border-radius: 8px; padding: 12px; }
-  .swot-grid .box h4 { margin-bottom: 6px; font-size: 10pt; }
-  .swot-grid .s { background: #EAF5FB; }
-  .swot-grid .w { background: #fdf2f2; }
-  .swot-grid .o { background: #f0fbf6; }
-  .swot-grid .t { background: #fff7e6; }
+  /* ---- rank cards (at a glance) ------------------------------------------
+     openhtmltopdf has no calc(), so column gaps come from cell padding and the
+     visible card is an inner div rather than a bordered cell. */
+  table.cards { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  table.cards > tbody > tr > td { width: 25%; vertical-align: top; padding-right: 3mm; }
+  .rankcard { border: 1px solid #E3E9F0; border-radius: 3mm; padding: 4mm; page-break-inside: avoid; }
+  .rankcard .no { font-size: 8pt; font-weight: bold; color: #1F6B5E; letter-spacing: 1px; }
+  .rankcard .nm { font-size: 9.5pt; font-weight: bold; color: #16365A; margin-top: 1.5mm; line-height: 1.3; height: 11mm; }
+  .rankcard .pc { font-size: 17pt; font-weight: bold; color: #16365A; }
 
-  .goal-block { margin-bottom: 12px; }
-  .goal-block h4 { font-size: 10pt; color: #0F4C81; margin-bottom: 5px; }
+  /* ---- generic 2-col table ---------------------------------------------- */
+  table.two { width: 100%; border-collapse: collapse; }
+  table.two > tbody > tr > td { width: 50%; vertical-align: top; padding: 0 2mm 0 0; }
 
-  .career-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .career-row .field { width: 42%; font-size: 9.3pt; font-weight: 600; }
-  .career-row .bar-track { flex: 1; }
-  .career-row .stars { width: 60px; text-align: right; color: #f59e0b; font-size: 9pt; }
+  table.scale { width: 100%; border-collapse: collapse; margin-top: 3mm; }
+  table.scale td { padding: 2.5mm 3mm; border-bottom: 1px solid #EDF1F6; font-size: 9pt; }
+  table.scale td.rg { width: 22mm; font-weight: bold; color: #16365A; }
+  table.scale td.lb { width: 38mm; }
 
-  .signature-row { display: flex; justify-content: space-between; margin-top: 40px; font-size: 9.5pt; }
-  .signature-row .line { border-top: 1px solid #94a3b8; margin-top: 30px; padding-top: 4px; width: 200px; }
+  ul.tight { margin: 0; padding-left: 4.5mm; }
+  ul.tight li { margin-bottom: 2mm; font-size: 9pt; line-height: 1.45; }
+
+  .swot { width: 100%; border-collapse: separate; border-spacing: 3mm; }
+  .swot td { width: 50%; vertical-align: top; padding: 4mm; border-radius: 3mm; page-break-inside: avoid; }
+  .swot .s { background: #E6F1EE; }
+  .swot .w { background: #FBF1E3; }
+  .swot .o { background: #EDF1F6; }
+  .swot .t { background: #F9E9E8; }
+  .swot h4 { font-size: 10pt; margin-bottom: 2.5mm; }
+
+  .step { border-left: 3px solid #1F6B5E; padding: 0 0 0 4mm; margin-bottom: 5mm; page-break-inside: avoid; }
+  .step .no { font-size: 8pt; font-weight: bold; letter-spacing: 1.5px; color: #1F6B5E; }
+  .step h4 { font-size: 11pt; margin: 1mm 0 2mm; }
+
+  .career { margin-bottom: 4mm; page-break-inside: avoid; }
+  .career table { width: 100%; }
+  .career .fld { font-size: 10pt; font-weight: bold; color: #16365A; }
+  .career .st { text-align: right; width: 26mm; }
+  /* Rating dots are drawn, not typed: the base-14 Helvetica face has no
+     WinAnsi glyph for a filled circle and would render as "#". */
+  .dot { display: inline-block; width: 2.2mm; height: 2.2mm; border-radius: 50%;
+         background: #B4762A; margin-left: 1mm; }
+  .dot-off { background: #E3E9F0; }
+
+  .closing { page-break-before: always; text-align: center; padding-top: 55mm; }
+  .closing .big { font-size: 21pt; color: #16365A; line-height: 1.35; letter-spacing: 0.5px; }
+  .closing .sub { font-size: 11pt; color: #1F6B5E; margin-top: 8mm; line-height: 1.7; }
+  .closing-logo { width: 34mm; height: auto; margin: 26mm auto 0; display: block; }
+
+  .reslabel { font-size: 9.5pt; color: #16365A; margin: 0 0 1.5mm; }
+  .reslabel + ul.tight { margin-bottom: 3mm; }
+  .disclaimer { font-size: 7.5pt; color: #8A97A6; line-height: 1.5; margin-top: 8mm; }
+
+  .signature-row { margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #E3E9F0;
+                   font-size: 9pt; color: #6B7A8C; }
+  .signature-row span:last-child { float: right; }
 </style>
 </head>
 <body>
 
-<!-- ================================ PAGE 1: COVER ================================ -->
-<div class="page cover">
-  <div class="logo-badge">TM</div>
-  <h1>THE MENTALIST</h1>
-  <h2>Mental Skill Assessment Report</h2>
-  <div class="tagline">Helping Students Build Strong Minds for a Successful Future</div>
-  <div style="font-size:14pt;font-weight:600;" th:text="${profile.studentName}">Student Name</div>
-  <div class="meta-row">
-    <div><span>Report ID</span><span th:text="${reportNumber}">TM-1-20260101</span></div>
-    <div><span>Assessment Date</span><span th:text="${assessmentDate}">01 Jan 2026</span></div>
-    <div><span>Class</span><span th:text="${profile.className} ?: '-'">Class</span></div>
-  </div>
-  <div class="confidential">Confidential Report</div>
+<!-- running header/footer sources: rendered into the @page margin boxes -->
+<div id="headerRight">Student Psychometric Assessment Report</div>
+<div id="footerLeft">
+  <span th:text="${profile.studentName}">Student</span> &#183; Confidential
 </div>
 
-<!-- ================================ PAGE 2: STUDENT PROFILE ================================ -->
-<div class="page">
-  <div class="page-head"><div class="num">2</div><div><div class="sub">Personal Details</div><h2>Student Profile</h2></div></div>
-  <div class="card">
-    <table class="profile-table">
-      <tr><td class="label">Student Name</td><td class="value" th:text="${profile.studentName} ?: '-'">-</td></tr>
-      <tr><td class="label">Guardian's Name</td><td class="value" th:text="${profile.guardianName} ?: '-'">-</td></tr>
-      <tr><td class="label">Gender</td><td class="value" th:text="${profile.gender} ?: '-'">-</td></tr>
-      <tr><td class="label">Age</td><td class="value" th:text="${profile.age} ?: '-'">-</td></tr>
-      <tr><td class="label">Date of Birth</td><td class="value" th:text="${profile.dob} ?: '-'">-</td></tr>
-      <tr><td class="label">Class</td><td class="value" th:text="${profile.className} ?: '-'">-</td></tr>
-      <tr><td class="label">School</td><td class="value" th:text="${profile.school} ?: '-'">-</td></tr>
-      <tr><td class="label">City</td><td class="value" th:text="${profile.city} ?: '-'">-</td></tr>
-      <tr><td class="label">Assessment Date</td><td class="value" th:text="${profile.assessmentDate}">-</td></tr>
-      <tr><td class="label">Report Number</td><td class="value" th:text="${profile.reportNumber}">-</td></tr>
-      <tr><td class="label">Counsellor Name</td><td class="value" th:text="${profile.counsellorName} ?: '-'">-</td></tr>
+<!-- ============================ 1. COVER ============================ -->
+<div class="cover">
+  <div class="cover-rule"></div>
+
+  <img class="cover-logo" th:if="${companyLogo}" th:src="${companyLogo}" alt="Company logo"/>
+  <div class="cover-wordmark" th:unless="${companyLogo}">THE MENTALIST</div>
+
+  <h1>STUDENT PSYCHOMETRIC<br/>ASSESSMENT REPORT</h1>
+  <div class="quote">&#8220;Understanding Your Strengths,<br/>Interests &amp; Growth Potential&#8221;</div>
+
+  <div class="cover-meta">
+    <table>
+      <tr>
+        <td><div class="k">Student</div><div class="v" th:text="${profile.studentName} ?: '-'">Student Name</div></td>
+        <td><div class="k">Class</div><div class="v" th:text="${profile.className} ?: '-'">-</div></td>
+        <td><div class="k">Assessment Date</div><div class="v" th:text="${assessmentDate} ?: '-'">-</div></td>
+      </tr>
     </table>
   </div>
-  <div class="content-block">
-    <h4 style="margin-bottom:6px;">Purpose of Assessment</h4>
-    <p class="muted" style="font-size:9.7pt;">This report is designed to understand the student's personality, emotional
-      well-being, learning style, career readiness, behavioural traits, and overall mental strengths. The results
-      help parents and educators provide appropriate guidance.</p>
-  </div>
-  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 2 of 15</span></div>
+
+  <div class="programme" th:if="${profile.subjectName}" th:text="${profile.subjectName}">Assessment</div>
+  <div class="confidential">Confidential Report &#183; <span th:text="${reportNumber}">Report</span></div>
 </div>
 
-<!-- ================================ PAGE 3: MESSAGE TO PARENTS ================================ -->
-<div class="page">
-  <div class="page-head"><div class="num">3</div><div><h2>Message to Parents</h2></div></div>
-  <div class="card" style="font-size:10.3pt;">
-    <p><strong>Dear Parents,</strong></p>
-    <p>Every child is unique.</p>
-    <p>Academic marks tell only a small part of your child's story. Their confidence, emotional strength, personality,
-       decision-making ability, communication skills, learning style, and career interests play an equally important
-       role in future success.</p>
-    <p>This report has been prepared after a scientific psychometric assessment to help you understand your child's
-       strengths and areas requiring support.</p>
-    <p><strong>Please remember:</strong></p>
-    <ul class="tight" style="font-size:9.7pt;">
-      <li>There are no "good" or "bad" personalities.</li>
-      <li>Every child has unique abilities.</li>
-      <li>The purpose of this report is not to judge but to guide.</li>
-      <li>With proper guidance, every child can become successful.</li>
-    </ul>
-    <p>We encourage parents to discuss the report positively with their child and use it as a roadmap for future growth.</p>
-    <p class="muted" style="font-size:8.7pt;">This report is not for medical or diagnostic use.</p>
-    <p style="margin-top:20px;">Warm Regards,<br/><strong class="primary">The Mentalist</strong></p>
+<!-- ==================== 2. YOUR REPORT AT A GLANCE ==================== -->
+<div class="section">
+  <div class="section-head">
+    <div class="eyebrow">Executive Summary</div>
+    <h2>Your Report at a Glance</h2>
   </div>
-  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 3 of 15</span></div>
+
+  <div class="card tint">
+    <table style="width:100%;">
+      <tr>
+        <td><div class="small muted">STUDENT</div><div style="font-weight:bold;" th:text="${profile.studentName} ?: '-'">-</div></td>
+        <td><div class="small muted">CLASS</div><div style="font-weight:bold;" th:text="${profile.className} ?: '-'">-</div></td>
+        <td><div class="small muted">ASSESSMENT DATE</div><div style="font-weight:bold;" th:text="${assessmentDate} ?: '-'">-</div></td>
+      </tr>
+    </table>
+  </div>
+
+  <div th:if="${classGuidance}" class="card" style="margin-top:4mm;">
+    <h3 th:text="${classGuidance.stageTitle}">Stage</h3>
+    <p class="small" style="margin:0;" th:text="${classGuidance.stageFocus}">Focus for this class.</p>
+  </div>
+
+  <h3 style="margin-top:7mm;">Your Key Strengths</h3>
+  <table class="cards" th:if="${atAGlance}">
+    <tr>
+      <td th:each="i : ${#numbers.sequence(0, 3)}"
+          th:with="s=${i &lt; atAGlance.keyStrengths.size()} ? ${atAGlance.keyStrengths[i]} : null"
+          th:classappend="${s != null} ? 'b-' + ${s.interpretationBand} : ''">
+        <div class="rankcard" th:if="${s != null}">
+          <div class="no" th:text="${i &lt; 9} ? '0' + ${i + 1} : ${i + 1}">01</div>
+          <div class="nm" th:text="${s.dimensionName}">Dimension</div>
+          <div class="pc" th:text="${#numbers.formatDecimal(s.percentage, 1, 0)} + '%'">0%</div>
+          <div><span class="pill" th:text="${s.interpretationLabel}">Strong</span></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <h3 style="margin-top:7mm;">Areas to Develop</h3>
+  <!-- Always four fixed columns so both card rows line up, empty cells included. -->
+  <table class="cards" th:if="${atAGlance}">
+    <tr>
+      <td th:each="i : ${#numbers.sequence(0, 3)}"
+          th:with="a=${i &lt; atAGlance.areasToDevelop.size()} ? ${atAGlance.areasToDevelop[i]} : null"
+          th:classappend="${a != null} ? 'b-' + ${a.interpretationBand} : ''">
+        <div class="rankcard" th:if="${a != null}">
+          <div class="no" th:text="${i &lt; 9} ? '0' + ${i + 1} : ${i + 1}">01</div>
+          <div class="nm" th:text="${a.dimensionName}">Dimension</div>
+          <div class="pc" th:text="${#numbers.formatDecimal(a.percentage, 1, 0)} + '%'">0%</div>
+          <div><span class="pill" th:text="${a.interpretationLabel}">Developing</span></div>
+        </div>
+      </td>
+    </tr>
+  </table>
 </div>
 
-<!-- ============ PAGES 4-8, 10-11: reuse traitSection fragment ============ -->
-<div th:replace="~{report/fragments :: traitSection(4, 'Personality Analysis', 'Overall Personality: ' + ${personalityType}, ${personality})}"></div>
-<div th:replace="~{report/fragments :: traitSection(5, 'Emotional Intelligence', 'Explain', ${emotionalIntelligence})}"></div>
-<div th:replace="~{report/fragments :: traitSection(6, 'Learning Style Analysis', 'Learning Preference', ${learningStyle})}"></div>
-<div th:replace="~{report/fragments :: traitSection(7, 'Multiple Intelligence Report', 'Explain all', ${multipleIntelligence})}"></div>
-<div th:replace="~{report/fragments :: traitSection(8, 'Communication &amp; Leadership Skills', 'Explain', ${communicationLeadership})}"></div>
+<!-- ==================== 3. HOW TO READ YOUR REPORT ==================== -->
+<div class="section">
+  <div class="section-head">
+    <div class="eyebrow">Before You Begin</div>
+    <h2>How to Read Your Report</h2>
+  </div>
 
-<!-- ================================ PAGE 9: CAREER INTEREST ================================ -->
-<div class="page">
-  <div class="page-head"><div class="num">9</div><div><div class="sub">Most Suitable Career Domains</div><h2>Career Interest Assessment</h2></div></div>
-  <div class="card">
-    <div th:each="c : ${careers}" class="career-row">
-      <div class="field" th:text="${c.field}">Field</div>
-      <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${c.score} + '%'"></div></div>
-      <div class="stars"><span th:each="i : ${#numbers.sequence(1, c.stars)}">*</span><span th:text="'/5'">/5</span></div>
+  <p class="lead" th:text="${howToReadContent?.intro}">Your scores are not marks or grades.</p>
+
+  <table class="two">
+    <tr>
+      <td>
+        <div class="card">
+          <h3>What a higher score means</h3>
+          <p class="small" style="margin:0;" th:text="${howToReadContent?.higherMeans}">-</p>
+        </div>
+      </td>
+      <td>
+        <div class="card tint">
+          <h3>What a lower score means</h3>
+          <p class="small" style="margin:0;" th:text="${howToReadContent?.lowerMeans}">-</p>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="card" style="margin-top:4mm;" th:if="${howToReadContent != null and howToReadContent.cautions != null}">
+    <h3>Please Keep in Mind</h3>
+    <ul class="tight"><li th:each="c : ${howToReadContent.cautions}" th:text="${c}">-</li></ul>
+  </div>
+
+  <h3 style="margin-top:7mm;">The Interpretation Scale</h3>
+  <table class="scale">
+    <tr th:each="b : ${bandScale}" th:classappend="'b-' + ${b.band}">
+      <td class="rg" th:text="${b.range}">0-39</td>
+      <td class="lb"><span class="pill" th:text="${b.label}">Band</span></td>
+      <td>
+        <div class="bar-track">
+          <div class="bar-fill" th:style="'width:' + ${b.to} + '%'"></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <p class="small muted" style="margin-top:4mm;">The same scale is used everywhere in this report.</p>
+</div>
+
+<!-- ============ 3b. YOUR PERSONAL PROFILE + HOW STRENGTHS WORK TOGETHER ============ -->
+<div class="section" th:if="${synthesis != null and synthesis.personalProfile != null}">
+  <div class="section-head">
+    <div class="eyebrow">Written for You</div>
+    <h2>Your Personal Profile</h2>
+  </div>
+
+  <div class="card tint">
+    <p style="margin:0;" th:text="${synthesis.personalProfile}">Personalised narrative.</p>
+  </div>
+
+  <div th:if="${synthesis.strengthsTogether != null}">
+    <h3 style="margin-top:7mm;">How Your Strengths Work Together</h3>
+    <div class="card">
+      <p style="margin:0;" th:text="${synthesis.strengthsTogether}">Cross-dimension narrative.</p>
     </div>
   </div>
-  <div class="content-block">
-    <div class="status" th:text="${careerInterest.content.status}">Status</div>
+
+  <div th:each="t : ${synthesis.themes}" class="card" style="margin-top:4mm;">
+    <h3 th:text="${t.title}">Theme</h3>
+    <p class="small muted" style="margin:0 0 2mm;">
+      Based on: <span th:text="${#strings.listJoin(t.matchedDimensions, ', ')}">-</span>
+    </p>
+    <p class="small" style="margin:0;"><strong>What to do with it. </strong><span th:text="${t.suggestion}">-</span></p>
   </div>
-  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 9 of 15</span></div>
 </div>
 
-<div th:replace="~{report/fragments :: traitSection(10, 'Behavioural Analysis', 'Explain', ${behaviourAnalysis})}"></div>
-<div th:replace="~{report/fragments :: traitSection(11, 'Mental Wellness Report', 'Explain', ${mentalWellness})}"></div>
-
-<!-- ================================ PAGE 12: SWOT ================================ -->
-<div class="page">
-  <div class="page-head"><div class="num">12</div><div><h2>SWOT Analysis</h2></div></div>
-  <div class="swot-grid">
-    <div class="box s"><h4 class="primary">Strengths</h4><ul class="tight"><li th:each="s : ${swot.strengths}" th:text="${s}">-</li></ul></div>
-    <div class="box w"><h4 style="color:#b91c1c;">Weaknesses</h4><ul class="tight"><li th:each="w : ${swot.weaknesses}" th:text="${w}">-</li></ul></div>
-    <div class="box o"><h4 style="color:#0f766e;">Opportunities</h4><ul class="tight"><li th:each="o : ${swot.opportunities}" th:text="${o}">-</li></ul></div>
-    <div class="box t"><h4 style="color:#b45309;">Areas for Development</h4><ul class="tight"><li th:each="d : ${swot.development}" th:text="${d}">-</li></ul></div>
+<!-- ==================== 4. DIMENSION GROUP SECTIONS ==================== -->
+<div th:each="g : ${dimensionGroups}" class="section">
+  <div class="section-head">
+    <div class="eyebrow" th:text="${g.subtitle}">Profile</div>
+    <h2 th:text="${g.title}">Group</h2>
   </div>
-  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 12 of 15</span></div>
-</div>
 
-<!-- ================================ PAGE 13: DEVELOPMENT PLAN ================================ -->
-<div class="page">
-  <div class="page-head"><div class="num">13</div><div><h2>Overall Development Plan</h2></div></div>
-  <div class="goal-block"><h4>Short-Term Goals (30 Days)</h4><ul class="tight"><li th:each="g : ${developmentPlan.shortTerm}" th:text="${g}">-</li></ul></div>
-  <div class="goal-block"><h4>Medium-Term Goals (90 Days)</h4><ul class="tight"><li th:each="g : ${developmentPlan.mediumTerm}" th:text="${g}">-</li></ul></div>
-  <div class="goal-block"><h4>Long-Term Goals (1 Year)</h4><ul class="tight"><li th:each="g : ${developmentPlan.longTerm}" th:text="${g}">-</li></ul></div>
-  <div class="grid-2">
-    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Parent Action Plan</h4><ul class="tight"><li th:each="p : ${developmentPlan.parentActionPlan}" th:text="${p}">-</li></ul></div>
-    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Teacher Action Plan</h4><ul class="tight"><li th:each="t : ${developmentPlan.teacherActionPlan}" th:text="${t}">-</li></ul></div>
+  <!-- Section introduction: what this group of dimensions actually is -->
+  <div th:if="${g.intro != null}">
+    <p class="lead" th:text="${g.intro.whatItIs}">What this section is.</p>
+    <table class="two">
+      <tr>
+        <td><div class="card"><h3>How to Read This Section</h3>
+          <p class="small" style="margin:0;" th:text="${g.intro.howToRead}">-</p></div></td>
+        <td><div class="card tint"><h3>Why Profiles Differ</h3>
+          <p class="small" style="margin:0;" th:text="${g.intro.whyItVaries}">-</p></div></td>
+      </tr>
+    </table>
   </div>
-  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 13 of 15</span></div>
-</div>
 
-<!-- ================================ PAGE 14: CAREER & ACADEMIC GUIDANCE ================================ -->
-<div class="page">
-  <div class="page-head"><div class="num">14</div><div><h2>Career &amp; Academic Guidance</h2></div></div>
+  <h3 style="margin-top:7mm;">Your Profile</h3>
   <div class="card">
-    <h4 style="font-size:9.5pt;margin-bottom:6px;">Recommended Streams</h4>
-    <div class="badge-list"><span th:each="s : ${careerGuidance.recommendedStreams}" class="pill" th:text="${s}">Stream</span></div>
+    <div th:each="d : ${g.dimensions}" class="dim" th:classappend="${g.relativeScale} ? '' : 'b-' + ${d.interpretationBand}">
+      <table>
+        <tr>
+          <td class="nm" th:text="${d.dimensionName}">Dimension</td>
+          <td class="sc">
+            <span th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</span>
+            <span class="pill" th:unless="${g.relativeScale}" th:text="${d.interpretationLabel}">Band</span>
+            <span class="pill" th:if="${g.relativeScale}" th:text="'#' + ${d.rank}">#1</span>
+          </td>
+        </tr>
+      </table>
+      <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${d.barWidth} + '%'"></div></div>
+      <div class="desc" th:if="${d.description}" th:text="${d.description}">What this measures.</div>
+    </div>
   </div>
-  <div class="grid-2" style="margin-top:12px;">
-    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Books</h4><ul class="tight"><li th:each="b : ${careerGuidance.books}" th:text="${b}">-</li></ul></div>
-    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Competitions</h4><ul class="tight"><li th:each="c : ${careerGuidance.competitions}" th:text="${c}">-</li></ul></div>
-    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Skill Courses</h4><ul class="tight"><li th:each="c : ${careerGuidance.skillCourses}" th:text="${c}">-</li></ul></div>
-    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Online Learning</h4><ul class="tight"><li th:each="o : ${careerGuidance.onlineLearning}" th:text="${o}">-</li></ul></div>
+
+  <!-- One detailed page per leading dimension, only where content was authored -->
+  <div th:each="t : ${g.top}" th:if="${t.hasContent}" class="dimpage">
+    <div class="dim-head">
+      <table style="width:100%;">
+        <tr>
+          <td>
+            <div class="eyebrow" th:text="${g.subtitle}">Profile</div>
+            <h2 style="font-size:16pt;" th:text="${t.dimensionName}">Dimension</h2>
+          </td>
+          <td style="text-align:right;vertical-align:bottom;white-space:nowrap;">
+            <span style="font-size:20pt;font-weight:bold;color:#16365A;"
+                  th:text="${#numbers.formatDecimal(t.percentage, 1, 0)} + '%'">0%</span><br/>
+            <span class="pill" th:unless="${g.relativeScale}" th:text="${t.interpretationLabel}">Band</span>
+            <span class="pill" th:if="${g.relativeScale}" th:text="'Rank #' + ${t.rank} + ' of ' + ${g.dimensions.size()}">#1</span>
+          </td>
+        </tr>
+      </table>
+      <div class="bar-track" th:classappend="${g.relativeScale} ? '' : 'b-' + ${t.interpretationBand}">
+        <div class="bar-fill" th:style="'width:' + ${t.barWidth} + '%'"></div>
+      </div>
+    </div>
+
+    <h3>What Does This Measure?</h3>
+    <p th:text="${t.content.whatItMeasures}">Explanation.</p>
+
+    <div class="card tint" th:if="${t.bandNarrative}">
+      <h3>What Your Result May Mean</h3>
+      <p style="margin:0;" th:text="${t.bandNarrative}">Band-specific interpretation.</p>
+    </div>
+    <div class="card tint" th:if="${t.bandNarrative == null and g.relativeScale}">
+      <h3>What Your Result May Mean</h3>
+      <p style="margin:0;">This is one of your leading areas within this profile. It takes up a larger share
+         than the others, which suggests tasks drawing on it tend to feel more natural to you.</p>
+    </div>
+
+    <table class="two" style="margin-top:2.2mm;">
+      <tr>
+        <td>
+          <div class="card"><h3>What This May Look Like</h3>
+            <ul class="tight"><li th:each="l : ${t.content.looksLike}" th:text="${l}">-</li></ul></div>
+        </td>
+        <td>
+          <div class="card"><h3>Possible Strengths</h3>
+            <ul class="tight"><li th:each="s : ${t.content.strengths}" th:text="${s}">-</li></ul></div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="card" style="margin-top:2.2mm;">
+      <h3>How This May Support Learning</h3>
+      <p class="small" style="margin:0;" th:text="${t.content.learningImplications}">-</p>
+    </div>
+
+    <table class="two" style="margin-top:2.2mm;">
+      <tr>
+        <td>
+          <div class="card"><h3>Development Opportunities</h3>
+            <ul class="tight"><li th:each="d : ${t.content.development}" th:text="${d}">-</li></ul></div>
+        </td>
+        <td>
+          <div class="card"><h3>Activities to Try</h3>
+            <ul class="tight"><li th:each="a : ${t.content.activities}" th:text="${a}">-</li></ul></div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="card" style="margin-top:2.2mm;">
+      <h3>Career Connections</h3>
+      <p class="small muted" style="margin:0 0 2mm;">Areas worth exploring, not recommendations.</p>
+      <p style="margin:0;">
+        <span th:each="c : ${t.content.careerConnections}" class="pill" style="margin-right:2mm;" th:text="${c}">-</span>
+      </p>
+    </div>
+
+    <table class="two tips" style="margin-top:2.2mm;">
+      <tr>
+        <td><div class="card tint"><h3>Parent Tip</h3>
+          <p style="margin:0;" th:text="${t.content.parentTip}">-</p></div></td>
+        <td><div class="card tint"><h3>Student Tip</h3>
+          <p style="margin:0;" th:text="${t.content.studentTip}">-</p></div></td>
+      </tr>
+    </table>
   </div>
-  <div class="content-block"><div class="status" th:text="${careerGuidance.roadmap}">Roadmap</div></div>
-  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 14 of 15</span></div>
 </div>
 
-<!-- ================================ PAGE 15: COUNSELLOR SUMMARY ================================ -->
-<div class="page">
-  <div class="page-head"><div class="num">15</div><div><h2>Counsellor's Remarks</h2></div></div>
+<!-- ============ 5. LEGACY TRAIT SECTIONS (personality / behaviour / wellness / learning style) ============ -->
+<div th:replace="~{report/fragments :: traitSection('Your Personality &amp; Behaviour Profile', 'Overall style: ' + ${personalityType}, ${personality})}"></div>
+<div th:replace="~{report/fragments :: traitSection('How You Learn Best', 'Your Learning Profile', ${learningStyle})}"></div>
+<div th:replace="~{report/fragments :: traitSection('Emotional Intelligence in Practice', 'How You Understand Feelings', ${emotionalIntelligence})}"></div>
+<div th:replace="~{report/fragments :: traitSection('Communication &amp; Leadership', 'How You Lead and Work With Others', ${communicationLeadership})}"></div>
+<div th:replace="~{report/fragments :: traitSection('Behaviour &amp; Work Habits', 'How You Approach Things', ${behaviourAnalysis})}"></div>
+<div th:replace="~{report/fragments :: traitSection('Wellbeing Indicators', 'How You Are Doing', ${mentalWellness})}"></div>
+
+<!-- ==================== 6. CAREER EXPLORATION ==================== -->
+<div class="section">
+  <div class="section-head">
+    <div class="eyebrow">Areas That May Be Worth Exploring</div>
+    <h2>Career Exploration</h2>
+  </div>
+
+  <p class="lead">These are <strong>potential areas to explore</strong> based on your strengths and interests
+     &#8212; not predictions, and not decisions you need to make now.</p>
+
   <div class="card">
-    <h4 style="font-size:9.5pt;margin-bottom:6px;">Overall Observation</h4>
-    <p style="font-size:9.5pt;" th:text="${counsellorSummary.overallObservation}">Auto-generated summary.</p>
+    <div th:each="c : ${careers}" class="career">
+      <table>
+        <tr>
+          <td class="fld" th:text="${c.field}">Field</td>
+          <td class="st"><span th:each="i : ${#numbers.sequence(1, 5)}" class="dot"
+                               th:classappend="${i &gt; c.stars} ? 'dot-off' : ''"></span></td>
+        </tr>
+      </table>
+      <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${c.score} + '%'"></div></div>
+      <div class="desc small muted" th:if="${c.label}" th:text="${c.label}">Why this may suit you</div>
+    </div>
   </div>
-  <div class="cols3" style="margin-top:12px;">
-    <div class="col strengths"><h4>Key Strengths</h4><ul class="tight"><li th:each="s : ${counsellorSummary.keyStrengths}" th:text="${s}">-</li></ul></div>
-    <div class="col challenges"><h4>Areas to Improve</h4><ul class="tight"><li th:each="a : ${counsellorSummary.areasToImprove}" th:text="${a}">-</li></ul></div>
-    <div class="col suggestions"><h4>Final Recommendations</h4><ul class="tight"><li th:each="r : ${counsellorSummary.finalRecommendations}" th:text="${r}">-</li></ul></div>
+
+  <div class="card tint" style="margin-top:4mm;" th:if="${careerInterest}">
+    <h3>Why These Areas</h3>
+    <p class="small" style="margin:0;" th:text="${careerInterest.content.status}">Explanation.</p>
   </div>
-  <div class="grid-2" style="margin-top:12px;">
-    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Parent Recommendations</h4><ul class="tight"><li th:each="p : ${counsellorSummary.parentRecommendations}" th:text="${p}">-</li></ul></div>
-    <div class="card"><h4 style="font-size:9.5pt;margin-bottom:6px;">Teacher Recommendations</h4><ul class="tight"><li th:each="t : ${counsellorSummary.teacherRecommendations}" th:text="${t}">-</li></ul></div>
+
+  <!-- Cluster detail: what it is, why it surfaced for THIS student, what to explore -->
+  <div th:each="c : ${careerClusters}" class="card" style="margin-top:4mm;">
+    <table style="width:100%;">
+      <tr>
+        <td><h3 style="margin:0;" th:text="${c.field}">Cluster</h3></td>
+        <td class="st" style="text-align:right;width:26mm;">
+          <span th:each="i : ${#numbers.sequence(1, 5)}" class="dot"
+                th:classappend="${i &gt; c.stars} ? 'dot-off' : ''"></span>
+        </td>
+      </tr>
+    </table>
+    <p class="small" style="margin:2mm 0 0;" th:if="${c.whatItIs}" th:text="${c.whatItIs}">-</p>
+    <p class="small" style="margin:2mm 0 0;"><strong>Why this appears. </strong><span th:text="${c.whyItAppears}">-</span></p>
+    <p class="small" style="margin:2mm 0 0;" th:if="${c.exampleRoles}">
+      <strong>Possible areas. </strong><span th:text="${#strings.listJoin(c.exampleRoles, ' &#183; ')}">-</span>
+    </p>
+    <p class="small" style="margin:2mm 0 0;" th:if="${c.subjectsToExplore}">
+      <strong>Subjects to explore. </strong><span th:text="${#strings.listJoin(c.subjectsToExplore, ', ')}">-</span>
+    </p>
   </div>
-  <div class="signature-row">
-    <div><div class="line" th:text="${counsellorSummary.counsellorName} ?: 'The Mentalist Team'">Name</div>Counsellor Name / Designation</div>
-    <div><div class="line" th:text="${counsellorSummary.date}">Date</div>Date</div>
+
+  <!-- Stream guidance is gated by AssessmentContext, never by a grade test in this template -->
+  <div th:if="${streamOptions != null and !streamOptions.isEmpty()}">
+    <h3 style="margin-top:7mm;">Academic Stream Exploration</h3>
+    <p class="small muted">These are streams worth looking into, not a decision you have to make from this report.</p>
+    <div th:each="s : ${streamOptions}" class="card" style="margin-top:3mm;">
+      <h3 th:text="${s.name}">Stream</h3>
+      <p class="small" style="margin:0 0 2mm;" th:if="${s.whatItIs}" th:text="${s.whatItIs}">-</p>
+      <p class="small" style="margin:0 0 2mm;"><strong>Why it appears. </strong><span th:text="${s.whyItAppears}">-</span></p>
+      <p class="small" style="margin:0;" th:if="${s.exploreBy}">
+        <strong>Explore it by. </strong><span th:text="${#strings.listJoin(s.exploreBy, '; ')}">-</span>
+      </p>
+    </div>
   </div>
-  <p class="muted" style="font-size:7.5pt;margin-top:24px;">Disclaimer: This report is generated from a psychometric
-    assessment for educational guidance purposes only. It is not a medical or clinical diagnosis and should not be
-    used as the sole basis for major life decisions. All information is confidential.</p>
-  <div class="footer"><span class="brand">THE MENTALIST</span><span th:text="${reportNumber}">Report</span><span>Page 15 of 15</span></div>
+  <div th:if="${streamOptions == null or streamOptions.isEmpty()}" class="card tint" style="margin-top:4mm;">
+    <h3>Exploring, Not Deciding</h3>
+    <p class="small" style="margin:0;" th:text="${careerGuidance.roadmap}">Exploration guidance.</p>
+  </div>
+
+
+</div>
+
+<!-- ==================== 7. PERSONAL DEVELOPMENT MAP (SWOT) ==================== -->
+<div class="section">
+  <div class="section-head">
+    <div class="eyebrow">Bringing It Together</div>
+    <h2>Your Personal Development Map</h2>
+  </div>
+
+  <table class="swot">
+    <tr>
+      <td class="s">
+        <h4 style="color:#1F6B5E;">Strengths</h4>
+        <div class="small muted" style="margin-bottom:2mm;">What you naturally do well</div>
+        <ul class="tight"><li th:each="s : ${swot.strengths}" th:text="${s}">-</li></ul>
+      </td>
+      <td class="w">
+        <h4 style="color:#8A5A1D;">Development Areas</h4>
+        <div class="small muted" style="margin-bottom:2mm;">What you can improve</div>
+        <ul class="tight"><li th:each="w : ${swot.weaknesses}" th:text="${w}">-</li></ul>
+      </td>
+    </tr>
+    <tr>
+      <td class="o">
+        <h4>Opportunities</h4>
+        <div class="small muted" style="margin-bottom:2mm;">Where your strengths can be used</div>
+        <ul class="tight"><li th:each="o : ${swot.opportunities}" th:text="${o}">-</li></ul>
+      </td>
+      <td class="t">
+        <h4 style="color:#8C302A;">Things to Be Mindful Of</h4>
+        <div class="small muted" style="margin-bottom:2mm;">Worth keeping an eye on</div>
+        <ul class="tight"><li th:each="d : ${swot.development}" th:text="${d}">-</li></ul>
+      </td>
+    </tr>
+  </table>
+
+  <h3 style="margin-top:7mm;">Your Growth Plan</h3>
+  <div class="card"><h4>Next 30 Days</h4><ul class="tight"><li th:each="g : ${developmentPlan.shortTerm}" th:text="${g}">-</li></ul></div>
+  <div class="card"><h4>Next 90 Days</h4><ul class="tight"><li th:each="g : ${developmentPlan.mediumTerm}" th:text="${g}">-</li></ul></div>
+  <div class="card"><h4>This Year</h4><ul class="tight"><li th:each="g : ${developmentPlan.longTerm}" th:text="${g}">-</li></ul></div>
+</div>
+
+<!-- ==================== 8. A NOTE FOR PARENTS ==================== -->
+<div class="section">
+  <div class="section-head">
+    <div class="eyebrow">For Families</div>
+    <h2>A Note for Parents</h2>
+  </div>
+
+  <p class="lead" th:text="${parentGuideContent?.intro}">Every child is different.</p>
+
+  <div class="card" th:if="${parentGuideContent != null and parentGuideContent.howToDiscuss != null}">
+    <h3>How to Discuss It</h3>
+    <ul class="tight"><li th:each="p : ${parentGuideContent.howToDiscuss}" th:text="${p}">-</li></ul>
+  </div>
+
+  <table class="two" style="margin-top:4mm;" th:if="${parentGuideContent != null}">
+    <tr>
+      <td><div class="card"><h3>Supporting Strengths</h3>
+        <ul class="tight"><li th:each="p : ${parentGuideContent.supportingStrengths}" th:text="${p}">-</li></ul></div></td>
+      <td><div class="card"><h3>Supporting Development Areas</h3>
+        <ul class="tight"><li th:each="p : ${parentGuideContent.supportingDevelopment}" th:text="${p}">-</li></ul></div></td>
+    </tr>
+  </table>
+
+  <!-- Deliberate second parent page: these three blocks together fill it,
+       rather than spilling one card onto a near-empty page. -->
+  <div style="page-break-before: always;">
+  <div class="card" style="margin-top:4mm;" th:if="${parentGuideContent != null and parentGuideContent.whatNotToDo != null}">
+    <h3>What to Avoid</h3>
+    <ul class="tight"><li th:each="p : ${parentGuideContent.whatNotToDo}" th:text="${p}">-</li></ul>
+  </div>
+
+  <div class="card tint" style="margin-top:4mm;" th:if="${parentGuideContent?.usingWithSchool}">
+    <h3>Using This With the School</h3>
+    <p class="small" style="margin:0;" th:text="${parentGuideContent.usingWithSchool}">-</p>
+  </div>
+
+  <div class="card" style="margin-top:4mm;">
+    <h3>This Term</h3>
+    <ul class="tight"><li th:each="p : ${developmentPlan.parentActionPlan}" th:text="${p}">-</li></ul>
+  </div>
+  </div>
+</div>
+
+<!-- ==================== 8b. TEACHER & COUNSELLOR GUIDANCE ==================== -->
+<div class="section" th:if="${teacherGuideContent != null}">
+  <div class="section-head">
+    <div class="eyebrow">For Educators</div>
+    <h2>Guidance for Teachers &amp; Counsellors</h2>
+  </div>
+
+  <p class="lead" th:text="${teacherGuideContent.intro}">-</p>
+
+  <div class="card" th:if="${teacherGuideContent.classroomSupport != null}">
+    <h3>Classroom Support</h3>
+    <ul class="tight"><li th:each="t : ${teacherGuideContent.classroomSupport}" th:text="${t}">-</li></ul>
+  </div>
+
+  <table class="two" style="margin-top:4mm;">
+    <tr>
+      <td><div class="card"><h3>Observation Points</h3>
+        <ul class="tight"><li th:each="t : ${teacherGuideContent.observationPoints}" th:text="${t}">-</li></ul></div></td>
+      <td><div class="card"><h3>Follow-Up</h3>
+        <ul class="tight"><li th:each="t : ${teacherGuideContent.followUp}" th:text="${t}">-</li></ul></div></td>
+    </tr>
+  </table>
+
+  <div class="card tint" style="margin-top:4mm;">
+    <h3>Suggested Actions This Term</h3>
+    <ul class="tight"><li th:each="t : ${developmentPlan.teacherActionPlan}" th:text="${t}">-</li></ul>
+  </div>
+</div>
+
+<!-- ==================== 8c. COUNSELLOR'S SUMMARY ==================== -->
+<div class="section" th:if="${synthesis != null and synthesis.counsellorNarrative != null}">
+  <div class="section-head">
+    <div class="eyebrow">Bringing It Together</div>
+    <h2>Counsellor's Summary</h2>
+  </div>
+
+  <div class="card tint">
+    <p style="margin:0;" th:text="${synthesis.counsellorNarrative}">Counsellor narrative.</p>
+  </div>
+
+  <div class="card" style="margin-top:4mm;" th:if="${counsellorSummary?.overallObservation}">
+    <h3>Additional Observation</h3>
+    <p class="small" style="margin:0;" th:text="${counsellorSummary.overallObservation}">-</p>
+  </div>
+
+  <table class="two" style="margin-top:4mm;" th:if="${counsellorSummary}">
+    <tr>
+      <td><div class="card"><h3>Key Strengths</h3>
+        <ul class="tight"><li th:each="s : ${counsellorSummary.keyStrengths}" th:text="${s}">-</li></ul></div></td>
+      <td><div class="card"><h3>Areas to Improve</h3>
+        <ul class="tight"><li th:each="a : ${counsellorSummary.areasToImprove}" th:text="${a}">-</li></ul></div></td>
+    </tr>
+  </table>
+
+  <div class="signature-row" th:if="${counsellorSummary}">
+    <span th:text="${counsellorSummary.counsellorName} ?: 'The Mentalist Team'">Counsellor</span>
+    <span th:text="${counsellorSummary.date}">Date</span>
+  </div>
+
+  <p class="disclaimer">This report is generated from a psychometric assessment for educational guidance
+     purposes only. It is not a medical or clinical diagnosis and should not be used as the sole basis for
+     major decisions. All information is confidential.</p>
+</div>
+
+<!-- ==================== 9. YOUR NEXT STEPS ==================== -->
+<div class="section">
+  <div class="section-head">
+    <div class="eyebrow">Where to Go From Here</div>
+    <h2>Your Next Steps</h2>
+  </div>
+
+  <div th:if="${nextSteps}">
+    <div class="step">
+      <div class="no">01</div>
+      <h4>Build on Your Strengths</h4>
+      <ul class="tight"><li th:each="s : ${nextSteps.buildOnStrengths}" th:text="${s}">-</li></ul>
+    </div>
+    <div class="step">
+      <div class="no">02</div>
+      <h4>Develop One Area at a Time</h4>
+      <ul class="tight"><li th:each="d : ${nextSteps.developAreas}" th:text="${d}">-</li></ul>
+    </div>
+    <div class="step">
+      <div class="no">03</div>
+      <h4>Explore Related Subjects &amp; Activities</h4>
+      <ul class="tight"><li th:each="a : ${nextSteps.practicalActions}" th:text="${a}">-</li></ul>
+    </div>
+  </div>
+
+  <!-- One card rather than four, so this block cannot spill onto a near-empty page -->
+  <div class="card" style="margin-top:4mm;">
+    <h3>Ways to Explore Further</h3>
+    <table class="two">
+      <tr>
+        <td>
+          <h4 class="reslabel">Try Reading</h4>
+          <ul class="tight"><li th:each="b : ${careerGuidance.books}" th:text="${b}">-</li></ul>
+          <h4 class="reslabel">Skills to Build</h4>
+          <ul class="tight"><li th:each="c : ${careerGuidance.skillCourses}" th:text="${c}">-</li></ul>
+        </td>
+        <td>
+          <h4 class="reslabel">Try Taking Part In</h4>
+          <ul class="tight"><li th:each="c : ${careerGuidance.competitions}" th:text="${c}">-</li></ul>
+          <h4 class="reslabel">Learn Online</h4>
+          <ul class="tight"><li th:each="o : ${careerGuidance.onlineLearning}" th:text="${o}">-</li></ul>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card tint" th:if="${counsellorSummary}" style="margin-top:4mm;">
+    <table class="two">
+      <tr>
+        <td><h3>Your Key Strengths</h3><ul class="tight"><li th:each="s : ${counsellorSummary.keyStrengths}" th:text="${s}">-</li></ul></td>
+        <td><h3>Worth Working On</h3><ul class="tight"><li th:each="a : ${counsellorSummary.areasToImprove}" th:text="${a}">-</li></ul></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 10. CLOSING ==================== -->
+<div class="closing">
+  <div class="big">YOUR POTENTIAL<br/>IS NOT A SCORE.</div>
+  <div class="sub">It is a starting point for understanding yourself,<br/>
+       exploring possibilities and growing with confidence.</div>
+
+  <img class="closing-logo" th:if="${companyLogo}" th:src="${companyLogo}" alt="Company logo"/>
+  <div class="cover-wordmark" th:unless="${companyLogo}" style="font-size:15pt;margin-top:26mm;">THE MENTALIST</div>
+
+  <div class="small muted" style="margin-top:6mm;">
+    Report <span th:text="${reportNumber}">-</span>
+    <span th:if="${counsellorSummary}"> &#183; <span th:text="${counsellorSummary.date}">-</span></span>
+  </div>
 </div>
 
 </body>

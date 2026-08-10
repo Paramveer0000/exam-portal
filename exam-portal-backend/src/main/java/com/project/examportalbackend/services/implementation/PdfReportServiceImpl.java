@@ -54,6 +54,21 @@ public class PdfReportServiceImpl implements PdfReportService {
         ctx.setVariable("developmentPlan", dto.getDevelopmentPlan());
         ctx.setVariable("careerGuidance", dto.getCareerGuidance());
         ctx.setVariable("counsellorSummary", dto.getCounsellorSummary());
+        // Phase D presentation layer
+        ctx.setVariable("companyLogo", dto.getCompanyLogo());
+        ctx.setVariable("atAGlance", dto.getAtAGlance());
+        ctx.setVariable("bandScale", dto.getBandScale());
+        ctx.setVariable("dimensionGroups", dto.getDimensionGroups());
+        ctx.setVariable("classGuidance", dto.getClassGuidance());
+        ctx.setVariable("parentGuide", dto.getParentGuide());
+        ctx.setVariable("nextSteps", dto.getNextSteps());
+        // Content Engine V2
+        ctx.setVariable("synthesis", dto.getSynthesis());
+        ctx.setVariable("careerClusters", dto.getCareerClusters());
+        ctx.setVariable("streamOptions", dto.getStreamOptions());
+        ctx.setVariable("parentGuideContent", dto.getParentGuideContent());
+        ctx.setVariable("teacherGuideContent", dto.getTeacherGuideContent());
+        ctx.setVariable("howToReadContent", dto.getHowToReadContent());
         return ctx;
     }
 }

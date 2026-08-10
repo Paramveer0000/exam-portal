@@ -1,0 +1,247 @@
+{
+  "R": {
+    "dimensionCode": "R",
+    "whatItMeasures": "The Realistic interest area describes a preference for practical, hands-on work with tools, machines, materials or the outdoors. People with this interest usually like tasks with a visible result and clear standards: something is built, fixed or measured, and you can tell whether it worked. It is about the kind of work someone enjoys, not about how capable they are.",
+    "looksLike": [
+      "Prefers doing over discussing",
+      "Enjoys building, repairing or working with equipment",
+      "Comfortable outdoors or in a workshop or laboratory",
+      "Likes tasks with a clear, visible result",
+      "Values practical usefulness over theory"
+    ],
+    "learningImplications": "This interest suits learning that involves equipment, fieldwork and demonstration. Practical sessions, technical drawing and laboratory work usually hold attention better than extended discussion. Linking theory to a physical application, or asking what a formula is actually used to build, tends to restore engagement when a topic becomes abstract.",
+    "strengths": [
+      "Practical problem solving",
+      "Working accurately with tools and equipment",
+      "Physical stamina and persistence on a task",
+      "Comfort with technical, hands-on environments"
+    ],
+    "development": [
+      "Engaging with theory before its practical use is obvious",
+      "Recording and writing up practical work",
+      "Communicating technical work to non-technical people",
+      "Exploring roles that mix practical and analytical work"
+    ],
+    "activities": [
+      "Take on repair, assembly or maintenance projects at home",
+      "Try robotics, electronics or a workshop club",
+      "Choose laboratory-heavy or field-based options where available",
+      "Shadow a technician, engineer or field professional for a day",
+      "Learn a practical skill such as basic carpentry or wiring"
+    ],
+    "careerConnections": [
+      "Engineering and technical trades",
+      "Agriculture, forestry and field science",
+      "Defence, aviation and marine work",
+      "Sports and physical training",
+      "Manufacturing and equipment operation"
+    ],
+    "parentTip": "Practical interests are often undervalued at school, so make room for them at home: let this student fix, assemble and build. When they lose interest in an academic subject, showing them the applied version of it usually helps more than extra revision. Exposure to technical and field professionals gives them a realistic sense of the options.",
+    "studentTip": "You engage with a subject once you can see what it is for. Before revising an abstract topic, find one real object or process it is used in. Look for courses and subjects with strong practical components. Work on writing up what you do, since practical ability is judged in exams through the written record."
+  },
+
+  "I": {
+    "dimensionCode": "I",
+    "whatItMeasures": "The Investigative interest area describes a preference for analysis, research and understanding how things work. People with this interest enjoy questions more than instructions: they want to gather information, test an idea and reach a conclusion themselves. They are usually comfortable with problems that take a while to solve and that do not have an obvious answer at the start.",
+    "looksLike": [
+      "Asks questions well past the point others stop",
+      "Enjoys researching a topic independently",
+      "Wants evidence before accepting a claim",
+      "Comfortable working on one problem for a long time",
+      "Interested in science, theory and how systems work"
+    ],
+    "learningImplications": "This interest suits enquiry-based learning. Being given a question to investigate usually produces more effort than being given notes to memorise. Independent projects, experiments and reading beyond the textbook work well. Purely procedural work can feel dull, so connecting a procedure to the question it answers helps maintain attention.",
+    "strengths": [
+      "Analytical and critical thinking",
+      "Independent research",
+      "Persistence with difficult problems",
+      "Evaluating evidence carefully"
+    ],
+    "development": [
+      "Reaching a conclusion rather than researching indefinitely",
+      "Explaining findings simply to a general audience",
+      "Working within deadlines and set formats",
+      "Collaborating rather than always working alone"
+    ],
+    "activities": [
+      "Run a small independent research or science project",
+      "Enter science fairs or olympiad-style competitions",
+      "Read popular science or research summaries regularly",
+      "Practise summarising a complex finding in five sentences",
+      "Set a deadline for reaching a conclusion, then defend it"
+    ],
+    "careerConnections": [
+      "Scientific research and academia",
+      "Medicine and diagnostics",
+      "Data science and analytics",
+      "Engineering research and development",
+      "Economics and policy analysis"
+    ],
+    "parentTip": "Give this student questions rather than answers, and be willing to say you do not know and look it up together. Access to books, documentaries and a science club matters more than extra worksheets. Watch for perfectionism: they may keep researching rather than finish, so help them agree what 'done' looks like in advance.",
+    "studentTip": "Turn your curiosity into finished work. Decide in advance when you will stop researching and start writing, or a good project stays unfinished. Practise explaining your findings in plain language, since that skill decides whether your work is understood. Look for subjects and courses that let you investigate rather than only reproduce."
+  },
+
+  "A": {
+    "dimensionCode": "A",
+    "whatItMeasures": "The Artistic interest area describes a preference for creative, expressive and original work. People with this interest usually like open-ended tasks with room for personal interpretation, and dislike work that must be done exactly one way. It covers visual art, writing, music, performance and design, and shows up as a wish to make something that is recognisably their own.",
+    "looksLike": [
+      "Prefers open-ended tasks to fixed instructions",
+      "Expresses ideas through art, writing, music or performance",
+      "Notices style, aesthetics and originality",
+      "Dislikes highly repetitive or rigid work",
+      "Generates unusual ideas and alternatives"
+    ],
+    "learningImplications": "This interest suits learning with room for interpretation and creative output. Projects, presentations and original responses tend to produce better work than fixed-format exercises. Allowing choice in how something is presented usually raises effort noticeably. Highly structured, repetitive practice is harder to sustain, so it works better in short, clearly bounded sessions.",
+    "strengths": [
+      "Original thinking and idea generation",
+      "Creative expression across media",
+      "Seeing alternatives others miss",
+      "Presenting ideas in engaging ways"
+    ],
+    "development": [
+      "Finishing work to a deadline and a brief",
+      "Accepting structure and critique as part of the process",
+      "Sustaining routine practice of technical skills",
+      "Building the business side of creative work"
+    ],
+    "activities": [
+      "Keep an ongoing sketchbook, portfolio or writing folder",
+      "Enter creative competitions and exhibitions",
+      "Set self-imposed briefs with a deadline and constraints",
+      "Study the technical craft behind a chosen art form",
+      "Seek critique on finished work and revise it once"
+    ],
+    "careerConnections": [
+      "Design, animation and illustration",
+      "Architecture and interior design",
+      "Writing, publishing and content creation",
+      "Film, theatre and performing arts",
+      "Advertising and creative direction"
+    ],
+    "parentTip": "Creative interest is a serious strength and worth building deliberately rather than treating as a hobby to be squeezed out at exam time. Give access to materials and to people working in creative fields. Encourage finishing: a completed piece taught to a deadline is worth far more, both for learning and for a portfolio, than many unfinished starts.",
+    "studentTip": "Ideas are not scarce for you; finished work is. Set your own briefs with real deadlines and constraints, because constraints usually improve creative work rather than limit it. Build the technical craft underneath the creativity, and keep a portfolio of completed pieces, since most creative paths are entered by showing work rather than by describing it."
+  },
+
+  "S": {
+    "dimensionCode": "S",
+    "whatItMeasures": "The Social interest area describes a preference for work that involves helping, teaching, advising or caring for other people. People with this interest are usually motivated by seeing a direct benefit to someone else, and they tend to judge work by its human impact rather than by its technical elegance or its financial return.",
+    "looksLike": [
+      "Volunteers to help others without being asked",
+      "Enjoys teaching or explaining to classmates",
+      "Sensitive to how people are treated",
+      "Prefers cooperative to competitive settings",
+      "Motivated by work that visibly helps someone"
+    ],
+    "learningImplications": "This interest suits collaborative and discussion-based learning. Peer teaching, group projects and service activities generate strong engagement. Connecting an abstract subject to its human consequence often restores motivation. Long stretches of isolated study can feel unrewarding, so building in a regular session where they explain material to someone else helps sustain effort.",
+    "strengths": [
+      "Empathy and listening",
+      "Explaining and supporting others",
+      "Cooperation and teamwork",
+      "Patience with people who are struggling"
+    ],
+    "development": [
+      "Setting limits so helping does not crowd out own work",
+      "Handling conflict rather than smoothing it over",
+      "Working alone for sustained periods",
+      "Giving difficult feedback honestly"
+    ],
+    "activities": [
+      "Take a peer-tutoring or mentoring role",
+      "Volunteer with a community or school service project",
+      "Join student council or a welfare committee",
+      "Practise active listening without offering a solution",
+      "Shadow a teacher, counsellor or healthcare worker"
+    ],
+    "careerConnections": [
+      "Teaching and education",
+      "Counselling, psychology and social work",
+      "Nursing, therapy and healthcare",
+      "Human resources and community development",
+      "Public health and the non-profit sector"
+    ],
+    "parentTip": "Value this orientation openly; students with strong social interest sometimes hear that helping professions are a lesser choice. Give real opportunities to contribute, at home and through volunteering. Watch that supporting friends does not consistently displace their own preparation, and help them practise saying no without guilt.",
+    "studentTip": "Work that helps someone keeps you motivated, so build that into how you study: teach a topic to a classmate and you will learn it twice. Protect your own preparation time, since being the person everyone leans on can quietly eat your week. Practise saying the honest thing kindly, not just the comfortable thing."
+  },
+
+  "E": {
+    "dimensionCode": "E",
+    "whatItMeasures": "The Enterprising interest area describes a preference for leading, persuading, organising and taking initiative. People with this interest usually enjoy responsibility, like starting things, and are comfortable making a decision without complete information. They are often drawn to visible results, competition and situations where their effort clearly changes the outcome.",
+    "looksLike": [
+      "Takes charge when a group has no direction",
+      "Comfortable speaking up and persuading others",
+      "Starts projects, clubs or ventures",
+      "Enjoys competition and measurable targets",
+      "Willing to decide with incomplete information"
+    ],
+    "learningImplications": "This interest suits learning with responsibility and visible outcomes. Leading a project, presenting to a group, or working towards a target usually raises effort. Debate and case-based work land well. Passive listening is harder to sustain, so giving them a role in the lesson rather than an audience seat generally improves engagement.",
+    "strengths": [
+      "Initiative and drive",
+      "Persuasion and negotiation",
+      "Organising people and resources",
+      "Comfort with decisions and risk"
+    ],
+    "development": [
+      "Listening fully before deciding",
+      "Following through after the exciting start",
+      "Sharing credit and delegating properly",
+      "Preparing thoroughly rather than improvising"
+    ],
+    "activities": [
+      "Lead a school club, event or committee",
+      "Run a small enterprise or fundraising project",
+      "Join debate, model UN or business competitions",
+      "Practise finishing one project fully before starting another",
+      "Ask for feedback on how you handle a group"
+    ],
+    "careerConnections": [
+      "Business management and entrepreneurship",
+      "Sales, marketing and business development",
+      "Law and public administration",
+      "Finance and consulting",
+      "Media, events and public relations"
+    ],
+    "parentTip": "Give this student real responsibility rather than symbolic tasks; they grow when the outcome genuinely depends on them. Let them run something and let them experience the consequences if it is not followed through. Praise completion rather than the confident start, since finishing is usually the harder half for them.",
+    "studentTip": "Starting is easy for you, finishing is where the value is, so commit to completing one thing before beginning the next. Practise listening all the way through before you respond, since your first instinct is usually to move. Seek positions with real responsibility, but prepare properly rather than relying on improvising well."
+  },
+
+  "C": {
+    "dimensionCode": "C",
+    "whatItMeasures": "The Conventional interest area describes a preference for order, accuracy and clear procedures. People with this interest usually like knowing the standard, working systematically, and producing work that is correct and well organised. They tend to be reliable with detail and deadlines, and are often the person who notices the error everyone else has read past.",
+    "looksLike": [
+      "Keeps notes, files and schedules well organised",
+      "Prefers clear instructions and known standards",
+      "Notices errors and inconsistencies in detail",
+      "Finishes work reliably and on time",
+      "Uncomfortable when expectations are vague"
+    ],
+    "learningImplications": "This interest suits structured learning with clear criteria. Checklists, marking schemes, worked procedures and organised notes all support performance. Open-ended tasks with no stated standard can cause hesitation, so asking what a good answer would contain before starting usually unblocks the work. Systematic revision timetables genuinely suit this student rather than being imposed.",
+    "strengths": [
+      "Accuracy and attention to detail",
+      "Organisation and time management",
+      "Reliability and follow-through",
+      "Working systematically to a standard"
+    ],
+    "development": [
+      "Tolerating open-ended tasks without a fixed answer",
+      "Taking a reasonable risk when there is no precedent",
+      "Avoiding perfectionism on low-stakes work",
+      "Adapting when a plan has to change"
+    ],
+    "activities": [
+      "Maintain a revision timetable and track completion",
+      "Take the record-keeping role in a group project",
+      "Practise one deliberately open-ended creative task weekly",
+      "Learn spreadsheet and data-organisation skills",
+      "Set a time limit on checking, then submit"
+    ],
+    "careerConnections": [
+      "Accounting, auditing and taxation",
+      "Banking and financial operations",
+      "Administration and operations management",
+      "Data management and quality assurance",
+      "Law, compliance and records"
+    ],
+    "parentTip": "This student's organisation is a real asset, so trust their systems rather than replacing them with yours. Where they struggle is ambiguity: when a task has no clear standard, help them define what a good result would look like before they start. Watch for perfectionism on work that does not warrant it, and help them judge when good enough is genuinely enough.",
+    "studentTip": "Your organisation gives you a real advantage, so use it: build the timetable, keep the error log, work to the marking scheme. Your growth area is ambiguity. When a task has no clear right answer, write your own definition of a good result and work to that. Set a checking time limit so accuracy does not turn into never submitting."
+  }
+}

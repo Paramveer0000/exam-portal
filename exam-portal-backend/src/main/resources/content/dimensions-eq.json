@@ -1,0 +1,276 @@
+{
+  "EMPATHY": {
+    "dimensionCode": "EMPATHY",
+    "whatItMeasures": "Empathy and social awareness describe how readily a student notices what other people are feeling and takes it into account. It covers picking up on tone and body language, imagining a situation from someone else's position, and responding to that rather than only to what was said. It is a skill that develops with practice, not a fixed personality trait.",
+    "looksLike": [
+      "Notices when a classmate is upset before being told",
+      "Adjusts what they say based on how someone reacts",
+      "Considers the other side in a disagreement",
+      "Is sought out by friends who need to talk",
+      "Uncomfortable when someone is treated unfairly"
+    ],
+    "learningImplications": "Awareness of others supports group work, discussion and any subject involving human behaviour or interpretation. It helps in literature, history and the social sciences, where understanding a perspective is part of the task. In group projects this student often keeps the team functioning. The balance to watch is absorbing other people's stress during high-pressure periods.",
+    "strengths": ["Understanding other perspectives", "Building trust quickly", "Defusing tension in a group", "Responding to unspoken cues"],
+    "development": ["Setting limits so others' problems are not carried alone", "Saying the honest thing as well as the kind thing", "Staying steady when others are anxious", "Acting on what is noticed rather than only noticing"],
+    "activities": [
+      "Practise reflecting back what someone said before replying",
+      "Take a mentoring or buddy role with a younger student",
+      "Read fiction and discuss why a character acted as they did",
+      "Discuss a disagreement from both sides before judging",
+      "Volunteer with a community or peer-support activity"
+    ],
+    "careerConnections": ["Counselling and psychology", "Teaching and pastoral roles", "Healthcare and patient care", "Human resources", "Social and community work"],
+    "parentTip": "Name this as a strength out loud; students who feel deeply are sometimes told they are too sensitive. Help them notice when they are carrying someone else's worry, and that stepping back is allowed. Asking what they think another person was feeling in a situation turns a natural tendency into a deliberate, usable skill.",
+    "studentTip": "Reading people is genuinely useful, especially in team work. Two things to practise: acting on what you notice rather than only noticing it, and putting the problem down when it is not yours to carry. Being kind and being honest are not opposites, and the most useful feedback is usually both."
+  },
+
+  "STRESS_MGMT": {
+    "dimensionCode": "STRESS_MGMT",
+    "whatItMeasures": "Stress management describes how a student copes when demands rise, such as during exams, deadlines or unexpected change. It covers noticing pressure early, keeping routines going, and using strategies that help rather than ones that simply postpone the problem. This is an educational indicator of coping habits, not a health assessment.",
+    "looksLike": [
+      "Keeps working steadily as deadlines approach",
+      "Notices rising pressure before it becomes overwhelming",
+      "Has habits that reliably help them settle",
+      "Recovers reasonably quickly after a setback",
+      "Asks for help when workload becomes unmanageable"
+    ],
+    "learningImplications": "How a student handles pressure strongly affects exam performance, often more than how well they know the content. Steady routines, sleep and planned breaks protect recall. Where coping is still developing, timed practice under mild pressure builds tolerance gradually. The aim is a workable routine before the high-stakes period, not extra effort during it.",
+    "strengths": ["Staying functional under deadline pressure", "Recovering after disappointment", "Keeping routines during busy periods", "Recognising own limits"],
+    "development": ["Preparing earlier so pressure is spread out", "Building a reliable wind-down routine", "Asking for support before the point of crisis", "Separating what can and cannot be controlled"],
+    "activities": [
+      "Keep a consistent sleep schedule, especially in exam months",
+      "Break large tasks into a written list of small steps",
+      "Do timed practice papers to make exam conditions familiar",
+      "Build in regular physical activity each week",
+      "Agree one person to tell when workload feels unmanageable"
+    ],
+    "careerConnections": ["Healthcare and emergency services", "Project and operations management", "Teaching", "Aviation, defence and safety-critical roles", "Client-facing and deadline-driven work"],
+    "parentTip": "During exam periods, protect sleep, meals and some downtime rather than adding study hours; these usually do more for performance than extra revision. Ask how the preparation is going rather than what the predicted marks are. If pressure seems persistently high and is affecting sleep or appetite over weeks, involve the school counsellor.",
+    "studentTip": "Most exam stress is reduced by starting earlier, not by working harder later. Break big tasks into small written steps so progress is visible. Practise under timed conditions so the real thing is familiar. Protect sleep, it affects recall more than an extra hour of revision does. Tell someone when it becomes too much."
+  },
+
+  "SELF_MOTIVATION": {
+    "dimensionCode": "SELF_MOTIVATION",
+    "whatItMeasures": "Self-motivation describes how readily a student starts and continues work without being pushed. It covers getting going on something unappealing, keeping effort up when results are slow, and connecting daily work to a goal that matters to them. It tends to vary by subject and situation rather than being fixed.",
+    "looksLike": [
+      "Starts work without repeated reminders",
+      "Keeps going when progress is slow",
+      "Sets personal goals beyond what is required",
+      "Returns to a task after being interrupted",
+      "Works from interest rather than only for marks"
+    ],
+    "learningImplications": "Self-motivation predicts independent study more than almost any other habit. Where it is strong, the student needs goals rather than supervision. Where it is developing, short tasks with visible completion, and a clear link between today's work and something they care about, tend to work better than longer study targets or pressure.",
+    "strengths": ["Starting without being told", "Persisting through slow progress", "Setting own standards", "Working independently"],
+    "development": ["Getting started on unappealing tasks", "Keeping momentum without immediate results", "Turning long-term goals into weekly actions", "Sustaining effort in less interesting subjects"],
+    "activities": [
+      "Use a two-minute start rule for tasks you are avoiding",
+      "Set one specific weekly goal and tick it off visibly",
+      "Track a streak of completed study days",
+      "Write down why a subject matters before revising it",
+      "Study the least appealing subject first, not last"
+    ],
+    "careerConnections": ["Entrepreneurship and self-employment", "Research and independent scholarship", "Sales and commission-based roles", "Creative and freelance work", "Any role with limited supervision"],
+    "parentTip": "Motivation grows from ownership. Let this student set some of their own goals rather than receiving a timetable, and notice effort and consistency rather than only marks. If a subject has stalled, look for whether it feels pointless to them; explaining what it is actually for often restarts effort faster than pressure does.",
+    "studentTip": "Waiting to feel like it is the slowest way to start. Agree to work for two minutes and let momentum do the rest. Make progress visible with a checklist or a streak. Do the subject you least want to do first, while your energy is highest, and write one line on why it matters before you start."
+  },
+
+  "RESILIENCE": {
+    "dimensionCode": "RESILIENCE",
+    "whatItMeasures": "Resilience describes how a student responds to setbacks such as a poor result, a rejection or a plan that did not work. It covers recovering within a reasonable time, treating a failure as information rather than a verdict, and being willing to try again with an adjusted approach. It is built through experience and support rather than being something a student simply has.",
+    "looksLike": [
+      "Recovers within a reasonable time after a poor result",
+      "Willing to try again after something did not work",
+      "Treats mistakes as information rather than proof of inability",
+      "Adjusts approach instead of repeating it",
+      "Keeps perspective when one thing goes wrong"
+    ],
+    "learningImplications": "Resilience determines what happens after a bad test, which over a school career matters more than any single result. A resilient student analyses the paper and changes method; a student still developing this may avoid the subject instead. Reviewing what specifically went wrong, in writing, converts a setback into a plan and is the most reliable way to build this.",
+    "strengths": ["Recovering from disappointment", "Learning from mistakes", "Persisting after failure", "Keeping setbacks in proportion"],
+    "development": ["Separating one result from overall ability", "Reviewing a setback instead of avoiding the subject", "Asking for help after something goes wrong", "Being as fair to yourself as to a friend"],
+    "activities": [
+      "After every test, write what went wrong and one change",
+      "Keep an error log and revisit it before the next assessment",
+      "Set a goal that requires several attempts to reach",
+      "Practise a skill where early failure is normal and expected",
+      "Talk through a setback with someone before deciding what it means"
+    ],
+    "careerConnections": ["Entrepreneurship", "Research and development", "Sports and performance", "Sales and client development", "Creative and audition-based fields"],
+    "parentTip": "How a poor result is handled at home teaches more than the result itself. Ask what they think went wrong and what they would change, before discussing marks. Share your own setbacks and what you did next. If one bad result is treated as a catastrophe, avoidance of that subject usually follows.",
+    "studentTip": "A bad result is data about your method, not a verdict on your ability. Within a day or two, write down exactly what went wrong and the one thing you will change. Then go back to that subject rather than avoiding it, because avoidance is what turns a single bad mark into a long-term weakness."
+  },
+
+  "RESPONSE_CTRL": {
+    "dimensionCode": "RESPONSE_CTRL",
+    "whatItMeasures": "Response control describes the gap a student can create between feeling something and acting on it. It covers pausing before replying when annoyed, thinking through a consequence before speaking, and choosing a response rather than reacting automatically. It develops considerably through adolescence and improves with deliberate practice.",
+    "looksLike": [
+      "Pauses before responding when provoked",
+      "Thinks about consequences before speaking",
+      "Can hold back a first reaction and choose a better one",
+      "Stays measured in disagreements",
+      "Recovers composure quickly after being upset"
+    ],
+    "learningImplications": "Response control supports classroom relationships and group work, and it matters in exams too: the ability to pause rather than panic when a question looks unfamiliar protects performance. Students still developing this benefit from an agreed, concrete pause strategy rather than being told to calm down, since a specific routine is something they can actually execute.",
+    "strengths": ["Staying measured under provocation", "Thinking before speaking", "Handling disagreement calmly", "Recovering composure quickly"],
+    "development": ["Building a pause before reacting", "Noticing early signs of frustration", "Expressing disagreement without escalating", "Returning to a task after being upset"],
+    "activities": [
+      "Practise a count-to-five pause before replying when annoyed",
+      "Write a response first and send it later, if at all",
+      "Notice and name the physical signs of rising frustration",
+      "Role-play a difficult conversation before having it",
+      "Use a fixed routine when an exam question looks unfamiliar"
+    ],
+    "careerConnections": ["Client-facing and negotiation roles", "Healthcare and emergency work", "Teaching", "Law and mediation", "Team leadership"],
+    "parentTip": "Model the pause yourself, since this is learned largely by copying. Discuss incidents once everyone is calm rather than in the moment. Agree a specific strategy in advance, such as leaving the room briefly, so there is something concrete to do. Recognise improvement, because progress here is gradual and easy to overlook.",
+    "studentTip": "The gap between feeling and acting is a skill you can train. Agree one concrete pause with yourself, counting to five, or writing the message without sending it. Learn your own early warning signs so you can act before the reaction, not after. This matters in exams too: a fixed routine beats panic when a question looks strange."
+  },
+
+  "IMPULSE_CTRL": {
+    "dimensionCode": "IMPULSE_CTRL",
+    "whatItMeasures": "Impulse control and thoughtful communication describe how well a student resists acting on the first idea and instead considers before committing. It covers waiting rather than interrupting, checking work before submitting, and thinking about how a message will be received. It is closely tied to planning and to finishing work carefully.",
+    "looksLike": [
+      "Waits for their turn rather than interrupting",
+      "Checks work before handing it in",
+      "Thinks about how a message will be read",
+      "Resists the distraction of the phone during study",
+      "Plans before starting rather than diving in"
+    ],
+    "learningImplications": "This affects accuracy directly. Many lost marks come from answering too quickly, misreading a question, or not checking. Building a fixed review step into every piece of work usually recovers those marks. It also affects study conditions, since resisting distraction is what makes a study hour worth an hour rather than twenty minutes.",
+    "strengths": ["Careful, accurate work", "Thinking before communicating", "Resisting distraction", "Planning ahead"],
+    "development": ["Reading the whole question before answering", "Building a checking step into every submission", "Managing phone and notification distraction", "Pausing before sending a message written in frustration"],
+    "activities": [
+      "Reserve the last five minutes of any test for checking",
+      "Underline what a question actually asks before answering",
+      "Study with the phone in another room",
+      "Write a plan of two lines before starting a long answer",
+      "Wait an hour before replying to anything that annoyed you"
+    ],
+    "careerConnections": ["Accounting, audit and compliance", "Healthcare and clinical safety", "Quality assurance and engineering", "Legal work", "Editing and publishing"],
+    "parentTip": "Focus on process rather than speed. Ask whether the work was checked before it was handed in, and treat careless-error marks as a fixable habit rather than a lack of ability. Agree phone rules for study time together instead of imposing them, since agreed rules are far more likely to survive contact with a difficult evening.",
+    "studentTip": "A large share of lost marks are not knowledge gaps, they are speed. Underline what the question actually asks, and always keep the last five minutes for checking. Put your phone in another room while studying; willpower is not the tool for that job. Before sending a message written in irritation, wait an hour."
+  },
+
+  "ANGER_MGMT": {
+    "dimensionCode": "ANGER_MGMT",
+    "whatItMeasures": "Self-regulation in the context of anger describes how a student handles frustration and irritation. It covers noticing annoyance early, expressing it in a way that does not damage a relationship, and settling afterwards. Frustration itself is normal and useful information; this indicator is about what a student does with it.",
+    "looksLike": [
+      "Notices frustration building before it takes over",
+      "Says what is wrong instead of shutting down or lashing out",
+      "Settles reasonably quickly after being annoyed",
+      "Keeps disagreements about the issue, not the person",
+      "Can return to work after an upset"
+    ],
+    "learningImplications": "Frustration tolerance matters most with difficult material. A student who can stay with a problem that is not working learns more than one who abandons it at the first block. Where this is developing, agreeing in advance what to do when stuck, such as attempt twice, then ask, prevents frustration from ending the study session.",
+    "strengths": ["Handling frustration without escalation", "Expressing disagreement constructively", "Settling quickly after an upset", "Staying with difficult work"],
+    "development": ["Naming frustration early rather than holding it in", "Having a plan for when work is not going well", "Separating the problem from the person", "Returning to a task after walking away"],
+    "activities": [
+      "Agree a rule: try twice, then ask for help",
+      "Take a five-minute break when stuck rather than pushing through",
+      "Name what is annoying you in one sentence before reacting",
+      "Use physical activity as a regular outlet",
+      "Review afterwards what would have helped earlier"
+    ],
+    "careerConnections": ["Team leadership and supervision", "Teaching", "Customer and client relations", "Healthcare", "Mediation and negotiation"],
+    "parentTip": "Treat frustration as information rather than misbehaviour, and respond to what caused it once things are calm. Avoid discussing an incident while it is still hot. Agree in advance what they can do when stuck on homework, since most study-time frustration comes from being blocked with no agreed way out.",
+    "studentTip": "Frustration usually means you are stuck, not that you cannot do it. Agree a rule with yourself: try twice, take a short break, then ask. Naming what is annoying you in a single sentence takes most of the heat out of it. Keep disagreements about the problem rather than about the person."
+  },
+
+  "CONFLICT_CTRL": {
+    "dimensionCode": "CONFLICT_CTRL",
+    "whatItMeasures": "Emotional regulation during conflict describes how a student behaves when there is genuine disagreement. It covers staying in the conversation rather than withdrawing or escalating, listening to a position they disagree with, and looking for a resolution rather than a win. It is a learnable skill that matters in group work and later in almost every workplace.",
+    "looksLike": [
+      "Stays in the conversation during disagreement",
+      "Listens to a view they do not share",
+      "Looks for a resolution rather than winning",
+      "Keeps criticism about the issue, not the person",
+      "Can apologise or concede a point"
+    ],
+    "learningImplications": "Group projects are where this shows up at school. A student who can handle disagreement keeps a team productive; one who avoids it may agree publicly and disengage privately. Practising structured disagreement, such as stating the other position before your own, builds the skill in a low-stakes setting.",
+    "strengths": ["Staying constructive in disagreement", "Listening to opposing views", "Seeking workable resolutions", "Conceding a point gracefully"],
+    "development": ["Raising a problem instead of avoiding it", "Staying calm when strongly disagreeing", "Not agreeing publicly while disengaging privately", "Separating disagreement from personal criticism"],
+    "activities": [
+      "State the other person's position before giving your own",
+      "Take part in structured debate, arguing the side you oppose",
+      "Raise one small issue early rather than letting it build",
+      "Agree group-project roles in writing at the start",
+      "Practise conceding a point when the other side is right"
+    ],
+    "careerConnections": ["Law and mediation", "Management and team leadership", "Human resources", "Diplomacy and public policy", "Client relations"],
+    "parentTip": "Let disagreement happen at home in a manageable form; a student who is never allowed to disagree does not learn how to do it well. Model conceding a point when you are wrong. In group-project complaints, help them work out how to raise the issue with the group rather than solving it for them.",
+    "studentTip": "Disagreement handled well is a serious advantage, especially in group work. Try stating the other person's position first, in their terms, before you give yours; it changes the tone of most arguments. Raise small problems early. Being able to say you were wrong costs nothing and makes people trust your judgement more."
+  },
+
+  "RELATIONSHIP_MGMT": {
+    "dimensionCode": "RELATIONSHIP_MGMT",
+    "whatItMeasures": "Accountability and relationship management describe how a student maintains working relationships over time: keeping commitments, doing their share, repairing things after a disagreement, and being someone others can rely on. It is about consistency and follow-through rather than about popularity.",
+    "looksLike": [
+      "Does their share of group work without chasing",
+      "Keeps commitments made to friends and teachers",
+      "Repairs a relationship after a disagreement",
+      "Admits their part when something goes wrong",
+      "Is trusted by others to follow through"
+    ],
+    "learningImplications": "Reliability shapes how much responsibility a student is given, which in turn shapes their opportunities. In group projects, a student who does their part on time raises everyone's outcome. Agreeing written roles and deadlines at the start of group work makes accountability concrete rather than a matter of goodwill.",
+    "strengths": ["Reliability and follow-through", "Owning mistakes", "Maintaining long-term relationships", "Contributing fairly to group work"],
+    "development": ["Committing only to what can be delivered", "Repairing relationships rather than letting them lapse", "Raising problems with the person concerned", "Balancing others' expectations with own workload"],
+    "activities": [
+      "Write down group-project roles and deadlines at the start",
+      "Say no clearly when you cannot deliver, rather than going quiet",
+      "Follow up once on any commitment you made this week",
+      "Apologise specifically rather than generally after a mistake",
+      "Check in with a friend you have not spoken to for a while"
+    ],
+    "careerConnections": ["Project management", "Client and account management", "Team leadership", "Human resources", "Any collaborative professional role"],
+    "parentTip": "Let this student carry real commitments and experience the consequences when something is not delivered; this is how reliability is learned. Notice and name follow-through when it happens. Encourage repairing a fallen-out friendship rather than simply moving on, since that skill matters well beyond school.",
+    "studentTip": "Being reliable is quietly one of the most valuable things about you, and it is what gets you trusted with better opportunities. Only commit to what you can actually deliver, and say so clearly when you cannot rather than going silent. After a mistake, apologise for the specific thing; general apologies do not repair much."
+  },
+
+  "ENCOURAGEMENT": {
+    "dimensionCode": "ENCOURAGEMENT",
+    "whatItMeasures": "Social skill in encouraging others describes how a student supports the people around them: noticing effort, giving credit, helping someone who is struggling, and lifting a group's mood. It is a leadership behaviour that does not require a leadership title, and it strongly affects how teams function.",
+    "looksLike": [
+      "Notices and mentions other people's effort",
+      "Helps a struggling classmate without being asked",
+      "Gives credit rather than taking it",
+      "Lifts the mood of a group",
+      "Includes people who are on the edge of a group"
+    ],
+    "learningImplications": "Encouraging others improves group work and, usefully, the student's own learning: explaining and supporting a classmate consolidates the material. It also builds the social capital that makes study groups and peer help available when they themselves need it. The balance to watch is spending so long supporting others that their own work is squeezed.",
+    "strengths": ["Building others' confidence", "Creating a positive group climate", "Noticing and naming effort", "Including people"],
+    "development": ["Balancing support for others with own preparation", "Giving honest as well as positive feedback", "Accepting encouragement from others", "Encouraging specifically rather than generally"],
+    "activities": [
+      "Give one specific piece of praise each day, naming what was good",
+      "Take a peer-support or buddy role formally",
+      "Invite the quietest person in a group to contribute",
+      "Practise pairing a positive comment with one honest suggestion",
+      "Ask for feedback on your own work as well as giving it"
+    ],
+    "careerConnections": ["Teaching and coaching", "Team leadership and management", "Human resources and training", "Counselling", "Community organising"],
+    "parentTip": "Name this strength; encouraging others is a genuine leadership quality that report cards rarely mention. Make sure supporting friends is not consistently eating into their own study time. Encourage the harder half of the skill too, which is being honest as well as positive, since real support sometimes means saying the difficult thing.",
+    "studentTip": "Encouraging people is a leadership skill, whether or not you hold a title. Make it specific: naming exactly what someone did well is worth far more than a general compliment. Two things to work on, pairing honesty with encouragement, and protecting your own preparation time so supporting others does not quietly cost you your week."
+  },
+
+  "FEEDBACK_ACCEPT": {
+    "dimensionCode": "FEEDBACK_ACCEPT",
+    "whatItMeasures": "Self-awareness and feedback acceptance describe how a student receives correction and uses it. It covers listening without becoming defensive, separating criticism of work from criticism of self, and actually changing something afterwards. It is one of the strongest predictors of improvement over time, because it determines whether teaching turns into progress.",
+    "looksLike": [
+      "Listens to correction without becoming defensive",
+      "Asks what specifically to improve",
+      "Changes approach after feedback",
+      "Separates comments on work from their worth as a person",
+      "Seeks out feedback rather than avoiding it"
+    ],
+    "learningImplications": "This is the mechanism by which teaching becomes improvement. A student who reads the comments and acts on them gains far more from the same marked paper than one who looks only at the score. Building a habit of turning each piece of feedback into one specific action makes the effect concrete and visible.",
+    "strengths": ["Using correction constructively", "Asking for specific guidance", "Adjusting approach quickly", "Honest self-assessment"],
+    "development": ["Hearing criticism without taking it personally", "Asking for feedback before the final attempt", "Acting on feedback rather than only noting it", "Seeking out views that differ from your own"],
+    "activities": [
+      "Read the comments on a marked paper before the mark",
+      "Turn each piece of feedback into one specific action",
+      "Ask a teacher what one change would improve your work most",
+      "Show work in draft rather than only when finished",
+      "Keep a list of repeated feedback and check it before submitting"
+    ],
+    "careerConnections": ["Any professional role with review or appraisal", "Design and creative work with client revision", "Research and peer review", "Medicine and supervised practice", "Consulting"],
+    "parentTip": "Separate the work from the child in how you talk about results, since that is what makes feedback bearable. Ask what the teacher suggested rather than only what the mark was. Model it yourself by accepting correction visibly. A student who can hear feedback improves faster than one who is simply told they are clever.",
+    "studentTip": "Feedback is the cheapest way to improve, so go looking for it rather than waiting. Read the comments before the mark. Turn each comment into one specific thing you will do differently, otherwise it stays an opinion rather than a change. Show work in draft, when there is still time to act on what you hear."
+  }
+}

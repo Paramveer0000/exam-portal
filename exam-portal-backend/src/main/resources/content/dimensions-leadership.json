@@ -1,0 +1,151 @@
+{
+  "COMMUNICATION": {
+    "dimensionCode": "COMMUNICATION",
+    "whatItMeasures": "Communication describes how clearly a student gets an idea across and how well they take one in. It covers explaining something so the listener actually follows it, adjusting for the audience, listening properly rather than waiting to speak, and asking a question when something is unclear. It applies to writing and listening as much as to speaking confidently.",
+    "looksLike": [
+      "Explains an idea so others follow it the first time",
+      "Adjusts how they explain based on who is listening",
+      "Asks a clarifying question instead of guessing",
+      "Listens fully before responding",
+      "Comfortable presenting to a group"
+    ],
+    "learningImplications": "Communication affects marks directly, because most examinations assess the explanation rather than the understanding. A student who knows a topic but cannot structure an answer loses marks that are recoverable. Practising explaining topics aloud, then writing the same explanation under time, converts understanding into the form that is actually assessed.",
+    "strengths": ["Explaining clearly", "Adapting to the audience", "Listening and questioning well", "Presenting with confidence"],
+    "development": ["Being concise rather than thorough", "Listening fully before forming a reply", "Structuring written answers as clearly as spoken ones", "Checking the message was understood"],
+    "activities": [
+      "Explain each topic aloud after studying it",
+      "Join debate, drama or a public-speaking activity",
+      "Practise summarising a chapter in five sentences",
+      "Present a topic to a younger student and answer their questions",
+      "Write a timed answer immediately after explaining it aloud"
+    ],
+    "careerConnections": ["Teaching and training", "Law and advocacy", "Management and team leadership", "Media, marketing and public relations", "Sales and client relations"],
+    "parentTip": "Give this student regular chances to explain things to you and ask genuine follow-up questions, since that is where explanation gets sharper. If their spoken explanations are much stronger than their written answers, that gap is usually the quickest source of extra marks; ask them to explain aloud, then write the same thing down.",
+    "studentTip": "In exams you are marked on the explanation, not on what you know, so practise the explanation. Say the topic aloud until it comes out cleanly, then write it under time. Aim for clear rather than complete; a well-structured shorter answer usually scores better than everything you know in no particular order."
+  },
+
+  "TEAMWORK": {
+    "dimensionCode": "TEAMWORK",
+    "whatItMeasures": "Teamwork describes how effectively a student works as part of a group: contributing their share, coordinating with others, adapting when plans change, and putting the group's result ahead of individual credit. It covers both cooperating and being someone the group can depend on to deliver.",
+    "looksLike": [
+      "Delivers their part of a group task on time",
+      "Coordinates rather than working in isolation",
+      "Adjusts when the group changes direction",
+      "Shares credit for a good result",
+      "Steps in where the group is short-handed"
+    ],
+    "learningImplications": "Group projects, laboratory pairs and study groups are where this shows. Students who work well in teams get more out of collaborative study and are given more responsibility. Agreeing roles and deadlines in writing at the start of a project is the single most effective habit, since most group failures are coordination problems rather than effort problems.",
+    "strengths": ["Contributing reliably to a group", "Coordinating with others", "Adapting to changing plans", "Sharing credit"],
+    "development": ["Speaking up when the group is going wrong", "Not absorbing others' unfinished work", "Working independently as well as collaboratively", "Holding teammates to agreed commitments"],
+    "activities": [
+      "Agree written roles and deadlines at the start of group work",
+      "Take a different role than usual in the next project",
+      "Practise raising a concern with the group early",
+      "Play a team sport or join a group activity regularly",
+      "Review after a project what the group would do differently"
+    ],
+    "careerConnections": ["Project and operations management", "Healthcare teams", "Engineering and product development", "Sports and coaching", "Any collaborative professional environment"],
+    "parentTip": "When group-work complaints come up, resist solving it for them; help them work out how to raise it with the group instead. Team sports and group activities build this more effectively than instruction does. Watch for a pattern of quietly doing everyone else's share, which is common in conscientious students and worth naming.",
+    "studentTip": "Most group projects fail on coordination rather than effort, so agree who is doing what, and by when, in writing at the very start. If something is going wrong, say so early while it is still fixable. Do not silently absorb other people's work; it feels responsible but it teaches the group nothing and costs you time."
+  },
+
+  "OWNERSHIP": {
+    "dimensionCode": "OWNERSHIP",
+    "whatItMeasures": "Responsibility and ownership describe how far a student takes charge of outcomes that are theirs. It covers following through without supervision, admitting a mistake rather than explaining it away, and taking on a task because it needs doing. It is closely linked to how much independence and responsibility a student is trusted with.",
+    "looksLike": [
+      "Follows through without needing reminders",
+      "Admits a mistake rather than shifting blame",
+      "Takes on a task because it needs doing",
+      "Keeps track of their own deadlines",
+      "Fixes a problem rather than reporting it and stopping"
+    ],
+    "learningImplications": "Ownership is what makes independent study possible. A student with strong ownership can be given a goal rather than a timetable. Where it is developing, shorter cycles with visible checkpoints work better than long unsupervised stretches. Handing over control gradually, as it is earned, builds the habit faster than either full supervision or full freedom.",
+    "strengths": ["Following through independently", "Owning mistakes", "Taking initiative", "Managing own deadlines"],
+    "development": ["Taking on responsibility before being asked", "Owning outcomes rather than explaining them", "Asking for help without handing over the problem", "Keeping track of commitments in writing"],
+    "activities": [
+      "Own one household or school responsibility end to end",
+      "Keep your own deadline list rather than relying on reminders",
+      "When something goes wrong, state your part first",
+      "Volunteer for one task nobody has picked up",
+      "Review weekly what you committed to and what you delivered"
+    ],
+    "careerConnections": ["Entrepreneurship", "Project management", "Team leadership", "Consulting and client delivery", "Any role with limited supervision"],
+    "parentTip": "Hand over responsibility in steps and let the consequences of not following through actually land, within reason. Rescuing a forgotten assignment teaches that reminders will always come. Notice and name follow-through when it happens, since ownership is usually only mentioned when it is missing.",
+    "studentTip": "Keep your own list of what you have committed to, rather than relying on being reminded; that single habit changes how much you are trusted with. When something goes wrong, state your part in it first, it costs less than it feels like it will. Taking on the task nobody picked up is how you get given better ones."
+  },
+
+  "DECISION_CONF": {
+    "dimensionCode": "DECISION_CONF",
+    "whatItMeasures": "Decision-making confidence describes how comfortably a student reaches a decision and commits to it. It covers choosing without complete information, weighing options without getting stuck, standing by a choice under mild pressure, and revising it when there is a genuine reason rather than because someone pushed back.",
+    "looksLike": [
+      "Reaches a decision without excessive deliberation",
+      "Commits to a choice and follows it through",
+      "Stands by a decision under mild pressure",
+      "Changes course for a reason, not because of pressure",
+      "Comfortable choosing without complete information"
+    ],
+    "learningImplications": "Decision confidence matters in exams, where hesitating between options costs time and second-guessing changes right answers to wrong ones. It matters more in subject and stream choices, where the risk is deferring the decision until it is made by default. Practising deciding within a set time, then reviewing the outcome, builds the skill safely.",
+    "strengths": ["Deciding without over-deliberating", "Committing to a choice", "Holding a position under pressure", "Acting with incomplete information"],
+    "development": ["Setting a time limit on deciding", "Distinguishing a real reason to change from social pressure", "Gathering enough information without gathering all of it", "Reviewing decisions to build judgement"],
+    "activities": [
+      "Set a deadline for any decision and hold to it",
+      "In practice papers, do not change an answer without a clear reason",
+      "Write down two options and the deciding factor, then choose",
+      "Take a role that requires making calls for a group",
+      "Review a past decision and what you would repeat"
+    ],
+    "careerConnections": ["Management and leadership", "Entrepreneurship", "Medicine and emergency response", "Law", "Finance and investment"],
+    "parentTip": "Let this student make real choices and live with the results, starting with small ones. Avoid making decisions for them to save time, since that is exactly the practice they need. When they do decide, ask about their reasoning rather than only the outcome, because good reasoning sometimes produces a poor result and is still worth reinforcing.",
+    "studentTip": "Give every decision a deadline, or gathering information quietly becomes avoiding the choice. Write the two options and the one factor that actually decides it. In exams, do not change an answer unless you have a specific reason; second-guessing costs more marks than it saves. Review decisions afterwards to build judgement."
+  },
+
+  "ADAPTABILITY": {
+    "dimensionCode": "ADAPTABILITY",
+    "whatItMeasures": "Adaptability describes how a student handles change: a new teacher, an altered syllabus, an unexpected question format, or a plan that has to be abandoned. It covers adjusting without losing momentum, trying a different approach when the first one fails, and staying functional when the situation is unfamiliar.",
+    "looksLike": [
+      "Adjusts quickly when plans change",
+      "Tries a different approach when the first fails",
+      "Comfortable with unfamiliar tasks and formats",
+      "Recovers momentum after a disruption",
+      "Willing to work in different ways or settings"
+    ],
+    "learningImplications": "Adaptability protects performance when something unexpected happens, which in exams is common: an unusual question, a changed format, a topic that did not come up. Students who can switch approach lose less. Deliberately varying study methods and practising unfamiliar question types builds tolerance for that in advance.",
+    "strengths": ["Adjusting to change quickly", "Trying alternative approaches", "Working in unfamiliar situations", "Recovering after disruption"],
+    "development": ["Staying organised while adapting", "Keeping core routines through change", "Choosing when to adapt and when to persist", "Preparing for more than one likely scenario"],
+    "activities": [
+      "Practise unfamiliar question formats deliberately",
+      "Vary study location and method occasionally",
+      "When a method is not working after two attempts, switch",
+      "Take on an unfamiliar role in a group activity",
+      "Plan a second approach before you need it"
+    ],
+    "careerConnections": ["Startups and entrepreneurship", "Consulting", "Emergency and frontline services", "Technology and product roles", "Field and travel-based work"],
+    "parentTip": "Small, manageable changes build this: a new activity, an unfamiliar setting, a different way of doing something routine. When plans change, talk through the adjustment rather than absorbing the disruption for them. Balance matters, though; adaptability works best on top of stable core routines for sleep, meals and study.",
+    "studentTip": "Exams reward the ability to handle a question you did not expect, so practise unfamiliar formats rather than only the ones you are good at. If a study method is not working after two honest attempts, change it instead of repeating it harder. Keep your core routines stable, and adapt the methods on top of them."
+  },
+
+  "CONFLICT_RES": {
+    "dimensionCode": "CONFLICT_RES",
+    "whatItMeasures": "Conflict resolution describes how effectively a student helps settle a disagreement, whether their own or between others. It covers hearing both positions accurately, finding the actual point of difference, and reaching something both sides can accept. It is a step beyond staying calm in conflict: it is the ability to move a disagreement towards resolution.",
+    "looksLike": [
+      "Helps settle disagreements between others",
+      "Identifies what the disagreement is actually about",
+      "Hears both positions before proposing anything",
+      "Proposes solutions rather than assigning blame",
+      "Keeps a disagreement from becoming personal"
+    ],
+    "learningImplications": "This matters most in group projects, where unresolved disagreement usually shows up as a poor final product. A student who can resolve it keeps the group's work on track. Practising in low-stakes situations, by restating both positions before suggesting anything, builds a habit that transfers directly to workplaces later.",
+    "strengths": ["Mediating between others", "Finding the real point of disagreement", "Proposing workable compromises", "Keeping conflict impersonal"],
+    "development": ["Addressing conflict early rather than hoping it resolves", "Handling disagreements you are personally involved in", "Ensuring the quieter side is heard", "Following up that the resolution held"],
+    "activities": [
+      "Restate both positions before suggesting a solution",
+      "Raise a small group-project issue early rather than late",
+      "Take part in structured debate or peer mediation",
+      "Ask the quieter person in a group what they think",
+      "Check a week later whether an agreement actually held"
+    ],
+    "careerConnections": ["Law, mediation and arbitration", "Human resources", "Management and team leadership", "Diplomacy and public policy", "Counselling"],
+    "parentTip": "When siblings or friends fall out, coaching them through resolving it teaches more than settling it yourself. Ask what each side actually wanted, since disagreements are often about something different from what is being argued. Model repairing things after a disagreement at home, because that is where the pattern is learned first.",
+    "studentTip": "Most disagreements are not about what people are arguing over, so find the real point of difference first. Restating both positions before you suggest anything defuses more than any clever compromise. Address problems in group work early, while they are small. And check later that the agreement actually held, because often it does not."
+  }
+}
