@@ -59,10 +59,14 @@ const PsychometricReportPage = () => {
   // Download only appears once the AI narrative exists. Generates the
   // 15-page PDF server-side (or reuses the previously generated one) then
   // saves it via the browser.
-  const downloadPdf = async () => {
+  // The server keeps the first PDF it rendered for an attempt so an issued
+  // report stays reproducible. That also means a plain download can never pick
+  // up a newer report layout, so `regenerate` is the explicit opt-in to
+  // re-render this attempt from the current template.
+  const downloadPdf = async (regenerate = false) => {
     setPdfLoading(true);
     setPdfError(null);
-    const gen = await mentalistReportServices.generateReport(quizResId, {});
+    const gen = await mentalistReportServices.generateReport(quizResId, { regenerate });
     if (!gen.data) {
       setPdfLoading(false);
       setPdfError(gen.error || "Could not generate the report");
@@ -126,15 +130,33 @@ const PsychometricReportPage = () => {
 
       <div className="psychReport__actions">
         {aiSummary && !aiSummary.startsWith("__error__:") ? (
-          <Button variant="success" onClick={downloadPdf} disabled={pdfLoading}>
-            {pdfLoading ? (
-              <>
-                <Spinner as="span" size="sm" animation="border" /> Preparing PDF…
-              </>
-            ) : (
-              "Download The Mentalist Report (PDF)"
-            )}
-          </Button>
+          <>
+            <Button
+              variant="success"
+              onClick={() => downloadPdf(false)}
+              disabled={pdfLoading}
+            >
+              {pdfLoading ? (
+                <>
+                  <Spinner as="span" size="sm" animation="border" /> Preparing PDF…
+                </>
+              ) : (
+                "Download The Mentalist Report (PDF)"
+              )}
+            </Button>
+            {/* Re-renders this attempt from the current report template. The
+                scores are read back from the stored result, so a rebuilt PDF
+                shows the same numbers in the newer layout. */}
+            <Button
+              variant="outline-secondary"
+              className="ms-2"
+              onClick={() => downloadPdf(true)}
+              disabled={pdfLoading}
+              title="Re-create the PDF using the latest report design. Scores are unchanged."
+            >
+              Rebuild PDF
+            </Button>
+          </>
         ) : (
           <Button
             variant="primary"
