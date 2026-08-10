@@ -251,8 +251,15 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
         swot.setOpportunities(careers.stream().limit(3)
                 .map(c -> c.getField() + " is a promising direction given the current profile.")
                 .collect(Collectors.toList()));
+        // The two lowest dimensions usually land in the same band, so their
+        // first suggestion is the same sentence -- taking suggestions.get(0)
+        // from each printed that line twice in the SWOT quadrant. Draw from
+        // every suggestion the two dimensions offer and keep the first two
+        // DISTINCT ones instead. Presentation-only: no score is read or changed.
         swot.setDevelopment(ranked.subList(ranked.size() - 2, ranked.size()).stream()
-                .map(e -> interpretationEngine.interpret(titleCase(e.getKey()), e.getValue()).suggestions.get(0))
+                .flatMap(e -> interpretationEngine.interpret(titleCase(e.getKey()), e.getValue()).suggestions.stream())
+                .distinct()
+                .limit(2)
                 .collect(Collectors.toList()));
         return swot;
     }
