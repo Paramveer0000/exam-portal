@@ -54,6 +54,11 @@
   /* ---- running header / footer ------------------------------------------ */
   #headerRight { position: running(headerRight); font-size: 7.5pt; color: #8A97A6; text-align: right; }
   #footerLeft  { position: running(footerLeft);  font-size: 7.5pt; color: #8A97A6; }
+  /* Small logo repeated in the top-right of every content page. The image is
+     embedded once and referenced by the running element, so this does not
+     multiply the PDF size per page. */
+  #headerRight img { width: 22mm; height: auto; }
+  #headerRight .hdr-tag { display: block; margin-top: 0.8mm; }
 
   /* ---- cover -------------------------------------------------------------
      Fixed vertical budget for A4 (297mm). Spacing is deliberately generous:
@@ -187,6 +192,60 @@
   .gauge-sc { text-align: right; white-space: nowrap; width: 32mm; padding-left: 3mm;
               font-size: 9.5pt; font-weight: bold; color: #16365A; }
 
+  /* ---- accent cards ------------------------------------------------------
+     Tinted panel with a thick coloured left edge. Accents rotate so a run of
+     cards reads as distinct blocks instead of one grey wall. Colours stay
+     inside the brand tokens (navy / green / teal / amber), not the reference
+     document's palette. */
+  .acard { border-radius: 3mm; padding: 4.5mm 5mm; margin-bottom: 4mm;
+           border-left: 2.4mm solid #16365A; background: #F4F7FA;
+           page-break-inside: avoid; }
+  .acard h3 { font-size: 11.5pt; margin-bottom: 2mm; color: #16365A; }
+  .acard p:last-child { margin-bottom: 0; }
+  .acard .val { font-size: 15pt; font-weight: bold; color: #16365A; }
+  .acard-1 { border-left-color: #16365A; background: #F1F5FA; }
+  .acard-1 h3, .acard-1 .val { color: #16365A; }
+  .acard-2 { border-left-color: #1F6B5E; background: #EFF6F4; }
+  .acard-2 h3, .acard-2 .val { color: #1F6B5E; }
+  .acard-3 { border-left-color: #2C7A8C; background: #EEF5F7; }
+  .acard-3 h3, .acard-3 .val { color: #23606E; }
+  .acard-4 { border-left-color: #B4762A; background: #FBF4E9; }
+  .acard-4 h3, .acard-4 .val { color: #8A5A1D; }
+
+  /* ---- ranked bar chart --------------------------------------------------
+     Label column right-aligned, rounded pill bar, value at the far right.
+     A table (not flex) because openhtmltopdf renders CSS 2.1. */
+  table.rank { width: 100%; border-collapse: collapse; }
+  table.rank td { padding: 1.1mm 0; vertical-align: middle; }
+  table.rank td.lb { width: 52mm; text-align: right; padding-right: 3mm;
+                     font-size: 8.5pt; font-weight: bold; color: #23303D; }
+  table.rank td.vl { width: 14mm; text-align: right; padding-left: 2.5mm;
+                     font-size: 9pt; font-weight: bold; color: #1F6B5E; white-space: nowrap; }
+  .rbar { height: 3.6mm; background: #EDF1F6; border-radius: 1.8mm; }
+  .rbar div { height: 3.6mm; border-radius: 1.8mm; background: #1F6B5E; }
+  /* Leading rows get the darker brand navy so the top of the list reads first */
+  .rank .top div { background: #16365A; }
+
+  /* ---- chips -------------------------------------------------------------
+     Tag pills used for career roles / subjects, grouped under a small label. */
+  .chipgroup { margin-bottom: 3mm; }
+  .chipgroup .glabel { font-size: 9pt; font-weight: bold; color: #16365A; margin-bottom: 1.8mm; }
+  .chip { display: inline-block; font-size: 7.5pt; padding: 1mm 2.6mm; margin: 0 1.6mm 1.6mm 0;
+          border-radius: 5mm; background: #EFF6F4; color: #1F6B5E; }
+  .chip-alt { background: #F1F5FA; color: #16365A; }
+
+  /* ---- callout ----------------------------------------------------------- */
+  .callout { border: 1px solid #CFE4DE; border-left: 2.4mm solid #1F6B5E;
+             background: #F3FAF8; border-radius: 3mm; padding: 4mm 4.5mm;
+             page-break-inside: avoid; }
+  .callout .clabel { font-size: 8pt; font-weight: bold; letter-spacing: 1.5px;
+                     text-transform: uppercase; color: #1F6B5E; margin-bottom: 2mm; }
+
+  /* ---- subhead with a coloured rule (reference-style section divider) ----- */
+  .subhead { font-size: 11.5pt; font-weight: bold; color: #16365A;
+             border-bottom: 1.2mm solid #1F6B5E; padding-bottom: 2mm;
+             margin: 7mm 0 4mm; page-break-after: avoid; }
+
   /* ---- generic 2-col table ---------------------------------------------- */
   table.two { width: 100%; border-collapse: collapse; }
   table.two > tbody > tr > td { width: 50%; vertical-align: top; padding: 0 2mm 0 0; }
@@ -249,7 +308,13 @@
 <body>
 
 <!-- running header/footer sources: rendered into the @page margin boxes -->
-<div id="headerRight">Psychometric &amp; Mental Skill Assessment Report</div>
+<!-- Logo only: the section title already sits top-left on every page, so a
+     second line of text here just crowds it. Falls back to the report name
+     when no logo is configured. -->
+<div id="headerRight">
+  <img th:if="${companyLogo}" th:src="${companyLogo}" alt=""/>
+  <span class="hdr-tag" th:unless="${companyLogo}">Psychometric &amp; Mental Skill Assessment Report</span>
+</div>
 <div id="footerLeft">
   <span th:text="${brand.name} ?: 'The Mentalist'">The Mentalist</span>
   &#183; Confidential Student Assessment Report
@@ -543,16 +608,16 @@
     <div class="card" style="margin-top:2.2mm;">
       <h3>Career Connections</h3>
       <p class="small muted" style="margin:0 0 2mm;">Areas worth exploring, not recommendations.</p>
-      <p style="margin:0;">
-        <span th:each="c : ${t.content.careerConnections}" class="pill" style="margin-right:2mm;" th:text="${c}">-</span>
-      </p>
+      <div class="chipgroup" style="margin:0;">
+        <span th:each="c : ${t.content.careerConnections}" class="chip" th:text="${c}">-</span>
+      </div>
     </div>
 
     <table class="two tips" style="margin-top:2.2mm;">
       <tr>
-        <td><div class="card tint"><h3>Parent Tip</h3>
+        <td><div class="acard acard-2" style="margin:0;"><h3>Parent Tip</h3>
           <p style="margin:0;" th:text="${t.content.parentTip}">-</p></div></td>
-        <td><div class="card tint"><h3>Student Tip</h3>
+        <td><div class="acard acard-3" style="margin:0;"><h3>Student Tip</h3>
           <p style="margin:0;" th:text="${t.content.studentTip}">-</p></div></td>
       </tr>
     </table>
@@ -579,18 +644,32 @@
   <p class="lead">These are <strong>potential areas to explore</strong> based on your strengths and interests
      &#8212; not predictions, and not decisions you need to make now.</p>
 
-  <div class="card">
-    <div th:each="c : ${careers}" class="career">
-      <table>
-        <tr>
-          <td class="fld" th:text="${c.field}">Field</td>
-          <td class="st"><span th:each="i : ${#numbers.sequence(1, 5)}" class="dot"
-                               th:classappend="${i &gt; c.stars} ? 'dot-off' : ''"></span></td>
-        </tr>
-      </table>
-      <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${c.score} + '%'"></div></div>
-      <div class="desc small muted" th:if="${c.label}" th:text="${c.label}">Why this may suit you</div>
-    </div>
+  <!-- Ranked alignment chart: label, pill bar, value. Draws the same c.score
+       the engine produced; presentation only. -->
+  <div class="subhead">Interest and Ability Alignment</div>
+  <table class="rank">
+    <tr th:each="c,it : ${careers}" th:classappend="${it.index &lt; 3} ? 'top' : ''">
+      <td class="lb" th:text="${c.field}">Field</td>
+      <td>
+        <div class="rbar"><div th:style="'width:' + ${c.score} + '%'"></div></div>
+      </td>
+      <td class="vl" th:text="${#numbers.formatDecimal(c.score, 1, 0)}">0</td>
+    </tr>
+  </table>
+
+  <!-- Top three expanded, each on its own accent card -->
+  <div class="subhead">Your Leading Areas</div>
+  <div th:each="c,it : ${careers}" th:if="${it.index &lt; 3}"
+       class="acard" th:classappend="'acard-' + (${it.index} + 1)">
+    <table style="width:100%;">
+      <tr>
+        <td><h3 style="margin:0;" th:text="'#' + (${it.index} + 1) + '  ' + ${c.field}">Field</h3></td>
+        <td style="text-align:right;white-space:nowrap;width:22mm;">
+          <span class="val" th:text="${#numbers.formatDecimal(c.score, 1, 0)} + '%'">0%</span>
+        </td>
+      </tr>
+    </table>
+    <p class="small" style="margin:2mm 0 0;" th:if="${c.label}" th:text="${c.label}">Why this may suit you</p>
   </div>
 
   <div class="card tint" style="margin-top:4mm;" th:if="${careerInterest}">
@@ -674,10 +753,19 @@
     </tr>
   </table>
 
-  <h3 style="margin-top:7mm;">Your Growth Plan</h3>
-  <div class="card"><h4>Next 30 Days</h4><ul class="tight"><li th:each="g : ${developmentPlan.shortTerm}" th:text="${g}">-</li></ul></div>
-  <div class="card"><h4>Next 90 Days</h4><ul class="tight"><li th:each="g : ${developmentPlan.mediumTerm}" th:text="${g}">-</li></ul></div>
-  <div class="card"><h4>This Year</h4><ul class="tight"><li th:each="g : ${developmentPlan.longTerm}" th:text="${g}">-</li></ul></div>
+  <div class="subhead">Your Growth Plan</div>
+  <div class="acard acard-1">
+    <h3>Next 30 Days</h3>
+    <ul class="tight"><li th:each="g : ${developmentPlan.shortTerm}" th:text="${g}">-</li></ul>
+  </div>
+  <div class="acard acard-2">
+    <h3>Next 90 Days</h3>
+    <ul class="tight"><li th:each="g : ${developmentPlan.mediumTerm}" th:text="${g}">-</li></ul>
+  </div>
+  <div class="acard acard-3">
+    <h3>This Year</h3>
+    <ul class="tight"><li th:each="g : ${developmentPlan.longTerm}" th:text="${g}">-</li></ul>
+  </div>
 </div>
 
 <!-- ==================== 8. A NOTE FOR PARENTS ==================== -->
@@ -759,7 +847,8 @@
     <h2>Counsellor's Summary</h2>
   </div>
 
-  <div class="card tint">
+  <div class="callout">
+    <div class="clabel">Counsellor's Observation</div>
     <p style="margin:0;" th:text="${synthesis.counsellorNarrative}">Counsellor narrative.</p>
   </div>
 
