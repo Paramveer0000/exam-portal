@@ -8,15 +8,137 @@
      Page numbering is handled by the @page counters, so this fragment no
      longer takes a page number. Lives in its own file (never rendered
      standalone) so ${section} isn't null when this template is processed
-     top-to-bottom. -->
-<div th:fragment="traitSection(title, subtitle, section)" class="section">
+     top-to-bottom.
+
+     `variant` selects the score treatment so the six sections that use this
+     fragment do not all look identical (the whole report previously repeated
+     one layout six times):
+       'meter'  - full-width labelled meters, one per row     (emotional intelligence)
+       'tiles'  - 2-up tiles with a big number                (learning style)
+       'split'  - leading trait highlighted, rest compact     (communication & leadership)
+       'compact'- dense two-column bars                       (behaviour)
+       'gauge'  - wide bars, gentle wording                   (wellbeing)
+       default  - the original single-column bar list         (personality)
+     Every variant renders the SAME t.score / t.band values; only the layout
+     differs. No score is computed, rounded or reinterpreted here. -->
+<div th:fragment="traitSection(title, subtitle, section, variant)" class="section">
   <div class="section-head">
     <div class="eyebrow" th:text="${subtitle}">Profile</div>
     <h2 th:text="${title}">Section</h2>
   </div>
 
-  <div class="card">
-    <div th:each="t : ${section.traits}" class="dim">
+  <!-- meter: one labelled meter per row -->
+  <div th:if="${variant == 'meter'}">
+    <div th:each="t : ${section.traits}" class="meter" th:classappend="'b-' + ${#strings.replace(#strings.toUpperCase(t.band), ' ', '_')}">
+      <table>
+        <tr>
+          <td class="nm" th:text="${t.name}">Trait</td>
+          <td class="sc">
+            <span class="pct" th:text="${#numbers.formatDecimal(t.score, 1, 0)} + '%'">0%</span>
+            <span class="pill" th:text="${t.band}">Band</span>
+          </td>
+        </tr>
+      </table>
+      <div class="bar-track tall"><div class="bar-fill tall" th:style="'width:' + ${t.score} + '%'"></div></div>
+    </div>
+  </div>
+
+  <!-- tiles: 2-up cards with a large number -->
+  <table th:if="${variant == 'tiles'}" class="tiles">
+    <tr th:each="row : ${#numbers.sequence(0, (section.traits.size() - 1) / 2)}">
+      <td th:each="col : ${#numbers.sequence(0, 1)}"
+          th:with="t=${(row * 2 + col) &lt; section.traits.size()} ? ${section.traits[row * 2 + col]} : null"
+          th:classappend="${t != null} ? 'b-' + ${#strings.replace(#strings.toUpperCase(t.band), ' ', '_')} : ''">
+        <div class="tile" th:if="${t != null}">
+          <table>
+            <tr>
+              <td><div class="tile-nm" th:text="${t.name}">Trait</div></td>
+              <td class="tile-pc" th:text="${#numbers.formatDecimal(t.score, 1, 0)} + '%'">0%</td>
+            </tr>
+          </table>
+          <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${t.score} + '%'"></div></div>
+          <div style="margin-top:1.8mm;"><span class="pill" th:text="${t.band}">Band</span></div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- split: leading trait pulled out, remainder compact -->
+  <div th:if="${variant == 'split'}">
+    <div th:with="lead=${section.traits.isEmpty()} ? null : ${section.traits[0]}">
+      <div class="leadcard" th:if="${lead != null}" th:classappend="'b-' + ${#strings.replace(#strings.toUpperCase(lead.band), ' ', '_')}">
+        <table>
+          <tr>
+            <td>
+              <div class="lead-label">Most Prominent Here</div>
+              <div class="lead-nm" th:text="${lead.name}">Trait</div>
+            </td>
+            <td style="text-align:right;vertical-align:middle;white-space:nowrap;">
+              <span class="lead-pc" th:text="${#numbers.formatDecimal(lead.score, 1, 0)} + '%'">0%</span><br/>
+              <span class="pill" th:text="${lead.band}">Band</span>
+            </td>
+          </tr>
+        </table>
+        <div class="bar-track tall"><div class="bar-fill tall" th:style="'width:' + ${lead.score} + '%'"></div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:4mm;">
+      <div th:each="t,it : ${section.traits}" th:if="${it.index > 0}" class="dim" th:classappend="'b-' + ${#strings.replace(#strings.toUpperCase(t.band), ' ', '_')}">
+        <table>
+          <tr>
+            <td class="nm" th:text="${t.name}">Trait</td>
+            <td class="sc">
+              <span th:text="${#numbers.formatDecimal(t.score, 1, 0)} + '%'">0%</span>
+              <span class="pill" th:text="${t.band}">Band</span>
+            </td>
+          </tr>
+        </table>
+        <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${t.score} + '%'"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- compact: dense two-column bars -->
+  <table th:if="${variant == 'compact'}" class="two">
+    <tr>
+      <td th:each="col : ${#numbers.sequence(0, 1)}">
+        <div class="card">
+          <div th:each="t,it : ${section.traits}" th:if="${it.index % 2 == col}"
+               class="dim compact" th:classappend="'b-' + ${#strings.replace(#strings.toUpperCase(t.band), ' ', '_')}">
+            <table>
+              <tr>
+                <td class="nm" th:text="${t.name}">Trait</td>
+                <td class="sc" th:text="${#numbers.formatDecimal(t.score, 1, 0)} + '%'">0%</td>
+              </tr>
+            </table>
+            <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${t.score} + '%'"></div></div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- gauge: wide, calm bars (wellbeing) -->
+  <div th:if="${variant == 'gauge'}" class="card">
+    <p class="small muted" style="margin:0 0 4mm;">These are general wellbeing indicators from a school
+       assessment, not a clinical or medical measure.</p>
+    <div th:each="t : ${section.traits}" class="gauge" th:classappend="'b-' + ${#strings.replace(#strings.toUpperCase(t.band), ' ', '_')}">
+      <div class="gauge-nm" th:text="${t.name}">Trait</div>
+      <table>
+        <tr>
+          <td><div class="bar-track tall"><div class="bar-fill tall" th:style="'width:' + ${t.score} + '%'"></div></div></td>
+          <td class="gauge-sc">
+            <span th:text="${#numbers.formatDecimal(t.score, 1, 0)} + '%'">0%</span>
+            <span class="pill" th:text="${t.band}">Band</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- default: original single-column list (personality) -->
+  <div th:if="${variant == null or variant == 'bars'}" class="card">
+    <div th:each="t : ${section.traits}" class="dim" th:classappend="'b-' + ${#strings.replace(#strings.toUpperCase(t.band), ' ', '_')}">
       <table>
         <tr>
           <td class="nm" th:text="${t.name}">Trait</td>
@@ -44,7 +166,7 @@
       </td>
       <td>
         <div class="card">
-          <h3 style="color:#8A5A1D;">Watch For</h3>
+          <h3 style="color:#8A5A1D;">Worth Building</h3>
           <ul class="tight"><li th:each="c : ${section.content.challenges}" th:text="${c}">Challenge</li></ul>
         </div>
       </td>

@@ -23,8 +23,28 @@
   * { box-sizing: border-box; }
   body { margin: 0; font-family: Helvetica, Arial, sans-serif; color: #23303D; font-size: 10pt; line-height: 1.5; }
 
-  /* ---- brand palette (from the company logo: navy + teal) ---------------- */
-  /* navy #16365A, teal #1F6B5E, ink #23303D, mist #F4F7FA, line #E3E9F0 */
+  /* ---- design tokens ------------------------------------------------------
+     Single source of truth for the report palette, taken from the company
+     logo (navy ring + green wordmark). openhtmltopdf 1.0.10 does NOT support
+     var(), so these cannot be CSS custom properties -- this block is the
+     token reference and every rule below quotes the token name it uses.
+     Change a value here and grep the token name to update its rules.
+
+       --primary        #16365A  deep navy       headings, bars, key numbers
+       --primary-dark   #0E2440  navy shade      cover rule, closing panel
+       --secondary      #1F6B5E  brand green     eyebrows, section underline
+       --accent         #2C7A8C  teal            secondary emphasis
+       --success        #1F6B5E  green           Excellent / Strong bands
+       --warning        #B4762A  amber           Needs Improvement band
+       --danger         #9B3A34  soft red        Critical band (never alarming)
+       --text           #23303D  ink             body copy
+       --muted          #6B7A8C  slate           secondary copy
+       --faint          #8A97A6  light slate     footers, captions
+       --surface        #FFFFFF  white           cards
+       --background     #F4F7FA  mist            tinted cards, page wash
+       --line           #E3E9F0  hairline        borders
+       --track          #EDF1F6  light fill      bar tracks, pills
+     ------------------------------------------------------------------------ */
 
   h1, h2, h3, h4 { margin: 0; font-weight: bold; color: #16365A; }
   p { margin: 0 0 7px; }
@@ -35,20 +55,35 @@
   #headerRight { position: running(headerRight); font-size: 7.5pt; color: #8A97A6; text-align: right; }
   #footerLeft  { position: running(footerLeft);  font-size: 7.5pt; color: #8A97A6; }
 
-  /* ---- cover ------------------------------------------------------------- */
-  .cover { page: cover; height: 297mm; width: 210mm; padding: 26mm 22mm; text-align: center; }
-  .cover-rule { height: 6mm; background: #16365A; margin: -26mm -22mm 0; }
-  .cover-logo { width: 62mm; height: auto; margin: 22mm auto 0; display: block; }
-  .cover-wordmark { margin: 30mm 0 0; font-size: 26pt; letter-spacing: 3px; color: #16365A; }
-  .cover h1 { font-size: 25pt; line-height: 1.25; letter-spacing: 1px; margin-top: 16mm; }
-  .cover .quote { font-size: 12pt; color: #1F6B5E; font-style: italic; margin-top: 7mm; line-height: 1.6; }
-  .cover-meta { margin-top: 22mm; border-top: 1px solid #E3E9F0; border-bottom: 1px solid #E3E9F0; padding: 7mm 0; }
+  /* ---- cover -------------------------------------------------------------
+     Fixed vertical budget for A4 (297mm). Spacing is deliberately generous:
+     the cover is the one page that should feel empty rather than dense. */
+  .cover { page: cover; height: 297mm; width: 210mm; padding: 0 22mm; text-align: center; }
+  /* --primary-dark over --secondary: a two-tone bleed band, no image needed */
+  .cover-rule { height: 7mm; background: #0E2440; margin: 0 -22mm; }
+  .cover-rule-accent { height: 1.6mm; background: #1F6B5E; margin: 0 -22mm 0; }
+  .cover-logo { width: 54mm; height: auto; margin: 15mm auto 0; display: block; }
+  .cover-wordmark { margin: 24mm 0 0; font-size: 26pt; letter-spacing: 3px; color: #16365A; }
+  /* Brand block: name is only printed as text when there is no logo image,
+     otherwise the logo already carries the wordmark and repeating it looks cheap. */
+  .cover-tagline { margin-top: 4mm; font-size: 11pt; color: #1F6B5E; letter-spacing: 0.6px; }
+  .cover-subtagline { margin-top: 1.5mm; font-size: 8pt; letter-spacing: 2px;
+                      text-transform: uppercase; color: #8A97A6; }
+  /* Short centred divider, a lighter separator than a full rule */
+  .cover-div { width: 26mm; height: 0.7mm; background: #1F6B5E; margin: 9mm auto 0; }
+  .cover h1 { font-size: 23pt; line-height: 1.28; letter-spacing: 1px; margin-top: 8mm; }
+  .cover .quote { font-size: 11pt; color: #1F6B5E; font-style: italic; margin-top: 5mm; line-height: 1.6; }
+  .cover-meta { margin-top: 13mm; border-top: 1px solid #E3E9F0; border-bottom: 1px solid #E3E9F0; padding: 6mm 0; }
   .cover-meta table { width: 100%; }
-  .cover-meta td { text-align: center; padding: 0 4mm; }
-  .cover-meta .k { font-size: 7.5pt; letter-spacing: 1.5px; text-transform: uppercase; color: #8A97A6; padding-bottom: 2mm; }
-  .cover-meta .v { font-size: 12pt; font-weight: bold; color: #16365A; }
-  .cover .programme { margin-top: 10mm; font-size: 10pt; color: #6B7A8C; }
-  .cover .confidential { margin-top: 16mm; font-size: 8pt; letter-spacing: 2.5px; text-transform: uppercase; color: #8A97A6; }
+  .cover-meta td { text-align: center; padding: 0 3mm; }
+  .cover-meta .k { font-size: 7pt; letter-spacing: 1.5px; text-transform: uppercase; color: #8A97A6; padding-bottom: 1.6mm; }
+  .cover-meta .v { font-size: 11pt; font-weight: bold; color: #16365A; word-wrap: break-word; }
+  .cover .programme { margin-top: 7mm; font-size: 10pt; color: #6B7A8C; }
+  .cover .confidential { margin-top: 9mm; font-size: 8pt; letter-spacing: 2.5px; text-transform: uppercase; color: #8A97A6; }
+  /* Contact strip: whole block is dropped when no channel is configured */
+  .cover-contact { margin-top: 11mm; padding-top: 5mm; border-top: 1px solid #E3E9F0;
+                   font-size: 8.5pt; color: #6B7A8C; line-height: 1.75; }
+  .cover-contact .sep { color: #E3E9F0; }
 
   /* ---- section scaffolding ---------------------------------------------- */
   .section { page-break-before: always; }
@@ -108,6 +143,50 @@
   .rankcard .nm { font-size: 9.5pt; font-weight: bold; color: #16365A; margin-top: 1.5mm; line-height: 1.3; height: 11mm; }
   .rankcard .pc { font-size: 17pt; font-weight: bold; color: #16365A; }
 
+  /* ---- trait-section variants -------------------------------------------
+     Six sections share one Thymeleaf fragment; these give each a different
+     score treatment so the report stops repeating one layout. Colours all come
+     from the band classes above, so a variant never invents its own palette. */
+
+  /* meter: full-width labelled meter per trait (--background surface) */
+  .meter { background: #F4F7FA; border: 1px solid #E3E9F0; border-radius: 3mm;
+           padding: 3.5mm 4mm; margin-bottom: 3mm; page-break-inside: avoid; }
+  .meter table { width: 100%; }
+  .meter .nm { font-size: 10pt; font-weight: bold; color: #23303D; }
+  .meter .sc { text-align: right; white-space: nowrap; width: 34mm; }
+  .meter .pct { font-size: 12pt; font-weight: bold; color: #16365A; margin-right: 1.5mm; }
+  .bar-track.tall { height: 4.6mm; border-radius: 2.3mm; }
+  .bar-fill.tall  { height: 4.6mm; border-radius: 2.3mm; }
+
+  /* tiles: 2-up cards with a large number */
+  table.tiles { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  table.tiles > tbody > tr > td { width: 50%; vertical-align: top; padding: 0 3mm 3mm 0; }
+  .tile { border: 1px solid #E3E9F0; border-radius: 3mm; padding: 4mm; page-break-inside: avoid; }
+  .tile table { width: 100%; }
+  .tile-nm { font-size: 9.5pt; font-weight: bold; color: #16365A; line-height: 1.3; }
+  .tile-pc { text-align: right; font-size: 15pt; font-weight: bold; color: #16365A;
+             white-space: nowrap; vertical-align: top; width: 18mm; }
+
+  /* split: leading trait pulled out above the rest */
+  .leadcard { border: 1px solid #E3E9F0; border-left: 3mm solid #1F6B5E; border-radius: 3mm;
+              padding: 5mm; background: #F4F7FA; page-break-inside: avoid; }
+  .leadcard table { width: 100%; }
+  .lead-label { font-size: 7.5pt; letter-spacing: 1.5px; text-transform: uppercase; color: #1F6B5E; }
+  .lead-nm { font-size: 14pt; font-weight: bold; color: #16365A; margin-top: 1.5mm; }
+  .lead-pc { font-size: 20pt; font-weight: bold; color: #16365A; }
+
+  /* compact: denser rows for the two-column behaviour grid */
+  .dim.compact { margin-bottom: 3mm; }
+  .dim.compact .nm { font-size: 9pt; }
+  .dim.compact .sc { font-size: 9pt; width: 14mm; }
+
+  /* gauge: wide calm bars for wellbeing */
+  .gauge { margin-bottom: 4mm; page-break-inside: avoid; }
+  .gauge table { width: 100%; }
+  .gauge-nm { font-size: 9.5pt; font-weight: bold; color: #23303D; margin-bottom: 1.5mm; }
+  .gauge-sc { text-align: right; white-space: nowrap; width: 32mm; padding-left: 3mm;
+              font-size: 9.5pt; font-weight: bold; color: #16365A; }
+
   /* ---- generic 2-col table ---------------------------------------------- */
   table.two { width: 100%; border-collapse: collapse; }
   table.two > tbody > tr > td { width: 50%; vertical-align: top; padding: 0 2mm 0 0; }
@@ -151,41 +230,81 @@
   .reslabel + ul.tight { margin-bottom: 3mm; }
   .disclaimer { font-size: 7.5pt; color: #8A97A6; line-height: 1.5; margin-top: 8mm; }
 
-  .signature-row { margin-top: 8mm; padding-top: 3mm; border-top: 1px solid #E3E9F0;
-                   font-size: 9pt; color: #6B7A8C; }
-  .signature-row span:last-child { float: right; }
+  /* Signature block. A float here used to escape its parent and ride down onto
+     the @page footer; a table keeps both columns in normal flow so the box has
+     a real height, and page-break-inside stops it splitting across the fold. */
+  .signature-row { margin-top: 10mm; padding-top: 3mm; border-top: 1px solid #E3E9F0;
+                   font-size: 9pt; color: #6B7A8C; page-break-inside: avoid; }
+  .signature-row table { width: 100%; }
+  .signature-row td { vertical-align: bottom; }
+  .signature-row td.right { text-align: right; }
+  .signature-row .sig-label { font-size: 7pt; letter-spacing: 1.2px; text-transform: uppercase;
+                              color: #8A97A6; padding-bottom: 1.5mm; }
+  .signature-row .sig-name { font-size: 10pt; font-weight: bold; color: #16365A; }
+  /* Ruled line the counsellor signs on, then a clear gap before the page footer */
+  .signature-row .sig-line { border-bottom: 1px solid #8A97A6; height: 9mm; width: 55mm; }
+  .signature-after { height: 6mm; }
 </style>
 </head>
 <body>
 
 <!-- running header/footer sources: rendered into the @page margin boxes -->
-<div id="headerRight">Student Psychometric Assessment Report</div>
+<div id="headerRight">Psychometric &amp; Mental Skill Assessment Report</div>
 <div id="footerLeft">
-  <span th:text="${profile.studentName}">Student</span> &#183; Confidential
+  <span th:text="${brand.name} ?: 'The Mentalist'">The Mentalist</span>
+  &#183; Confidential Student Assessment Report
+  &#183; <span th:text="${reportNumber}">Report ID</span>
 </div>
 
 <!-- ============================ 1. COVER ============================ -->
 <div class="cover">
   <div class="cover-rule"></div>
+  <div class="cover-rule-accent"></div>
 
+  <!-- The logo already contains the wordmark, so the text name is the fallback,
+       not a duplicate of it. -->
   <img class="cover-logo" th:if="${companyLogo}" th:src="${companyLogo}" alt="Company logo"/>
-  <div class="cover-wordmark" th:unless="${companyLogo}">THE MENTALIST</div>
+  <div class="cover-wordmark" th:unless="${companyLogo}"
+       th:text="${brand.name} ?: 'THE MENTALIST'">THE MENTALIST</div>
 
-  <h1>STUDENT PSYCHOMETRIC<br/>ASSESSMENT REPORT</h1>
+  <div class="cover-tagline" th:if="${brand.tagline}" th:text="${brand.tagline}">Guiding Minds. Shaping Futures</div>
+  <div class="cover-subtagline" th:if="${brand.subTagline}" th:text="${brand.subTagline}">Empowering the New Generation</div>
+
+  <div class="cover-div"></div>
+
+  <h1>PSYCHOMETRIC &amp; MENTAL SKILL<br/>ASSESSMENT REPORT</h1>
   <div class="quote">&#8220;Understanding Your Strengths,<br/>Interests &amp; Growth Potential&#8221;</div>
 
   <div class="cover-meta">
     <table>
       <tr>
-        <td><div class="k">Student</div><div class="v" th:text="${profile.studentName} ?: '-'">Student Name</div></td>
-        <td><div class="k">Class</div><div class="v" th:text="${profile.className} ?: '-'">-</div></td>
-        <td><div class="k">Assessment Date</div><div class="v" th:text="${assessmentDate} ?: '-'">-</div></td>
+        <td><div class="k">Prepared For</div><div class="v" th:text="${profile.studentName} ?: '-'">Student Name</div></td>
+        <td th:if="${profile.className}"><div class="k">Class</div><div class="v" th:text="${profile.className}">-</div></td>
+        <td th:if="${assessmentDate}"><div class="k">Assessment Date</div><div class="v" th:text="${assessmentDate}">-</div></td>
+        <td><div class="k">Report ID</div><div class="v" th:text="${reportNumber}">-</div></td>
       </tr>
     </table>
   </div>
 
   <div class="programme" th:if="${profile.subjectName}" th:text="${profile.subjectName}">Assessment</div>
-  <div class="confidential">Confidential Report &#183; <span th:text="${reportNumber}">Report</span></div>
+  <div class="confidential">Confidential Student Report</div>
+
+  <!-- Hidden entirely when no contact channel is configured -->
+  <div class="cover-contact" th:if="${brand.hasContact}">
+    <span th:if="${brand.address}" th:text="${brand.address}">Address</span>
+    <div>
+      <!-- SpEL will not coerce a String to boolean inside `and`, so separators
+           test emptiness explicitly rather than relying on truthiness. -->
+      <span th:if="${brand.phone}" th:text="${brand.phone}">Phone</span>
+      <span class="sep" th:if="${!#strings.isEmpty(brand.phone) and !#strings.isEmpty(brand.email)}"> &#124; </span>
+      <span th:if="${brand.email}" th:text="${brand.email}">Email</span>
+    </div>
+    <div>
+      <span th:if="${brand.website}" th:text="${brand.website}">Website</span>
+      <span class="sep" th:if="${!#strings.isEmpty(brand.website) and !#strings.isEmpty(brand.instagram)}"> &#124; </span>
+      <span th:if="${brand.instagram}" th:text="${brand.instagram}">Instagram</span>
+    </div>
+  </div>
 </div>
 
 <!-- ==================== 2. YOUR REPORT AT A GLANCE ==================== -->
@@ -441,12 +560,14 @@
 </div>
 
 <!-- ============ 5. LEGACY TRAIT SECTIONS (personality / behaviour / wellness / learning style) ============ -->
-<div th:replace="~{report/fragments :: traitSection('Your Personality &amp; Behaviour Profile', 'Overall style: ' + ${personalityType}, ${personality})}"></div>
-<div th:replace="~{report/fragments :: traitSection('How You Learn Best', 'Your Learning Profile', ${learningStyle})}"></div>
-<div th:replace="~{report/fragments :: traitSection('Emotional Intelligence in Practice', 'How You Understand Feelings', ${emotionalIntelligence})}"></div>
-<div th:replace="~{report/fragments :: traitSection('Communication &amp; Leadership', 'How You Lead and Work With Others', ${communicationLeadership})}"></div>
-<div th:replace="~{report/fragments :: traitSection('Behaviour &amp; Work Habits', 'How You Approach Things', ${behaviourAnalysis})}"></div>
-<div th:replace="~{report/fragments :: traitSection('Wellbeing Indicators', 'How You Are Doing', ${mentalWellness})}"></div>
+<!-- Each passes a different `variant` so these six pages read as distinct
+     sections rather than one layout repeated. Same data, different treatment. -->
+<div th:replace="~{report/fragments :: traitSection('Your Personality &amp; Behaviour Profile', 'Overall style: ' + ${personalityType}, ${personality}, 'bars')}"></div>
+<div th:replace="~{report/fragments :: traitSection('How You Learn Best', 'Your Learning Profile', ${learningStyle}, 'tiles')}"></div>
+<div th:replace="~{report/fragments :: traitSection('Emotional Intelligence in Practice', 'How You Understand Feelings', ${emotionalIntelligence}, 'meter')}"></div>
+<div th:replace="~{report/fragments :: traitSection('Communication &amp; Leadership', 'How You Lead and Work With Others', ${communicationLeadership}, 'split')}"></div>
+<div th:replace="~{report/fragments :: traitSection('Behaviour &amp; Work Habits', 'How You Approach Things', ${behaviourAnalysis}, 'compact')}"></div>
+<div th:replace="~{report/fragments :: traitSection('Wellbeing Indicators', 'How You Are Doing', ${mentalWellness}, 'gauge')}"></div>
 
 <!-- ==================== 6. CAREER EXPLORATION ==================== -->
 <div class="section">
@@ -657,9 +778,27 @@
   </table>
 
   <div class="signature-row" th:if="${counsellorSummary}">
-    <span th:text="${counsellorSummary.counsellorName} ?: 'The Mentalist Team'">Counsellor</span>
-    <span th:text="${counsellorSummary.date}">Date</span>
+    <table>
+      <tr>
+        <td>
+          <div class="sig-label">Counsellor</div>
+          <div class="sig-name" th:text="${counsellorSummary.counsellorName} ?: (${brand.name} ?: 'The Mentalist') + ' Team'">Counsellor</div>
+          <div class="small muted" th:if="${counsellorSummary.designation}" th:text="${counsellorSummary.designation}">Designation</div>
+        </td>
+        <td class="right">
+          <div class="sig-line"></div>
+          <div class="sig-label" style="padding:1.5mm 0 0;">Signature</div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="padding-top:4mm;">
+          <span class="sig-label">Date&#160;</span>
+          <span th:text="${counsellorSummary.date}">Date</span>
+        </td>
+      </tr>
+    </table>
   </div>
+  <div class="signature-after"></div>
 
   <p class="disclaimer">This report is generated from a psychometric assessment for educational guidance
      purposes only. It is not a medical or clinical diagnosis and should not be used as the sole basis for
@@ -729,11 +868,20 @@
        exploring possibilities and growing with confidence.</div>
 
   <img class="closing-logo" th:if="${companyLogo}" th:src="${companyLogo}" alt="Company logo"/>
-  <div class="cover-wordmark" th:unless="${companyLogo}" style="font-size:15pt;margin-top:26mm;">THE MENTALIST</div>
+  <div class="cover-wordmark" th:unless="${companyLogo}" style="font-size:15pt;margin-top:26mm;"
+       th:text="${brand.name} ?: 'THE MENTALIST'">THE MENTALIST</div>
 
   <div class="small muted" style="margin-top:6mm;">
     Report <span th:text="${reportNumber}">-</span>
     <span th:if="${counsellorSummary}"> &#183; <span th:text="${counsellorSummary.date}">-</span></span>
+  </div>
+
+  <!-- Closing contact line: dropped entirely when nothing is configured -->
+  <div class="small muted" style="margin-top:4mm;" th:if="${brand.hasContact}">
+    <span th:if="${brand.phone}" th:text="${brand.phone}">-</span>
+    <span th:if="${!#strings.isEmpty(brand.phone) and !#strings.isEmpty(brand.email)}"> &#183; </span>
+    <span th:if="${brand.email}" th:text="${brand.email}">-</span>
+    <span th:if="${brand.instagram}"><br/><span th:text="${brand.instagram}">-</span></span>
   </div>
 </div>
 

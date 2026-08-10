@@ -2,6 +2,7 @@ package com.project.examportalbackend.services.implementation;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
+import com.project.examportalbackend.configurations.ReportBrandProperties;
 import com.project.examportalbackend.dto.MentalistReportDto;
 import com.project.examportalbackend.services.PdfReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,13 @@ import java.io.ByteArrayOutputStream;
 public class PdfReportServiceImpl implements PdfReportService {
 
     @Autowired private TemplateEngine templateEngine;
+    @Autowired private ReportBrandProperties brand;
+
+    /** Used when no brand bean is wired, so a missing brand can never fail a report. */
+    private static final ReportBrandProperties FALLBACK_BRAND = new ReportBrandProperties();
+    static {
+        FALLBACK_BRAND.setName("THE MENTALIST");
+    }
 
     @Override
     public byte[] render(MentalistReportDto dto) {
@@ -56,6 +64,9 @@ public class PdfReportServiceImpl implements PdfReportService {
         ctx.setVariable("counsellorSummary", dto.getCounsellorSummary());
         // Phase D presentation layer
         ctx.setVariable("companyLogo", dto.getCompanyLogo());
+        // Company details for the cover/footer. Blank fields are hidden by the
+        // template rather than printed, so a partial brand block still reads well.
+        ctx.setVariable("brand", brand != null ? brand : FALLBACK_BRAND);
         ctx.setVariable("atAGlance", dto.getAtAGlance());
         ctx.setVariable("bandScale", dto.getBandScale());
         ctx.setVariable("dimensionGroups", dto.getDimensionGroups());
