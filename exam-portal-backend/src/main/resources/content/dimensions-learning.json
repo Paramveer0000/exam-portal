@@ -1,0 +1,124 @@
+{
+  "VISUAL_LEARNING": {
+    "dimensionCode": "VISUAL_LEARNING",
+    "whatItMeasures": "Visual learning preference describes how much a student takes in through seeing: diagrams, layout, colour, charts and written structure. A stronger visual preference means information tends to stick once it has been seen in an organised form. It is a preference for how material is presented, not a limit on what can be learned any other way.",
+    "looksLike": [
+      "Understands a diagram faster than the paragraph explaining it",
+      "Uses colour, highlighting or layout to organise notes",
+      "Remembers where on a page something appeared",
+      "Asks to be shown rather than told",
+      "Finds long spoken explanations hard to hold on to"
+    ],
+    "learningImplications": "Converting material into a visual form is usually the highest-value study step for this student. Mind maps, flowcharts, comparison tables and annotated diagrams work better than re-reading. Colour coding used consistently across subjects helps recall. When a teacher explains only verbally, taking notes as a diagram during the lesson keeps more of it.",
+    "strengths": [
+      "Reading diagrams, charts and maps quickly",
+      "Organising information visually",
+      "Strong memory for layout and images",
+      "Spotting patterns in presented data"
+    ],
+    "development": [
+      "Following spoken instructions without a visual aid",
+      "Writing explanations out in full sentences",
+      "Working from dense text-only sources",
+      "Listening in lectures without switching off"
+    ],
+    "activities": [
+      "Turn each chapter into a one-page visual summary",
+      "Use consistent colour coding across all subjects",
+      "Redraw key diagrams from memory, then check",
+      "Build comparison tables for topics that confuse each other",
+      "Sketch a process before trying to memorise the steps"
+    ],
+    "careerConnections": [
+      "Design and visual communication",
+      "Architecture and planning",
+      "Data visualisation and analytics",
+      "Engineering drawing and modelling",
+      "Media and film"
+    ],
+    "parentTip": "Buy the coloured pens and the large paper; for this student that is study equipment, not decoration. If revision is stalling, suggest converting the chapter into a diagram rather than reading it again. Do not be concerned if notes look unusual, judge them by whether the student can reconstruct the topic from them a week later.",
+    "studentTip": "Re-reading is your least efficient revision method. Convert material into a diagram, table or map, then revise from your version. Redrawing it from memory and checking the gaps is far more effective than highlighting. In lessons that are purely spoken, take your notes as a diagram so the information arrives in the form you actually retain."
+  },
+
+  "AUDITORY_LEARNING": {
+    "dimensionCode": "AUDITORY_LEARNING",
+    "whatItMeasures": "Auditory learning preference describes how much a student takes in through listening and speaking: explanation, discussion, reading aloud and hearing something described. A stronger auditory preference means spoken material is often retained more easily than the same content read silently. It is a preference about delivery, not a measure of ability.",
+    "looksLike": [
+      "Remembers what was said in class without writing it down",
+      "Talks a problem through to think it out",
+      "Reads aloud or sub-vocalises when concentrating",
+      "Learns well from discussion and explanation",
+      "Distracted noticeably by background noise"
+    ],
+    "learningImplications": "Speaking and hearing the material is usually the most effective study route. Reading notes aloud, recording summaries and replaying them, and explaining a topic to another person all work well. Group discussion is genuinely productive rather than a distraction. Silent reading alone tends to be the weakest method, so pairing it with saying the ideas out loud improves retention considerably.",
+    "strengths": [
+      "Strong memory for spoken explanation",
+      "Learning through discussion and questioning",
+      "Verbal reasoning and articulation",
+      "Picking up pronunciation and language quickly"
+    ],
+    "development": [
+      "Studying effectively in silence when required",
+      "Converting spoken understanding into written answers",
+      "Working from diagrams and written text alone",
+      "Managing distraction in noisy environments"
+    ],
+    "activities": [
+      "Record yourself summarising a topic and replay it",
+      "Read difficult passages aloud rather than silently",
+      "Explain each topic to someone else after studying it",
+      "Join a study group with a structured agenda",
+      "Use audio explanations while travelling"
+    ],
+    "careerConnections": [
+      "Teaching and training",
+      "Law, advocacy and negotiation",
+      "Broadcasting, podcasting and media",
+      "Counselling and client-facing roles",
+      "Languages and interpretation"
+    ],
+    "parentTip": "Let this student talk. Asking them to explain what they studied is genuine revision, not chatter. A quiet study space matters more for them than for most, since background noise competes directly with how they learn. If they are struggling with a chapter, read it with them aloud rather than sending them back to read it silently.",
+    "studentTip": "Say it out loud. Explaining a topic to another person, or to an empty room, will show you within a minute whether you actually know it. Record short summaries and listen back. Because exams are silent and written, practise converting your spoken explanation into a written answer under timed conditions."
+  },
+
+  "KINESTHETIC_LEARNING": {
+    "dimensionCode": "KINESTHETIC_LEARNING",
+    "whatItMeasures": "Kinesthetic learning preference describes how much a student takes in by doing: handling materials, carrying out a procedure, moving while thinking, or working through a real example. A stronger kinesthetic preference means understanding often arrives during the activity rather than from the explanation beforehand. It is about how information is best delivered, not about ability or attention.",
+    "looksLike": [
+      "Understands a procedure properly only after doing it",
+      "Fidgets or needs to move during long seated work",
+      "Learns quickly in laboratory or workshop settings",
+      "Prefers examples and practice to theory first",
+      "Remembers what was done better than what was read"
+    ],
+    "learningImplications": "Study works best when it is active. Working through problems rather than reading solutions, using cards and objects, writing at a board while standing, and taking short movement breaks all help. Long passive sessions produce poor returns. Splitting work into shorter blocks with activity between them typically yields better recall than a single extended sitting.",
+    "strengths": [
+      "Learning procedures rapidly by doing them",
+      "Practical and laboratory work",
+      "Coordination and physical skill",
+      "Energy and engagement in active tasks"
+    ],
+    "development": [
+      "Sustaining attention through theory-first teaching",
+      "Recording practical understanding in writing",
+      "Revising from notes as well as from doing",
+      "Sitting through long written examinations comfortably"
+    ],
+    "activities": [
+      "Study standing at a whiteboard rather than seated",
+      "Work through practice problems instead of reading solutions",
+      "Use flashcards you physically sort into piles",
+      "Take a movement break every 25 minutes",
+      "Do the experiment before reading the theory where possible"
+    ],
+    "careerConnections": [
+      "Engineering and technical trades",
+      "Healthcare, surgery and physiotherapy",
+      "Laboratory and field science",
+      "Sports, coaching and performing arts",
+      "Manufacturing and skilled practical work"
+    ],
+    "parentTip": "Movement during study is usually a need rather than avoidance. Allow standing, pacing and short breaks, and judge a session by what was understood rather than by how still they sat. Keep sport or physical activity in the week even during exams, since for this student it generally improves concentration rather than competing with study.",
+    "studentTip": "Do not copy the study habits of someone who can sit still for three hours; it will not work for you. Use short active blocks, stand at a board, sort cards, work problems rather than read them. After any practical work, write up what you did in your own words, because the exam tests the written account rather than the doing."
+  }
+}

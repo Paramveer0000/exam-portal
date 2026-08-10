@@ -1,0 +1,370 @@
+{
+  "LOGICAL": {
+    "dimensionCode": "LOGICAL",
+    "whatItMeasures": "Logical-mathematical thinking describes how comfortably a student works with reasoning, numbers, sequences and cause-and-effect. It covers spotting patterns in information, breaking a problem into steps, testing whether an explanation holds up, and staying with a question long enough to reach an answer. It is not the same as marks in mathematics: a student can reason well and still find a particular syllabus difficult.",
+    "looksLike": [
+      "Asks why something works, not just how to do it",
+      "Breaks a big problem into smaller steps before starting",
+      "Notices when an explanation contradicts itself",
+      "Enjoys puzzles, strategy games or logical riddles",
+      "Prefers rules and reasons over being told to memorise"
+    ],
+    "learningImplications": "Students with stronger logical reasoning usually learn best when they can see the structure behind a topic. Worked examples, flowcharts and 'why does this rule exist' explanations tend to land better than rote lists. They often benefit from being asked to predict an answer before checking it, and from subjects where each step builds on the last. In subjects that rely on memory alone, they may need help finding an underlying pattern to hold on to.",
+    "strengths": [
+      "Structured, step-by-step problem solving",
+      "Comfort with numbers, data and measurement",
+      "Spotting inconsistencies and faulty reasoning",
+      "Planning an approach before acting"
+    ],
+    "development": [
+      "Explaining reasoning out loud so others can follow it",
+      "Staying open to answers that feel counter-intuitive at first",
+      "Balancing analysis with a decision when time is short",
+      "Applying reasoning to non-numerical subjects too"
+    ],
+    "activities": [
+      "Logic puzzles, sudoku or chess a few times a week",
+      "Simple coding or block-programming projects",
+      "Estimating an answer before calculating it",
+      "Explaining a solved problem to a classmate",
+      "Building a small budget or data table from real numbers"
+    ],
+    "careerConnections": [
+      "Engineering and technology",
+      "Data analysis, research and pure sciences",
+      "Finance, accounting and actuarial work",
+      "Software development",
+      "Operations and logistics planning"
+    ],
+    "parentTip": "Ask 'how did you work that out?' more often than 'is it correct?'. Reasoning grows when a child has to make their thinking visible. Puzzles, board games and everyday estimation at the shop all count as practice. If marks in mathematics do not match this result, look at study habits and confidence before concluding the ability is not there.",
+    "studentTip": "Your reasoning is a tool you can point at any subject, not only mathematics. When a topic feels like a pile of facts, look for the rule underneath it. Try predicting an answer before you calculate, then check where you were off. Explaining a solution to someone else is one of the fastest ways to find the gaps in your own understanding."
+  },
+
+  "VERBAL": {
+    "dimensionCode": "VERBAL",
+    "whatItMeasures": "Verbal-linguistic ability describes how comfortably a student works with words, whether reading, writing, speaking or listening. It covers building an argument in sentences, picking the right word for a meaning, following a long explanation, and enjoying the sound and rhythm of language. It shows up in any subject that asks a student to explain, summarise or persuade, not only in language classes.",
+    "looksLike": [
+      "Explains ideas clearly without needing to draw them",
+      "Enjoys reading, storytelling, debate or writing",
+      "Picks up new vocabulary quickly and uses it",
+      "Remembers information better after writing it in own words",
+      "Notices how something is phrased, not just what it says"
+    ],
+    "learningImplications": "Students with stronger verbal ability often learn well through reading, discussion and written summary. Turning notes into their own sentences, teaching a topic aloud, or arguing a position tends to fix ideas in memory. They may find diagram-only or purely numerical material harder to absorb until they can put it into words. Encouraging them to narrate a diagram or process in full sentences usually bridges that gap.",
+    "strengths": [
+      "Clear written and spoken explanation",
+      "Strong reading comprehension",
+      "Persuading, summarising and structuring an argument",
+      "Learning vocabulary and new terminology quickly"
+    ],
+    "development": [
+      "Getting to the point without over-explaining",
+      "Listening as carefully as speaking in group work",
+      "Working with diagrams and data, not only text",
+      "Editing writing down rather than adding to it"
+    ],
+    "activities": [
+      "Keep a short daily journal or blog",
+      "Join a debate, drama or public-speaking club",
+      "Summarise a chapter in five sentences from memory",
+      "Read outside the syllabus, including non-fiction",
+      "Teach a topic aloud to a family member"
+    ],
+    "careerConnections": [
+      "Journalism, content and publishing",
+      "Law and public policy",
+      "Teaching and training",
+      "Marketing, advertising and public relations",
+      "Corporate communication"
+    ],
+    "parentTip": "Give this student an audience. Let them explain what they learned at school, argue a point at dinner, or read aloud to a younger sibling. Access to varied reading matters more than any worksheet. If they talk far more than they write, gently move some of that energy onto paper, where arguments have to hold together on their own.",
+    "studentTip": "Words are how you think, so use them deliberately. Rewrite your notes in your own sentences rather than copying them. When a topic is confusing, explain it aloud until the sentence stops breaking down, that is usually where the gap is. Watch for over-writing: an idea stated once clearly is stronger than the same idea stated three ways."
+  },
+
+  "SPATIAL": {
+    "dimensionCode": "SPATIAL",
+    "whatItMeasures": "Visual-spatial ability describes how comfortably a student pictures shapes, objects and relationships in space, and how well they read visual information. It covers rotating an object mentally, following a map, understanding a diagram at a glance, and imagining how parts fit into a whole. It matters in geometry and design, but also in any subject where a diagram carries the explanation.",
+    "looksLike": [
+      "Understands diagrams, maps and charts quickly",
+      "Draws or sketches to think a problem through",
+      "Notices layout, colour and visual detail others miss",
+      "Can picture how something will look before making it",
+      "Prefers seeing a demonstration to reading instructions"
+    ],
+    "learningImplications": "Students with stronger spatial ability usually absorb information faster when it is shown rather than described. Mind maps, labelled diagrams, colour-coded notes and physical models tend to work well. They often benefit from converting text-heavy material into a sketch or table before revising it. Purely verbal instruction can be tiring for them, and drawing the idea is usually a faster route in than re-reading the paragraph.",
+    "strengths": [
+      "Reading and building diagrams, maps and models",
+      "Design sense and attention to visual detail",
+      "Imagining an outcome before producing it",
+      "Organising information visually"
+    ],
+    "development": [
+      "Putting visual understanding into words for others",
+      "Working through text-only material without a diagram",
+      "Showing method in writing, not just the final answer",
+      "Being patient with step-by-step verbal instructions"
+    ],
+    "activities": [
+      "Turn a chapter into a one-page mind map",
+      "Sketch, model-build, or try 3D design software",
+      "Photography or basic graphic design projects",
+      "Redraw textbook diagrams from memory, then compare",
+      "Use colour coding consistently across subjects"
+    ],
+    "careerConnections": [
+      "Architecture and interior design",
+      "Graphic design, animation and UI/UX",
+      "Engineering and product design",
+      "Surveying, geography and planning",
+      "Film, photography and visual media"
+    ],
+    "parentTip": "Give this student space and materials to make things: paper, colours, building sets, design software. When homework stalls, suggest drawing the problem rather than re-reading it. Their notebooks may look unconventional, full of arrows and sketches; that is usually working memory on paper, not carelessness, so judge it by whether it helps them recall.",
+    "studentTip": "If a paragraph is not going in, draw it. Convert lists into diagrams, timelines into lines, and processes into flowcharts, then revise from your version rather than the book. One caution: in exams you usually have to write the reasoning, not just show the answer you pictured, so practise translating your diagram back into sentences."
+  },
+
+  "MUSICAL": {
+    "dimensionCode": "MUSICAL",
+    "whatItMeasures": "Musical-rhythmic ability describes sensitivity to sound, rhythm, pitch and pattern in what is heard. It covers noticing tone and timing, remembering things that have a beat or melody, and enjoying music as something to make rather than only to hear. It also shows up as an ear for the rhythm of language, which supports learning pronunciation, poetry and new languages.",
+    "looksLike": [
+      "Remembers tunes, jingles or rhythms easily",
+      "Taps, hums or moves to a beat while working",
+      "Notices when a sound, note or accent is slightly off",
+      "Learns things more easily when set to a rhythm",
+      "Is affected noticeably by background sound"
+    ],
+    "learningImplications": "Students with a strong ear often learn well through rhythm and repetition with sound. Setting facts to a tune, reading aloud with emphasis, or using recorded explanations can be effective. They may be unusually sensitive to noise, so a distracting room costs them more than it costs others. Instrumental or wordless music sometimes helps concentration, while music with lyrics usually competes with reading.",
+    "strengths": [
+      "Strong auditory memory and pattern recognition",
+      "Ear for pronunciation and new languages",
+      "Timing, rhythm and coordination",
+      "Focus and persistence when practising a skill"
+    ],
+    "development": [
+      "Working effectively in silent conditions too",
+      "Using written and visual notes alongside listening",
+      "Managing sensitivity to a noisy classroom",
+      "Turning practice discipline towards academic subjects"
+    ],
+    "activities": [
+      "Learn or keep up an instrument, or join a choir",
+      "Set formulae or dates to a rhythm when revising",
+      "Record yourself explaining a topic and replay it",
+      "Try simple music production or audio editing",
+      "Practise a new language by imitating audio closely"
+    ],
+    "careerConnections": [
+      "Music performance, teaching and composition",
+      "Sound engineering and audio production",
+      "Film, media and broadcasting",
+      "Speech and language work",
+      "Event and performance production"
+    ],
+    "parentTip": "Treat music as practice, not as a distraction from study. The discipline of daily instrument practice transfers well to other subjects. Pay attention to the study environment: this student is likely more disrupted by background noise than a sibling would be. Instrumental music may help them concentrate, but songs with words usually do not while reading.",
+    "studentTip": "Use your ear deliberately. Read difficult passages aloud, record summaries and listen back while travelling, or attach a rhythm to lists you must memorise. Protect your study space from noise, since sound costs you more attention than it costs other people. Keep any instrument going, the practice habit itself is a study skill."
+  },
+
+  "KINESTHETIC": {
+    "dimensionCode": "KINESTHETIC",
+    "whatItMeasures": "Bodily-kinesthetic ability describes how comfortably a student learns and expresses through movement, touch and physical activity. It covers coordination, control and timing, and the tendency to understand something properly only after doing it. It is not limited to sport: it also appears in laboratory work, craft, instrument playing, repair and anything that involves working skilfully with the hands.",
+    "looksLike": [
+      "Understands a process better after trying it once",
+      "Finds it hard to sit still for long stretches",
+      "Good coordination in sport, dance or handwork",
+      "Learns by taking apart, building or handling things",
+      "Uses gestures while explaining"
+    ],
+    "learningImplications": "Students with stronger kinesthetic ability usually need to do something with information rather than only read it. Laboratory work, models, role play, writing on a whiteboard while standing, or walking while revising can all work. Long passive lessons are genuinely harder for them to absorb. Splitting study into shorter blocks with movement in between typically produces better recall than one long seated session.",
+    "strengths": [
+      "Practical, hands-on problem solving",
+      "Physical coordination, timing and control",
+      "Learning procedures quickly by doing them",
+      "Energy and stamina for active tasks"
+    ],
+    "development": [
+      "Sustaining focus through longer seated work",
+      "Recording method in writing after doing it practically",
+      "Planning before acting on the first idea",
+      "Revising from notes as well as from practice"
+    ],
+    "activities": [
+      "Study standing at a board, or while walking",
+      "Use physical models, cards or objects when revising",
+      "Take part in a regular sport, dance or drama activity",
+      "Do practical experiments rather than only reading them",
+      "Break study into 25-minute blocks with movement between"
+    ],
+    "careerConnections": [
+      "Sports, coaching and physical education",
+      "Physiotherapy and allied health",
+      "Laboratory and technical practical work",
+      "Performing arts, dance and theatre",
+      "Skilled trades, engineering and field work"
+    ],
+    "parentTip": "Restlessness during study is often a learning need rather than misbehaviour. Allow standing, pacing or short movement breaks, and judge the session by what was understood rather than by how still they sat. Protect time for sport or physical activity even in exam months, since for this student it usually improves concentration instead of competing with it.",
+    "studentTip": "Do not try to study the way a still, seated learner does. Work in shorter blocks, stand up, use a whiteboard, handle objects, and turn processes into something you physically carry out. After any practical activity, write down what happened in your own words, because exams usually test the written account rather than the doing."
+  },
+
+  "INTERPERSONAL": {
+    "dimensionCode": "INTERPERSONAL",
+    "whatItMeasures": "Interpersonal ability describes how comfortably a student reads and works with other people. It covers noticing how someone is feeling, adjusting how a message is delivered, cooperating in a group, and resolving small conflicts before they grow. It is about social understanding rather than simply being talkative: a quiet student can read a room very accurately.",
+    "looksLike": [
+      "Notices when a friend is upset before being told",
+      "Is often the one others come to for advice",
+      "Works comfortably in groups and shares credit",
+      "Adjusts explanations depending on who is listening",
+      "Helps settle disagreements between classmates"
+    ],
+    "learningImplications": "Students with stronger interpersonal ability usually learn well in discussion, group work and peer teaching. Explaining a topic to someone else consolidates it for them, and study groups genuinely help rather than distract. They may find long solitary study draining and lose momentum without contact. Pairing solo revision with a regular session where they teach someone else tends to give the best of both.",
+    "strengths": [
+      "Teamwork and cooperation",
+      "Reading social situations accurately",
+      "Explaining things in a way others understand",
+      "Building and keeping relationships"
+    ],
+    "development": [
+      "Working productively alone for longer stretches",
+      "Saying no when helping others crowds out own work",
+      "Not depending on group approval for decisions",
+      "Giving honest feedback, not only comfortable feedback"
+    ],
+    "activities": [
+      "Form a small study group with a clear agenda",
+      "Take a peer-mentoring or buddy role at school",
+      "Join team sports, club committees or volunteering",
+      "Teach a younger student a topic you have finished",
+      "Practise giving one piece of honest, kind feedback weekly"
+    ],
+    "careerConnections": [
+      "Teaching, counselling and psychology",
+      "Human resources and people management",
+      "Healthcare and patient-facing roles",
+      "Sales, client relations and hospitality",
+      "Community and social work"
+    ],
+    "parentTip": "This student's social life is part of how they learn, not a distraction from it. Allow study groups, but agree in advance what the session is meant to produce. Watch for a pattern of helping everyone else at the cost of their own preparation, and give them permission to say no. Talking a topic through with you counts as revision.",
+    "studentTip": "Use people deliberately. Teaching a topic to someone else is one of the most efficient ways to find out whether you actually know it. At the same time, build the habit of working alone for set stretches, since exams are solitary. If you notice you are always the helper, protect some of that time for your own preparation."
+  },
+
+  "INTRAPERSONAL": {
+    "dimensionCode": "INTRAPERSONAL",
+    "whatItMeasures": "Intrapersonal ability describes how well a student understands their own thinking, feelings and motivation. It covers knowing what you find difficult, noticing your own mood and its effect on work, setting goals that actually fit you, and reflecting honestly after something goes wrong. It underpins independent study, because it is what allows a student to judge their own progress without being told.",
+    "looksLike": [
+      "Can say clearly what they find easy and difficult",
+      "Sets personal goals and tracks them without prompting",
+      "Prefers to think something through before responding",
+      "Reflects on why an attempt did not work",
+      "Works well independently for long stretches"
+    ],
+    "learningImplications": "Students with stronger self-awareness usually manage their own study well. They respond to being given responsibility for a plan rather than a fixed timetable. Reflective methods work: reviewing which topics went badly and why, keeping a record of repeated mistakes, and choosing their own revision order. They may under-use other people, so occasionally checking their self-assessment against a teacher's view is worthwhile.",
+    "strengths": [
+      "Independent study and self-management",
+      "Honest self-assessment",
+      "Goal setting and follow-through",
+      "Understanding of own motivation"
+    ],
+    "development": [
+      "Asking for help earlier rather than solving everything alone",
+      "Avoiding over-analysis when a decision is needed",
+      "Sharing thinking with others in group work",
+      "Being as fair to themselves as to other people"
+    ],
+    "activities": [
+      "Keep a short weekly reflection on what worked",
+      "Maintain an error log of repeated mistakes",
+      "Set one specific goal each fortnight and review it",
+      "Compare your self-rating with a teacher's feedback",
+      "Plan your own revision order and evaluate it afterwards"
+    ],
+    "careerConnections": [
+      "Counselling and psychology",
+      "Research and independent scholarship",
+      "Writing and creative work",
+      "Coaching and mentoring",
+      "Entrepreneurship and self-directed roles"
+    ],
+    "parentTip": "Give this student ownership of their plan rather than a schedule imposed on them; they generally respond better to being trusted with the goal. Ask reflective questions instead of issuing instructions. Watch for the flip side: strong self-awareness can turn into harsh self-criticism, so notice when honest reflection has tipped into being unfair to themselves.",
+    "studentTip": "Your ability to judge your own progress is genuinely useful, so formalise it. Keep a short log of what you got wrong and why, and let that decide what you revise next. Two cautions: ask for help sooner than feels necessary, and set a time limit on deciding, since thinking a choice through can quietly become avoiding it."
+  },
+
+  "NATURALIST": {
+    "dimensionCode": "NATURALIST",
+    "whatItMeasures": "Naturalistic ability describes sensitivity to the living world and to patterns in the environment. It covers noticing and classifying differences between things, curiosity about how natural systems work, and comfort learning outdoors or through observation. In a school setting it appears as an eye for categorisation and detail, which supports biology, geography and environmental subjects.",
+    "looksLike": [
+      "Notices small differences between similar things",
+      "Curious about animals, plants, weather or the environment",
+      "Enjoys collecting, sorting and classifying",
+      "Prefers observing something real to reading about it",
+      "Concerned about environmental issues"
+    ],
+    "learningImplications": "Students with stronger naturalistic ability learn well through observation, fieldwork and real examples. Classification tables, labelled specimens and comparisons between cases suit them. Abstract material lands better when tied to a concrete example from the natural world. Field trips, gardening, or simply studying outdoors can noticeably improve engagement compared with a purely textbook approach.",
+    "strengths": [
+      "Careful observation and attention to detail",
+      "Classifying and organising information",
+      "Curiosity about how systems work",
+      "Patience with long-running practical projects"
+    ],
+    "development": [
+      "Working with abstract material that has no concrete example",
+      "Recording observations formally and in writing",
+      "Moving from description to explanation",
+      "Sustaining interest in subjects outside the natural world"
+    ],
+    "activities": [
+      "Keep a nature or weather observation journal",
+      "Grow plants and record the variables that matter",
+      "Take part in an environmental club or clean-up project",
+      "Build classification tables when revising biology",
+      "Visit museums, botanical gardens or science centres"
+    ],
+    "careerConnections": [
+      "Environmental science and conservation",
+      "Agriculture, forestry and veterinary science",
+      "Biology, ecology and life sciences",
+      "Geography and earth sciences",
+      "Sustainability and climate policy"
+    ],
+    "parentTip": "Feed the curiosity with real things: a garden patch, a pet to care for, a walk where they name what they see, a museum visit. This student often learns more from one afternoon of proper observation than from a chapter. When an abstract subject stalls, help them find a concrete real-world case to anchor it to.",
+    "studentTip": "Anchor abstract topics to something real you can observe, and they will stick better. Build comparison and classification tables when you revise, since sorting is a natural strength for you. Practise writing observations up formally, because in exams the marks usually come from the recorded explanation rather than from having noticed the thing."
+  },
+
+  "EXISTENTIAL": {
+    "dimensionCode": "EXISTENTIAL",
+    "whatItMeasures": "Existential thinking describes the tendency to ask larger questions about meaning, purpose, ethics and how things connect. It covers interest in why things are the way they are, comfort with questions that have no single answer, and the habit of relating a topic to a bigger picture. In school it appears as an interest in the significance of what is being studied, not only its content.",
+    "looksLike": [
+      "Asks big 'why' questions beyond the syllabus",
+      "Interested in fairness, ethics and right and wrong",
+      "Connects what is learned to wider issues",
+      "Comfortable with questions that have no fixed answer",
+      "Thinks about long-term consequences"
+    ],
+    "learningImplications": "Students with stronger existential thinking engage best when they can see why a topic matters. Framing a subject around its purpose or its ethical implications tends to unlock effort. They may resist material that feels arbitrary until the point of it is explained. Discussion, essays that take a position, and connecting subjects to real issues all suit them well.",
+    "strengths": [
+      "Seeing the bigger picture and long-term consequences",
+      "Ethical reasoning and fairness",
+      "Connecting ideas across different subjects",
+      "Sustained interest in questions that matter to them"
+    ],
+    "development": [
+      "Engaging with routine material that has no obvious purpose",
+      "Turning broad thinking into specific, finishable work",
+      "Accepting that some topics must simply be learned",
+      "Balancing reflection with practical action"
+    ],
+    "activities": [
+      "Join a debate or model United Nations style activity",
+      "Read biographies and history beyond the syllabus",
+      "Write short opinion pieces defending a position",
+      "Discuss a current issue from two opposing sides",
+      "Link each subject to one real-world use before revising it"
+    ],
+    "careerConnections": [
+      "Law, public policy and civil services",
+      "Philosophy, social sciences and research",
+      "Journalism and writing",
+      "Social work and the development sector",
+      "Environmental and ethical advocacy"
+    ],
+    "parentTip": "Take the big questions seriously rather than deflecting them; being heard is what keeps this student engaged. When a subject seems pointless to them, explaining what it is actually used for often restores effort faster than pressure does. Discussion at home about news, fairness and choices is genuine intellectual practice for them, not idle talk.",
+    "studentTip": "You work hardest when a subject means something, so make the meaning explicit: before revising, write one line on what this topic is actually used for. For unavoidably routine material, set a fixed short slot and get it done rather than arguing with it. Turn big questions into specific finishable pieces of work, or they stay as thoughts."
+  }
+}

@@ -13,7 +13,42 @@ import java.util.List;
 @Component
 public class InterpretationEngine {
 
-    public enum Band { EXCELLENT, STRONG, GOOD, AVERAGE, NEEDS_IMPROVEMENT, CRITICAL }
+    public enum Band { EXCELLENT, STRONG, AVERAGE, NEEDS_IMPROVEMENT, CRITICAL }
+
+    /** One row of the published band scale: the range that maps to a band, plus its label. */
+    public static class BandRange {
+        public final Band band;
+        public final String label;
+        public final int from;
+        public final int to;
+
+        BandRange(Band band, String label, int from, int to) {
+            this.band = band;
+            this.label = label;
+            this.from = from;
+            this.to = to;
+        }
+
+        public Band getBand() { return band; }
+        public String getLabel() { return label; }
+        public int getFrom() { return from; }
+        public int getTo() { return to; }
+        public String getRange() { return from + "-" + to; }
+    }
+
+    /**
+     * The band scale as published to readers ("How to read your report"), lowest
+     * band first. Derived from the same cut-offs {@link #bandFor(double)} uses --
+     * there is deliberately no second copy of these thresholds anywhere.
+     */
+    public List<BandRange> bandScale() {
+        return Arrays.asList(
+                new BandRange(Band.CRITICAL, bandLabel(Band.CRITICAL), 0, 39),
+                new BandRange(Band.NEEDS_IMPROVEMENT, bandLabel(Band.NEEDS_IMPROVEMENT), 40, 54),
+                new BandRange(Band.AVERAGE, bandLabel(Band.AVERAGE), 55, 69),
+                new BandRange(Band.STRONG, bandLabel(Band.STRONG), 70, 84),
+                new BandRange(Band.EXCELLENT, bandLabel(Band.EXCELLENT), 85, 100));
+    }
 
     public static class Interpretation {
         public final Band band;
@@ -35,11 +70,10 @@ public class InterpretationEngine {
     }
 
     public Band bandFor(double score) {
-        if (score >= 90) return Band.EXCELLENT;
-        if (score >= 75) return Band.STRONG;
-        if (score >= 60) return Band.GOOD;
-        if (score >= 40) return Band.AVERAGE;
-        if (score >= 20) return Band.NEEDS_IMPROVEMENT;
+        if (score >= 85) return Band.EXCELLENT;
+        if (score >= 70) return Band.STRONG;
+        if (score >= 55) return Band.AVERAGE;
+        if (score >= 40) return Band.NEEDS_IMPROVEMENT;
         return Band.CRITICAL;
     }
 
@@ -47,7 +81,6 @@ public class InterpretationEngine {
         switch (band) {
             case EXCELLENT: return "Excellent";
             case STRONG: return "Strong";
-            case GOOD: return "Good";
             case AVERAGE: return "Average";
             case NEEDS_IMPROVEMENT: return "Needs Improvement";
             default: return "Critical";
@@ -79,19 +112,14 @@ public class InterpretationEngine {
                 suggestions = Arrays.asList("Practice regularly to convert strength into a defining trait",
                         "Apply this ability in new, less familiar contexts");
                 break;
-            case GOOD:
-                status = traitName + " is developing steadily, at a solid working level.";
-                strengths = Arrays.asList("Shows capability in " + traitName.toLowerCase() + " when motivated");
-                challenges = Arrays.asList("Performance can vary depending on the situation or support available");
-                suggestions = Arrays.asList("Build a consistent routine to strengthen this area",
-                        "Get regular feedback to identify specific gaps");
-                break;
             case AVERAGE:
-                status = traitName + " is at a typical level, with room for focused growth.";
-                strengths = Arrays.asList("A workable foundation to build on");
-                challenges = Arrays.asList("Not yet a dependable strength", "May need extra support in demanding situations");
-                suggestions = Arrays.asList("Set small, specific goals to build this area step by step",
-                        "Pair this with a stronger area to build confidence");
+                status = traitName + " is developing steadily, at a solid working level.";
+                strengths = Arrays.asList("Shows capability in " + traitName.toLowerCase() + " when motivated",
+                        "A workable foundation to build on");
+                challenges = Arrays.asList("Performance can vary depending on the situation or support available",
+                        "Not yet a dependable strength");
+                suggestions = Arrays.asList("Build a consistent routine to strengthen this area",
+                        "Set small, specific goals to build this area step by step");
                 break;
             case NEEDS_IMPROVEMENT:
                 status = traitName + " is below the typical level and would benefit from active support.";

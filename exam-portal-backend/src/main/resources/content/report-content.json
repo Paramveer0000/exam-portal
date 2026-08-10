@@ -1,0 +1,262 @@
+{
+  "_comment": "Report-level editorial content. {name} is replaced with the dimension's display name at render time. Band keys must match InterpretationEngine.Band exactly.",
+
+  "bandInterpretation": {
+    "EXCELLENT": "Your result places {name} at the top of the scale. This looks like a well-established strength that you can rely on and build other things around. The useful question now is not how to improve it, but where to point it: look for harder problems, wider responsibility, or chances to help others in this area.",
+    "STRONG": "Your result suggests {name} is well developed and works for you consistently. It is likely something you already lean on without thinking about it. Applying it in less familiar situations, where it is not the obvious tool, is usually what turns a strength like this into a defining one.",
+    "AVERAGE": "Your result suggests {name} is developing steadily and works at a solid level. It is likely to hold up in familiar situations and vary a little under pressure or in unfamiliar ones. Regular, specific practice tends to produce noticeable improvement here fairly quickly.",
+    "NEEDS_IMPROVEMENT": "Your result suggests {name} is an area where focused practice would help. This is a description of where you are at the moment, not a limit. Areas at this level usually respond well to small, consistent effort, particularly with some support in choosing what to work on first.",
+    "CRITICAL": "Your result suggests {name} is currently a priority area to work on. This says something about right now rather than about your potential. Progress here is more likely with structured support from a teacher, parent or counsellor than through effort alone, and it is worth choosing one small step rather than several."
+  },
+
+  "categoryIntro": {
+    "MI": {
+      "title": "How You Think & Learn",
+      "whatItIs": "The idea behind multiple intelligences is simple: people are not clever in one single way. One student may reason easily with numbers, another may think in pictures, a third may understand people quickly, and a fourth may learn best through movement. None of these is better than the others, and school tends to measure only some of them.",
+      "howToRead": "The percentages below show how your own profile divides between the nine areas, so they add up to around 100%. That means a figure near 20% is a genuinely strong area for you, not a low score. Read the order rather than the number: your top areas are where learning tends to feel most natural.",
+      "whyItVaries": "These patterns come from a mix of natural inclination, what you have practised, and what you have been given the chance to try. They shift over time. A lower area is usually one you have had less opportunity to develop rather than one that is closed to you."
+    },
+    "EQ": {
+      "title": "How You Understand Feelings",
+      "whatItIs": "Emotional intelligence describes how well a person notices and manages emotions, their own and other people's. It covers staying steady under pressure, recovering after a setback, reading how someone else is feeling, and handling disagreement without damage. These are skills that are learned and practised, not fixed traits.",
+      "howToRead": "Each area below is scored out of 100. Higher results point to habits that are already working for you; lower results point to skills worth practising deliberately. This is an educational assessment of everyday habits, not a health or clinical measure of any kind.",
+      "whyItVaries": "Emotional skills develop considerably through the school years and are strongly affected by what is going on around a student at the time. A result here reflects habits at this moment, and habits are changeable with practice and support."
+    },
+    "LEADERSHIP": {
+      "title": "How You Lead & Work With Others",
+      "whatItIs": "Leadership here does not mean holding a title. It describes the everyday behaviours that make someone effective with other people: explaining clearly, following through on commitments, contributing properly to a team, deciding when a decision is needed, and adapting when things change.",
+      "howToRead": "Each area is scored out of 100. Stronger areas are the ones others probably already rely on you for. Developing areas are skills, which means they respond to deliberate practice in ordinary situations such as group projects and clubs, rather than requiring any special opportunity.",
+      "whyItVaries": "These behaviours are heavily shaped by opportunity. A student who has never been given responsibility usually scores lower on ownership, not because they lack it, but because it has not yet been asked of them."
+    },
+    "RIASEC": {
+      "title": "What Interests You",
+      "whatItIs": "This section describes the kinds of work and activity you are drawn to, using six interest areas: Realistic, Investigative, Artistic, Social, Enterprising and Conventional. Most people are a mix of two or three. It is about what you enjoy and find engaging, not about what you are capable of.",
+      "howToRead": "Your strongest two or three areas together form your interest profile, and the combination is more informative than any single area. Interests point towards environments where you are likely to stay motivated, which over a long career matters as much as ability does.",
+      "whyItVaries": "Interests broaden as you are exposed to more things, and they do change through school and beyond. A low area often simply means you have not yet had much contact with that kind of work."
+    },
+    "LEARNING_PREF": {
+      "title": "How You Learn Best",
+      "whatItIs": "This section describes how you take information in most easily: by seeing it, by hearing it, or by doing something with it. Almost everyone uses all three, but most people have a preference that makes some study methods considerably more efficient than others for them.",
+      "howToRead": "Your strongest preference suggests where to put your study effort first. This is about efficiency rather than limitation: you can learn any way, but matching your method to your preference usually gets more out of the same hour.",
+      "whyItVaries": "Preferences are tendencies rather than categories. The most effective students use their strongest channel first and then deliberately practise the others, because examinations are written and will not adapt to anyone's preference."
+    },
+    "CAREER_INTEREST": {
+      "title": "Where Your Interests Point",
+      "whatItIs": "This section shows the broad career areas your answers lean towards. These are directions worth exploring, not recommendations or predictions. At school age the purpose is to widen the list of things you have looked at seriously, not to narrow it down.",
+      "howToRead": "Treat a strong area as an invitation to find out more: talk to someone doing the work, try a related activity, read about an ordinary working day. Interest usually deepens or disappears quickly once you meet the reality of a field.",
+      "whyItVaries": "You can only be interested in work you know exists. Areas scoring low are often ones you have simply never encountered, which is why exploration matters more than the ranking itself at this stage."
+    }
+  },
+
+  "careerClusters": {
+    "Engineering & Technology": {
+      "whatItIs": "Designing, building and improving physical and digital systems, from bridges and engines to software and networks.",
+      "exampleRoles": ["Mechanical or civil engineer", "Software developer", "Electronics or robotics engineer", "Systems or network engineer", "Product engineer"],
+      "subjectsToExplore": ["Mathematics", "Physics", "Computer science", "Technical drawing or design"]
+    },
+    "Data & Research Science": {
+      "whatItIs": "Investigating questions using evidence and data, in laboratories, universities or industry research teams.",
+      "exampleRoles": ["Research scientist", "Data analyst or data scientist", "Statistician", "Laboratory researcher", "Academic"],
+      "subjectsToExplore": ["Mathematics and statistics", "Physics, chemistry or biology", "Computer science", "Research methods"]
+    },
+    "Medicine & Health Care": {
+      "whatItIs": "Diagnosing, treating and caring for people, across clinical, therapeutic and public health settings.",
+      "exampleRoles": ["Doctor", "Nurse", "Physiotherapist", "Pharmacist", "Public health specialist"],
+      "subjectsToExplore": ["Biology", "Chemistry", "Psychology", "Physical education and health"]
+    },
+    "Business & Management": {
+      "whatItIs": "Running organisations: planning, coordinating people and resources, and taking responsibility for results.",
+      "exampleRoles": ["Operations manager", "Product manager", "Management consultant", "Entrepreneur", "Business analyst"],
+      "subjectsToExplore": ["Business studies", "Economics", "Mathematics", "Communication"]
+    },
+    "Finance & Accounting": {
+      "whatItIs": "Managing, recording, auditing and analysing money for organisations and individuals.",
+      "exampleRoles": ["Chartered accountant", "Auditor", "Financial analyst", "Banker", "Tax specialist"],
+      "subjectsToExplore": ["Accountancy", "Mathematics", "Economics", "Business studies"]
+    },
+    "Law & Public Policy": {
+      "whatItIs": "Working with rules, rights and governance, in legal practice, public administration or policy work.",
+      "exampleRoles": ["Lawyer", "Civil servant", "Policy analyst", "Legal researcher", "Diplomat"],
+      "subjectsToExplore": ["Political science", "History", "Economics", "Language and literature"]
+    },
+    "Media & Communication": {
+      "whatItIs": "Creating and delivering information and stories through journalism, content, advertising and public relations.",
+      "exampleRoles": ["Journalist", "Content strategist", "Public relations specialist", "Copywriter", "Broadcast producer"],
+      "subjectsToExplore": ["Language and literature", "Media studies", "Political science", "Digital design"]
+    },
+    "Design & Creative Arts": {
+      "whatItIs": "Shaping how things look, feel and work, across graphic, product, spatial and digital design.",
+      "exampleRoles": ["Graphic designer", "UI/UX designer", "Architect", "Animator", "Industrial designer"],
+      "subjectsToExplore": ["Art and design", "Mathematics for spatial work", "Computer graphics", "Technical drawing"]
+    },
+    "Performing Arts & Music": {
+      "whatItIs": "Creating and presenting live or recorded performance in music, theatre, dance and film.",
+      "exampleRoles": ["Musician or composer", "Actor or theatre practitioner", "Dancer or choreographer", "Sound engineer", "Film production crew"],
+      "subjectsToExplore": ["Music", "Theatre or performing arts", "Physical education", "Media production"]
+    },
+    "Sports & Physical Sciences": {
+      "whatItIs": "Work centred on physical performance, health and movement, from coaching to sports science.",
+      "exampleRoles": ["Athlete or coach", "Sports scientist", "Physiotherapist", "Physical education teacher", "Defence services"],
+      "subjectsToExplore": ["Physical education", "Biology", "Psychology", "Health science"]
+    },
+    "Education & Social Work": {
+      "whatItIs": "Helping people learn and cope, through teaching, counselling, psychology and community work.",
+      "exampleRoles": ["Teacher", "Counsellor", "Psychologist", "Social worker", "Special educator"],
+      "subjectsToExplore": ["Psychology", "Sociology", "Language and literature", "Any subject taken to depth"]
+    },
+    "Environment & Agriculture": {
+      "whatItIs": "Working with natural systems and land: conservation, sustainability, farming and environmental management.",
+      "exampleRoles": ["Environmental scientist", "Agricultural specialist", "Veterinarian", "Forestry officer", "Sustainability consultant"],
+      "subjectsToExplore": ["Biology", "Geography", "Chemistry", "Environmental science"]
+    }
+  },
+
+  "streams": {
+    "Science": {
+      "whatItIs": "Physics, chemistry, biology and mathematics, leading towards engineering, medicine, research and technology routes.",
+      "suitsWhen": "reasoning, investigation and technical interests are prominent in the profile",
+      "exploreBy": ["Talking to students already in the stream", "Trying laboratory or project work", "Checking which entrance routes it opens"]
+    },
+    "Commerce": {
+      "whatItIs": "Accountancy, economics and business studies, leading towards finance, management and entrepreneurial routes.",
+      "suitsWhen": "organisation, numeracy and enterprise interests are prominent in the profile",
+      "exploreBy": ["Keeping accounts for a real activity", "Following business news", "Talking to an accountant or business owner"]
+    },
+    "Humanities": {
+      "whatItIs": "History, political science, psychology, sociology and languages, leading towards law, policy, media, education and social science routes.",
+      "suitsWhen": "language, social understanding and questions of meaning are prominent in the profile",
+      "exploreBy": ["Debating and writing regularly", "Reading widely outside the syllabus", "Talking to lawyers, teachers or journalists"]
+    },
+    "Vocational": {
+      "whatItIs": "Applied and skill-based routes such as design, hospitality, technical trades and performing arts, often with earlier practical entry.",
+      "suitsWhen": "practical, creative or service interests are prominent in the profile",
+      "exploreBy": ["Trying the practical work directly", "Building a portfolio of finished pieces", "Talking to people working in the field"]
+    }
+  },
+
+  "synthesisThemes": [
+    {
+      "code": "ANALYTICAL",
+      "title": "An analytical, problem-solving pattern",
+      "dimensions": ["LOGICAL", "I", "ENGINEERING", "TECHNOLOGY", "DECISION_CONF"],
+      "narrative": "Your strongest areas cluster around reasoning and investigation. This combination usually suits work where a problem has to be understood before it can be solved, and where you are given a question rather than a set of instructions. You are likely to stay engaged longer when you can see the structure behind a topic, and to lose interest quickly when asked to memorise without explanation.",
+      "suggestion": "Look for project work, laboratory subjects and open problems rather than closed exercises."
+    },
+    {
+      "code": "VISUAL_CREATIVE",
+      "title": "A visual and creative pattern",
+      "dimensions": ["SPATIAL", "A", "ARTS", "DESIGN", "VISUAL_LEARNING", "MUSICAL"],
+      "narrative": "Your strongest areas cluster around visual thinking and creative expression. This combination usually suits work where something is designed, made or presented, and where there is room for interpretation rather than one correct method. You are likely to understand a diagram faster than a paragraph, and to do your best work when given a brief rather than a template.",
+      "suggestion": "Convert study material into visual form, and build a portfolio of finished creative work."
+    },
+    {
+      "code": "PEOPLE",
+      "title": "A people-centred pattern",
+      "dimensions": ["INTERPERSONAL", "S", "EMPATHY", "TEACHING", "PSYCHOLOGY", "ENCOURAGEMENT"],
+      "narrative": "Your strongest areas cluster around understanding and working with people. This combination usually suits work where the result depends on a relationship: teaching, advising, caring or coordinating. You are likely to learn well by explaining things to others, and to find long stretches of isolated study harder to sustain than most.",
+      "suggestion": "Use peer teaching as a study method, and protect some solo study time as well."
+    },
+    {
+      "code": "LEADING",
+      "title": "An organising and leading pattern",
+      "dimensions": ["E", "OWNERSHIP", "COMMUNICATION", "MANAGEMENT", "ENTREPRENEURSHIP", "DECISION_CONF"],
+      "narrative": "Your strongest areas cluster around initiative, responsibility and persuasion. This combination usually suits work where you are accountable for an outcome and have to bring other people with you. You are likely to engage more when given a role than an audience seat, and your main risk is starting more than you finish.",
+      "suggestion": "Take on one real responsibility and see it through completely before adding another."
+    },
+    {
+      "code": "PRACTICAL",
+      "title": "A practical, hands-on pattern",
+      "dimensions": ["KINESTHETIC", "R", "KINESTHETIC_LEARNING", "NATURALIST", "ENVIRONMENT"],
+      "narrative": "Your strongest areas cluster around doing rather than discussing. This combination usually suits work with a visible, physical result, where you can test whether something worked. You are likely to understand a process properly only after carrying it out, and to find long passive lessons genuinely harder to absorb than others do.",
+      "suggestion": "Study actively in short blocks, and always write up what you did afterwards."
+    },
+    {
+      "code": "STRUCTURED",
+      "title": "An organised, methodical pattern",
+      "dimensions": ["C", "COMMERCE", "IMPULSE_CTRL", "RELATIONSHIP_MGMT", "FEEDBACK_ACCEPT"],
+      "narrative": "Your strongest areas cluster around accuracy, order and reliability. This combination usually suits work where being correct and consistent matters, and where there is a standard to work towards. You are likely to be the person others depend on for follow-through, and your main growth area is comfort with tasks that have no defined right answer.",
+      "suggestion": "Keep using your systems, and practise one deliberately open-ended task each week."
+    },
+    {
+      "code": "EXPRESSIVE",
+      "title": "A verbal and expressive pattern",
+      "dimensions": ["VERBAL", "COMMUNICATION", "AUDITORY_LEARNING", "GOVERNMENT", "MEDIA"],
+      "narrative": "Your strongest areas cluster around language and explanation. This combination usually suits work built on argument, writing and persuasion. You are likely to think most clearly when you put something into your own words, and to gain marks by improving how an answer is structured rather than by learning more content.",
+      "suggestion": "Rewrite notes in your own sentences and practise explaining topics aloud before writing them."
+    },
+    {
+      "code": "REFLECTIVE",
+      "title": "A reflective, independent pattern",
+      "dimensions": ["INTRAPERSONAL", "EXISTENTIAL", "SELF_MOTIVATION", "RESILIENCE"],
+      "narrative": "Your strongest areas cluster around self-awareness and independent thinking. This combination usually suits work where you set your own direction and judge your own progress. You are likely to study well alone and to need a reason before you commit effort, which means routine material can stall unless its purpose is clear to you.",
+      "suggestion": "Write one line on why a topic matters before revising it, and ask for help sooner than feels necessary."
+    }
+  ],
+
+  "parentGuide": {
+    "title": "A Guide for Parents",
+    "intro": "This report describes tendencies and preferences at a single point in time. It is a starting point for a conversation, not a verdict on your child and not a prediction of what they will become. Used well, it tells you where to put encouragement, where to offer support, and which conversations are worth having next.",
+    "howToDiscuss": [
+      "Read it together rather than delivering conclusions from it.",
+      "Start with the strengths and ask whether they recognise themselves in the description.",
+      "Ask what they think is accurate and what is not; disagreement is useful information.",
+      "Treat developing areas as things to work on together, not as failures to explain.",
+      "Give it time. One conversation now and another in a fortnight works better than one long session."
+    ],
+    "supportingStrengths": [
+      "Name the strength specifically, so they know what they are good at and why.",
+      "Give opportunities to use it: a responsibility, a project, a chance to help someone else.",
+      "Let a strength stretch into harder territory rather than staying comfortable.",
+      "Notice effort and method, not only results."
+    ],
+    "supportingDevelopment": [
+      "Pick one area at a time; working on four at once usually means progress on none.",
+      "Break it into a small, specific, weekly action rather than a general intention.",
+      "Ask the school for their view; teachers see behaviours at school you cannot.",
+      "Expect slow, uneven progress, and notice it out loud when it happens."
+    ],
+    "whatNotToDo": [
+      "Do not compare these results with a sibling's or a friend's; the profiles are not competing.",
+      "Do not treat a lower score as a fixed limit, or use it as evidence in an argument.",
+      "Do not narrow their options based on one assessment.",
+      "Do not present this as a decision about their future, particularly for younger students.",
+      "Do not use the language of this report as a label for who they are."
+    ],
+    "usingWithSchool": "Share the report with a teacher or counsellor who knows your child, and ask whether it matches what they observe. Where the two agree, you have something solid to act on. Where they disagree, that difference is worth exploring, since a student often behaves quite differently at home and at school. Ask for one specific, practical suggestion rather than a general assessment."
+  },
+
+  "teacherGuide": {
+    "title": "Guidance for Teachers & Counsellors",
+    "intro": "This profile is generated from the student's own responses and reflects self-reported tendencies. It is intended to complement classroom observation, not replace it. Where the profile and your observation disagree, your observation of sustained behaviour is generally the better evidence.",
+    "classroomSupport": [
+      "Use the learning preference to vary how key material is presented, not to stream the student.",
+      "Give stronger dimensions a job: peer explanation, group coordination, or a stretch task.",
+      "For developing areas, set one specific behaviour to practise rather than general encouragement.",
+      "Check whether low results reflect a lack of opportunity rather than a lack of capability."
+    ],
+    "observationPoints": [
+      "Does the student's group-work behaviour match the leadership and teamwork results?",
+      "Does performance drop specifically under timed or high-pressure conditions?",
+      "Is a low result consistent across settings, or specific to one subject or teacher?",
+      "Does the student act on feedback, or note it and continue unchanged?"
+    ],
+    "followUp": [
+      "Agree one development focus with the student and review it within a term.",
+      "Share the one or two most useful observations with parents, rather than the whole profile.",
+      "Reassess after a meaningful interval; short-term change usually reflects circumstances rather than growth.",
+      "Refer on to specialist support if concerns about wellbeing are observed over time, as this report is educational and not diagnostic."
+    ]
+  },
+
+  "howToRead": {
+    "intro": "Your scores are not marks or grades, and there is no pass or fail in this report. They describe what you currently lean towards, based on how you answered. They are a snapshot of habits and preferences, and habits change.",
+    "higherMeans": "A higher score generally indicates a stronger expression of that area in this assessment. It usually points to something that already comes fairly naturally to you, and that you can build on deliberately.",
+    "lowerMeans": "A lower score does not mean bad, and it does not mean permanent. It identifies an area where practice would help. Very often a low result reflects less opportunity or practice so far rather than any limit on what is possible.",
+    "cautions": [
+      "This is an educational assessment, not a medical or clinical diagnosis.",
+      "It describes tendencies today, not fixed traits or a prediction of your future.",
+      "Career sections list areas worth exploring, never decisions you should make now.",
+      "Read patterns across several areas rather than reacting to a single number."
+    ]
+  }
+}

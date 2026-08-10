@@ -20,8 +20,10 @@ import com.project.examportalbackend.repository.PsychometricReportRepository;
 import com.project.examportalbackend.repository.QuestionRepository;
 import com.project.examportalbackend.repository.QuizResultRepository;
 import com.project.examportalbackend.repository.UserRepository;
+import com.project.examportalbackend.dto.DimensionScoreView;
 import com.project.examportalbackend.security.AuthFacade;
 import com.project.examportalbackend.services.AiService;
+import com.project.examportalbackend.services.DimensionProfileService;
 import com.project.examportalbackend.services.PsychometricReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -81,6 +83,7 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
     @Autowired private DimensionRepository dimensionRepository;
     @Autowired private DimensionResultRepository dimensionResultRepository;
     @Autowired private com.project.examportalbackend.repository.QuestionDimensionRepository questionDimensionRepository;
+    @Autowired private DimensionProfileService dimensionProfileService;
 
     // ------------------------------------------------------------------ score
 
@@ -358,12 +361,10 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
 
     /** EQ/Leadership rows for the given type; empty for attempts scored before dimension_results existed. */
     private List<PsychometricReportDto.DimensionRow> dimensionRowsOfType(List<DimensionResult> results, String type) {
+        List<DimensionScoreView> views = dimensionProfileService.buildScoreViews(results, type);
         List<PsychometricReportDto.DimensionRow> rows = new ArrayList<>();
-        for (DimensionResult dr : results) {
-            Dimension d = dimensionRepository.findById(dr.getDimensionCode()).orElse(null);
-            if (d != null && type.equals(d.getDimensionType())) {
-                rows.add(PsychometricReportDto.DimensionRow.of(d.getDimensionCode(), d.getDisplayName(), dr.getPercentage()));
-            }
+        for (DimensionScoreView v : views) {
+            rows.add(PsychometricReportDto.DimensionRow.of(v.getDimensionCode(), v.getDimensionName(), v.getPercentage()));
         }
         return rows;
     }

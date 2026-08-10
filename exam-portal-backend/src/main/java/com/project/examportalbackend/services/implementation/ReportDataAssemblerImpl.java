@@ -1,7 +1,6 @@
 package com.project.examportalbackend.services.implementation;
 
 import com.project.examportalbackend.dto.MentalistReportDto;
-import com.project.examportalbackend.dto.MentalistReportDto.CareerGuidance;
 import com.project.examportalbackend.dto.MentalistReportDto.CounsellorSummary;
 import com.project.examportalbackend.dto.MentalistReportDto.DevelopmentPlan;
 import com.project.examportalbackend.dto.MentalistReportDto.SectionBlock;
@@ -23,11 +22,17 @@ import com.project.examportalbackend.models.User;
 import com.project.examportalbackend.repository.MentalistReportRepository;
 import com.project.examportalbackend.repository.QuizResultRepository;
 import com.project.examportalbackend.repository.UserRepository;
+import com.project.examportalbackend.services.AssessmentContext;
+import com.project.examportalbackend.services.CareerRecommendationEngine;
+import com.project.examportalbackend.services.DimensionContentService;
 import com.project.examportalbackend.services.InterpretationEngine;
+import com.project.examportalbackend.services.ProfileSynthesisService;
 import com.project.examportalbackend.services.InterpretationEngine.Interpretation;
 import com.project.examportalbackend.services.PsychometricReportService;
+import com.project.examportalbackend.services.ReportBrandingService;
 import com.project.examportalbackend.services.ReportContentAiService;
 import com.project.examportalbackend.services.ReportDataAssembler;
+import com.project.examportalbackend.services.ReportPresentationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,29 +59,17 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy");
 
-    // career_suggestions.field -> academic stream, for page 14. See V12__career_suggestions.sql.
-    private static final Map<String, String> FIELD_TO_STREAM = new LinkedHashMap<>();
-    static {
-        FIELD_TO_STREAM.put("Engineering & Technology", "Science");
-        FIELD_TO_STREAM.put("Data & Research Science", "Science");
-        FIELD_TO_STREAM.put("Medicine & Health Care", "Science");
-        FIELD_TO_STREAM.put("Environment & Agriculture", "Science");
-        FIELD_TO_STREAM.put("Business & Management", "Commerce");
-        FIELD_TO_STREAM.put("Finance & Accounting", "Commerce");
-        FIELD_TO_STREAM.put("Law & Public Policy", "Humanities");
-        FIELD_TO_STREAM.put("Media & Communication", "Humanities");
-        FIELD_TO_STREAM.put("Education & Social Work", "Humanities");
-        FIELD_TO_STREAM.put("Design & Creative Arts", "Vocational");
-        FIELD_TO_STREAM.put("Performing Arts & Music", "Vocational");
-        FIELD_TO_STREAM.put("Sports & Physical Sciences", "Vocational");
-    }
-
     @Autowired private PsychometricReportService psychometricReportService;
     @Autowired private QuizResultRepository quizResultRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private MentalistReportRepository mentalistReportRepository;
     @Autowired private InterpretationEngine interpretationEngine;
     @Autowired private ReportContentAiService reportContentAiService;
+    @Autowired private CareerRecommendationEngine careerRecommendationEngine;
+    @Autowired private ReportPresentationService reportPresentationService;
+    @Autowired private ReportBrandingService reportBrandingService;
+    @Autowired private ProfileSynthesisService profileSynthesisService;
+    @Autowired private DimensionContentService dimensionContentService;
 
     @Override
     public MentalistReportDto assemble(Long quizResId) {
@@ -177,8 +170,31 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
 
         dto.setSwot(buildSwot(mi, psych.getCareers()));
         dto.setDevelopmentPlan(buildDevelopmentPlan(dto));
-        dto.setCareerGuidance(buildCareerGuidance(psych.getCareers()));
+        AssessmentContext context = AssessmentContext.of(result.getQuiz(), student);
+        dto.setCareerGuidance(careerRecommendationEngine.buildCareerGuidance(context, psych.getCareers()));
         dto.setCounsellorSummary(buildCounsellorSummary(dto, quizResId, existing));
+
+        // Phase D presentation layer: grouping/ordering/labelling of the values
+        // already computed above. No score is produced here.
+        dto.setCompanyLogo(reportBrandingService.companyLogoDataUrl());
+        dto.setBandScale(interpretationEngine.bandScale());
+        List<MentalistReportDto.DimensionGroup> groups =
+                reportPresentationService.buildDimensionGroups(quizResId, psych);
+        dto.setDimensionGroups(groups);
+        MentalistReportDto.AtAGlance glance = reportPresentationService.buildAtAGlance(groups);
+        dto.setAtAGlance(glance);
+        dto.setClassGuidance(reportPresentationService.buildClassGuidance(context));
+        dto.setParentGuide(reportPresentationService.parentGuide());
+        dto.setNextSteps(reportPresentationService.buildActionPlan(glance));
+
+        // Content Engine V2: interpretation and personalisation. Reads the
+        // groups built above; produces narrative text, never numbers.
+        dto.setSynthesis(profileSynthesisService.synthesise(groups, context));
+        dto.setCareerClusters(careerRecommendationEngine.buildCareerClusters(context, psych.getCareers(), groups));
+        dto.setStreamOptions(careerRecommendationEngine.buildStreamOptions(context, psych.getCareers(), groups));
+        dto.setParentGuideContent(dimensionContentService.parentGuide());
+        dto.setTeacherGuideContent(dimensionContentService.teacherGuide());
+        dto.setHowToReadContent(dimensionContentService.howToRead());
 
         return dto;
     }
@@ -272,27 +288,6 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
             goals.add(t.getName() + ": " + interp.suggestions.get(0));
         }
         return goals.isEmpty() ? Arrays.asList("Maintain current strengths through regular practice.") : goals;
-    }
-
-    private CareerGuidance buildCareerGuidance(List<CareerRow> careers) {
-        CareerGuidance cg = new CareerGuidance();
-        Set<String> streams = new LinkedHashSet<>();
-        for (CareerRow c : careers) {
-            streams.add(FIELD_TO_STREAM.getOrDefault(c.getField(), "Vocational"));
-        }
-        cg.setRecommendedStreams(new ArrayList<>(streams));
-        cg.setBooks(Arrays.asList("Age-appropriate biographies of professionals in the recommended fields",
-                "\"What Color Is Your Parachute?\" (career exploration basics)",
-                "NCERT career guidance handbook for the student's class"));
-        cg.setCompetitions(Arrays.asList("School-level Olympiads aligned to the top-ranked domain",
-                "Inter-school quiz, debate or science exhibition relevant to the interest area"));
-        cg.setSkillCourses(Arrays.asList("A foundational online course in the top recommended field",
-                "A soft-skills or communication workshop"));
-        cg.setOnlineLearning(Arrays.asList("Khan Academy / NCERT digital resources for core subjects",
-                "A recognised MOOC platform course matching the recommended stream"));
-        cg.setRoadmap("Over the next academic year, the student should explore the recommended stream through "
-                + "electives and extracurriculars, then revisit this assessment before finalising subject choices.");
-        return cg;
     }
 
     private CounsellorSummary buildCounsellorSummary(MentalistReportDto dto, Long quizResId, MentalistReport existing) {

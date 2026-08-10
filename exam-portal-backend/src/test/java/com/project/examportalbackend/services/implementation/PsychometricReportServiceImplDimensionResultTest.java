@@ -19,6 +19,7 @@ import com.project.examportalbackend.repository.QuizResultRepository;
 import com.project.examportalbackend.repository.UserRepository;
 import com.project.examportalbackend.security.AuthFacade;
 import com.project.examportalbackend.services.AiService;
+import com.project.examportalbackend.services.InterpretationEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -81,6 +82,10 @@ class PsychometricReportServiceImplDimensionResultTest {
         ReflectionTestUtils.setField(service, "dimensionRepository", dimensionRepository);
         ReflectionTestUtils.setField(service, "dimensionResultRepository", dimensionResultRepository);
         ReflectionTestUtils.setField(service, "questionDimensionRepository", questionDimensionRepository);
+        DimensionProfileServiceImpl dimensionProfileService = new DimensionProfileServiceImpl();
+        ReflectionTestUtils.setField(dimensionProfileService, "dimensionRepository", dimensionRepository);
+        ReflectionTestUtils.setField(dimensionProfileService, "interpretationEngine", new InterpretationEngine());
+        ReflectionTestUtils.setField(service, "dimensionProfileService", dimensionProfileService);
         lenient().when(questionDimensionRepository.findByQuesId(any())).thenReturn(Collections.emptyList());
 
         empathy = dimension("EMPATHY", "EQ", "Empathy / Social Awareness");

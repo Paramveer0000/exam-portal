@@ -1,0 +1,170 @@
+{
+  "ENGINEERING": {
+    "dimensionCode": "ENGINEERING",
+    "whatItMeasures": "Interest in engineering describes attraction to designing, building and improving things that work. It covers curiosity about how machines and systems function, satisfaction in solving a practical problem, and willingness to work through the mathematics and physics that underpin a design. This indicates interest, not aptitude or eligibility for any course.",
+    "looksLike": ["Wants to know how a machine or system works", "Enjoys building, assembling or fixing", "Interested in improving how something is done", "Comfortable with mathematics applied to real problems", "Notices design flaws in everyday objects"],
+    "learningImplications": "Engineering interest is best supported by keeping mathematics and physics strong while doing something practical alongside them. Projects where theory produces a working result convert abstract study into motivation. Robotics, electronics and design software give a realistic taste of the work well before a course has to be chosen.",
+    "strengths": ["Applied problem solving", "Working systematically to a specification", "Combining theory with practical build", "Persistence through iteration"],
+    "development": ["Keeping mathematics and physics strong", "Documenting and explaining a design", "Working within constraints and budgets", "Collaborating on larger builds"],
+    "activities": ["Join a robotics or electronics club", "Build a small project end to end and document it", "Learn CAD or simulation software basics", "Take apart and reassemble a working device", "Talk to a practising engineer about a normal working day"],
+    "careerConnections": ["Mechanical, civil and electrical engineering", "Software and computer engineering", "Aerospace and automotive design", "Manufacturing and process engineering", "Product design"],
+    "parentTip": "Support the practical side rather than only the entrance-exam side. A student who builds things stays motivated through the years of mathematics and physics that engineering requires. Conversations with working engineers give a far more realistic picture of the field than coaching-class marketing does.",
+    "studentTip": "Build something small, completely, and write up how it works. That teaches more about whether you want this field than any amount of reading. Keep mathematics and physics strong, because they are the gate. Try several branches before deciding, since mechanical, electrical and software work feel very different day to day."
+  },
+
+  "TECHNOLOGY": {
+    "dimensionCode": "TECHNOLOGY",
+    "whatItMeasures": "Interest in technology describes attraction to computing, software, data and digital systems. It covers curiosity about how applications and networks work, enjoyment of building or automating something, and comfort learning new tools independently. It reflects what a student is drawn to rather than what they are currently able to do.",
+    "looksLike": ["Curious about how software or the internet works", "Tries new applications and tools independently", "Enjoys automating or simplifying a repetitive task", "Comfortable teaching themselves from online resources", "Interested in data, systems or security"],
+    "learningImplications": "Technology interest rewards self-directed practice more than most fields, because tools and resources are freely available. Building small working projects teaches faster than passive tutorials. Mathematics and logical reasoning support it, and writing matters more than students expect, since technical work has to be explained to non-technical people.",
+    "strengths": ["Self-directed learning", "Logical problem solving", "Comfort with new tools", "Building and iterating quickly"],
+    "development": ["Finishing projects rather than starting many", "Explaining technical work to non-technical people", "Building depth in fundamentals, not only tools", "Working within a team codebase or standard"],
+    "activities": ["Learn one programming language properly through projects", "Build and finish a small application or website", "Take part in a hackathon or coding competition", "Contribute to or read an open-source project", "Explain a technical concept to someone non-technical"],
+    "careerConnections": ["Software development", "Data science and analytics", "Cybersecurity", "Cloud and systems engineering", "Product and technical management"],
+    "parentTip": "Distinguish between consuming technology and building with it; the second is what indicates genuine interest. Screen time spent building a project is not the same as screen time spent scrolling. Encourage finishing one project rather than starting many, since a completed piece of work is what demonstrates ability later.",
+    "studentTip": "Build things and finish them. One completed project teaches more than ten tutorials and, unlike marks, it is something you can show. Learn the fundamentals rather than only the currently fashionable tool. Practise explaining what you built to someone non-technical, because that skill separates good engineers from unemployed ones."
+  },
+
+  "MEDICAL": {
+    "dimensionCode": "MEDICAL",
+    "whatItMeasures": "Interest in medical and healthcare work describes attraction to understanding the human body, diagnosing problems and caring for people who are unwell. It combines scientific curiosity with a wish to help directly. It indicates interest only, and says nothing about eligibility, aptitude for entrance examinations, or suitability for clinical practice.",
+    "looksLike": ["Curious about how the body works and why illness happens", "Comfortable around people who are unwell", "Interested in biology beyond the syllabus", "Wants work with a visible human benefit", "Careful and methodical with detail"],
+    "learningImplications": "Medical interest needs biology and chemistry kept strong, alongside genuine exposure to healthcare settings. The reality of the work, long training, shift patterns, emotional demands, is worth understanding early. Volunteering or shadowing gives a far more accurate picture than television or family expectation does.",
+    "strengths": ["Scientific curiosity applied to people", "Attention to detail", "Care and patience with others", "Sustained effort over long training"],
+    "development": ["Building resilience for emotionally demanding work", "Sustaining long-term study discipline", "Communicating clearly with anxious people", "Exploring the full range of health careers, not only medicine"],
+    "activities": ["Volunteer or shadow in a healthcare setting if permitted", "Read about the daily reality of clinical work", "Keep biology and chemistry strong", "Learn basic first aid properly", "Talk to people in several health professions, not only doctors"],
+    "careerConnections": ["Medicine and surgery", "Nursing and allied health", "Physiotherapy and rehabilitation", "Pharmacy and biomedical science", "Public health and epidemiology"],
+    "parentTip": "Help this student see the whole field rather than one prestigious role. Nursing, physiotherapy, pharmacy, biomedical research and public health are substantial careers with different entry routes and working lives. Real exposure to a healthcare setting is worth more than years of assumption, in either direction.",
+    "studentTip": "Get real exposure before committing, since healthcare work is very different from how it looks from outside. Keep biology and chemistry strong. Look at the whole field rather than one job title, because several health professions may suit you better and have different entry routes. Understand the training length before you choose."
+  },
+
+  "PSYCHOLOGY": {
+    "dimensionCode": "PSYCHOLOGY",
+    "whatItMeasures": "Interest in psychology describes attraction to understanding why people think, feel and behave as they do. It covers curiosity about motivation and behaviour, interest in listening to people's experiences, and willingness to study behaviour systematically rather than relying on intuition. It is an interest indicator only.",
+    "looksLike": ["Curious about why people behave as they do", "People confide in them", "Interested in behaviour, motivation and emotion", "Notices patterns in how people react", "Wants to understand rather than judge"],
+    "learningImplications": "Psychology is a science, and students are often surprised by how much statistics and research method it involves. Keeping mathematics reasonable matters. Reading actual psychological research rather than popular articles gives a realistic picture. Listening skills can be practised long before any formal training begins.",
+    "strengths": ["Understanding people and behaviour", "Listening carefully", "Observing patterns", "Suspending judgement"],
+    "development": ["Comfort with statistics and research method", "Separating evidence from popular belief", "Maintaining professional distance", "Understanding the long qualification route"],
+    "activities": ["Read introductory psychology from a reputable source", "Practise listening without offering advice", "Keep mathematics and statistics reasonable", "Volunteer in a peer-support or helpline-style role if available", "Talk to a practising psychologist or counsellor"],
+    "careerConnections": ["Clinical and counselling psychology", "Organisational and occupational psychology", "Educational psychology", "Behavioural research", "Human resources and user research"],
+    "parentTip": "Take this interest seriously; psychology is a rigorous scientific field with wide application, not a soft option. Point out the statistics and research involved so the choice is informed. Practising real listening at home, hearing them out fully before responding, both supports the interest and models the skill.",
+    "studentTip": "Psychology involves more statistics and research method than most people expect, so keep your mathematics reasonable. Read actual research rather than popular psychology articles. Practise listening without jumping to advice, it is harder than it sounds and it is the core skill. Understand the qualification route early, since it is long."
+  },
+
+  "TEACHING": {
+    "dimensionCode": "TEACHING",
+    "whatItMeasures": "Interest in teaching describes attraction to helping others learn: explaining clearly, noticing where someone is stuck, and finding satisfaction when understanding arrives. It covers patience with the process of learning and interest in a subject deep enough to want to pass it on.",
+    "looksLike": ["Enjoys explaining things to classmates", "Patient when someone does not understand", "Notices where a person is actually stuck", "Finds different ways to explain the same idea", "Satisfied when someone else succeeds"],
+    "learningImplications": "Teaching interest is directly useful while still a student, because explaining material is one of the most effective ways to learn it. Peer tutoring builds both the subject knowledge and the skill. Depth in at least one subject matters, since teaching well requires knowing considerably more than is being taught.",
+    "strengths": ["Explaining clearly and patiently", "Diagnosing misunderstanding", "Adapting explanation to the listener", "Sustained interest in a subject"],
+    "development": ["Building deep subject expertise", "Managing a group, not only individuals", "Handling varied ability in one room", "Understanding the realities of the profession"],
+    "activities": ["Tutor a younger student regularly", "Explain a topic three different ways", "Take a subject deeper than the syllabus requires", "Lead a study group session", "Talk to teachers about the profession honestly"],
+    "careerConnections": ["School and higher-education teaching", "Corporate training and instructional design", "Educational content and publishing", "Coaching and mentoring", "Educational technology"],
+    "parentTip": "Peer tutoring is genuine practice and genuine revision at the same time, so encourage it rather than seeing it as time taken from their own study. Encourage depth in one subject, since teaching requires knowing well beyond what is taught. Honest conversations with working teachers give a realistic view of the profession.",
+    "studentTip": "Teaching someone else is the fastest way to find out what you do not know, so use it as a study method now. Go deeper in at least one subject than the syllabus requires. Practise explaining the same idea in several different ways, since the second explanation is usually the one that works."
+  },
+
+  "MANAGEMENT": {
+    "dimensionCode": "MANAGEMENT",
+    "whatItMeasures": "Interest in management describes attraction to organising people, resources and processes towards a result. It covers planning, coordinating, making decisions and taking responsibility for how a group performs. It reflects the kind of work someone is drawn to, not their current capability as a leader.",
+    "looksLike": ["Organises people and tasks naturally", "Comfortable being responsible for a result", "Thinks about how to make a process work better", "Enjoys planning and coordinating", "Steps in when a group lacks direction"],
+    "learningImplications": "Management interest is best developed through real responsibility rather than theory. Running an event, leading a project, or managing a club budget teaches more than reading about leadership. Numeracy and communication both matter, and experiencing the consequences of a plan that did not work is a large part of the learning.",
+    "strengths": ["Planning and coordination", "Taking responsibility for outcomes", "Decision making", "Organising people and resources"],
+    "development": ["Delegating rather than absorbing work", "Listening before deciding", "Following through after the launch", "Handling underperformance in a team"],
+    "activities": ["Lead a school event or club end to end", "Manage a real budget for an activity", "Take a coordinating role in a group project", "Review after a project what you would change", "Learn spreadsheet and planning basics"],
+    "careerConnections": ["General and operations management", "Project and programme management", "Consulting", "Supply chain and logistics", "Business analysis"],
+    "parentTip": "Give real responsibility with real consequences, since management is learned by doing rather than by being told. Let them run something and let it go imperfectly. Ask what they would do differently next time, because the review is where most of the learning happens rather than in the event itself.",
+    "studentTip": "Run something real, a club, an event, a project, and see it through to the end including the parts that are dull. Learn to delegate rather than doing everything yourself; it feels slower and it is the actual skill. Review honestly afterwards, because that is where you improve."
+  },
+
+  "ENTREPRENEURSHIP": {
+    "dimensionCode": "ENTREPRENEURSHIP",
+    "whatItMeasures": "Interest in entrepreneurship describes attraction to starting and building something of your own. It covers spotting an unmet need, willingness to act without guarantees, comfort with uncertainty, and persistence through early failure. It is an interest indicator and not a prediction of commercial success.",
+    "looksLike": ["Notices problems and thinks about solving them commercially", "Starts small ventures or projects", "Comfortable with uncertainty and risk", "Persistent after something does not work", "Prefers building own thing to following instructions"],
+    "learningImplications": "Entrepreneurial interest is best served by small real attempts rather than by theory. Selling something, running an event, or building a small service teaches customer, cost and delivery realities quickly. Basic financial literacy and communication both matter more than any business vocabulary learned in advance.",
+    "strengths": ["Spotting opportunities", "Acting under uncertainty", "Persistence after setbacks", "Self-direction"],
+    "development": ["Following through past the exciting stage", "Understanding costs, pricing and cash", "Listening to customers rather than assuming", "Building a team rather than working alone"],
+    "activities": ["Run one small venture end to end and count the money honestly", "Interview ten potential users before building anything", "Learn basic accounting and pricing", "Enter a business plan or startup competition", "Talk to someone who runs a small business"],
+    "careerConnections": ["Founding and running a business", "Product management", "Business development and sales", "Venture and startup roles", "Family business and self-employment"],
+    "parentTip": "Let small ventures happen and let them fail cheaply, since that is the least expensive education available in this area. Insist on honest accounting, including their own time, because a venture that looks profitable often is not. Follow-through past the exciting first weeks is the habit most worth encouraging.",
+    "studentTip": "Start something small and real rather than planning something large and hypothetical. Talk to potential customers before you build. Count your costs honestly, including your own time. Expect the first attempt to fail and treat it as tuition. The rare skill is not having ideas, it is finishing them."
+  },
+
+  "COMMERCE": {
+    "dimensionCode": "COMMERCE",
+    "whatItMeasures": "Interest in commerce describes attraction to business, trade, money and how organisations operate financially. It covers curiosity about pricing, profit, markets and financial records, and comfort working with numbers in a business context rather than a purely mathematical one.",
+    "looksLike": ["Interested in how businesses make money", "Comfortable with numbers applied to money", "Notices pricing, offers and market behaviour", "Enjoys keeping accounts or records accurately", "Follows business or financial news"],
+    "learningImplications": "Commerce interest is supported by accuracy, numeracy and organisation. Accounting rewards systematic work more than brilliance. Practical exposure, handling a real budget, tracking a small portfolio on paper, or keeping accounts for a club, makes abstract concepts concrete and shows quickly whether the daily work appeals.",
+    "strengths": ["Numerical accuracy", "Organised record keeping", "Understanding markets and value", "Systematic working"],
+    "development": ["Interpreting numbers, not only recording them", "Communicating financial information clearly", "Understanding the wider business context", "Keeping up with regulation and change"],
+    "activities": ["Keep accounts for a club or family project", "Track a hypothetical investment portfolio on paper", "Learn spreadsheet skills properly", "Follow business news weekly and summarise one story", "Talk to an accountant or banker about daily work"],
+    "careerConnections": ["Chartered accountancy and audit", "Banking and financial services", "Taxation and compliance", "Business analysis", "Trade and retail management"],
+    "parentTip": "Give this student real financial responsibility at a manageable scale: a budget to manage, accounts to keep, a purchase to research and justify. Commerce careers reward accuracy and consistency, so habits of careful record keeping built now matter more than early technical vocabulary.",
+    "studentTip": "Get practical: keep real accounts for something, track a portfolio on paper, manage an actual budget. Learn spreadsheets properly, they are the working tool of the whole field. Practise explaining what numbers mean rather than only producing them, since interpretation is what gets valued as you progress."
+  },
+
+  "ARTS": {
+    "dimensionCode": "ARTS",
+    "whatItMeasures": "Interest in the arts describes attraction to creative and cultural work: making, performing, interpreting and understanding artistic expression. It covers enjoyment of producing original work and interest in the traditions and craft behind an art form. It indicates interest rather than measured artistic ability.",
+    "looksLike": ["Makes things without being asked to", "Interested in culture, style and artistic traditions", "Prefers open-ended creative tasks", "Notices craft and technique in others' work", "Expresses ideas through a chosen medium"],
+    "learningImplications": "Arts interest is best supported by regular practice and by building a body of finished work. The technical craft underneath the creativity matters and is often underestimated. Studying the history and context of an art form deepens the work. A portfolio of completed pieces is usually what opens doors, more than marks.",
+    "strengths": ["Original expression", "Aesthetic judgement", "Sustained practice of a craft", "Interpreting and responding to work"],
+    "development": ["Finishing work to a deadline", "Accepting and using critique", "Building technical skill systematically", "Understanding the professional side of creative work"],
+    "activities": ["Keep an ongoing portfolio of finished pieces", "Study the technical craft behind your art form", "Enter exhibitions or competitions", "Seek critique and revise one piece properly", "Learn about how creative work is actually commissioned and paid"],
+    "careerConnections": ["Fine art, illustration and animation", "Performing arts and theatre", "Arts education and curation", "Cultural and heritage work", "Creative direction"],
+    "parentTip": "Treat this as a field with real careers and real training rather than as a hobby to be set aside at exam time. Support the craft, classes, materials, exposure to good work, and encourage finished pieces. A portfolio of completed work is the currency of creative fields, more than any single mark.",
+    "studentTip": "Finish things. A portfolio of completed pieces is what gets you taken seriously, and unfinished ideas count for nothing. Build the technical craft under the creativity, since inspiration without skill stalls. Learn how creative work actually gets commissioned and paid, because that knowledge is what makes it a career."
+  },
+
+  "DESIGN": {
+    "dimensionCode": "DESIGN",
+    "whatItMeasures": "Interest in design describes attraction to shaping how things look and work for the people who use them. It covers noticing what is well or badly designed, caring about both appearance and usability, and enjoying the process of iterating towards something better. It sits between creative and practical work.",
+    "looksLike": ["Notices when something is badly designed", "Cares about how things work, not only how they look", "Redesigns or improves existing things", "Interested in what users find confusing", "Iterates rather than settling for the first version"],
+    "learningImplications": "Design interest is developed through making and revising. Producing several versions of the same piece teaches more than starting many new ones. Understanding the user matters as much as visual skill, so getting real feedback on work is central. A portfolio showing process, not only outcomes, is what design courses and employers look for.",
+    "strengths": ["Combining function with appearance", "Iterating towards a better version", "Understanding user needs", "Visual problem solving"],
+    "development": ["Testing with real users rather than assuming", "Accepting critique on personal work", "Working within a brief and constraints", "Documenting the process, not only the result"],
+    "activities": ["Redesign something you find frustrating and explain why", "Learn a design tool properly", "Show work to real users and revise from feedback", "Keep a portfolio showing process and iterations", "Study why a well-known design works"],
+    "careerConnections": ["Graphic and communication design", "UI/UX and product design", "Industrial and product design", "Architecture and interiors", "Animation and motion graphics"],
+    "parentTip": "Design is a substantial professional field with strong demand, particularly in digital product work. Support tools and exposure to good design. Encourage testing work on real people, since design is judged by whether it works for a user rather than by whether the designer likes it.",
+    "studentTip": "Design is judged by whether it works for someone else, so put your work in front of real people and revise from what they struggle with. Keep a portfolio that shows your process and iterations, not only polished final images; courses and employers want to see how you think."
+  },
+
+  "GOVERNMENT": {
+    "dimensionCode": "GOVERNMENT",
+    "whatItMeasures": "Interest in government and public service describes attraction to how societies are organised and governed, and to work that serves the public. It covers curiosity about policy, law and administration, and motivation to contribute at a community or national scale rather than only individually.",
+    "looksLike": ["Follows news, policy and current affairs", "Interested in fairness, rights and how rules are made", "Wants to contribute at community or national level", "Comfortable with formal processes and institutions", "Argues about how things ought to be organised"],
+    "learningImplications": "This interest is supported by strong reading, writing and general awareness. History, civics, economics and language all contribute. Competitive public-service examinations reward broad, sustained reading over years rather than late preparation, so a habit of following current affairs seriously is genuinely useful early.",
+    "strengths": ["Understanding systems and institutions", "Written and verbal argument", "Broad general awareness", "Long-term perseverance"],
+    "development": ["Sustaining very long preparation timelines", "Understanding multiple sides of a policy issue", "Working within slow institutional processes", "Balancing idealism with practicality"],
+    "activities": ["Follow serious news daily and summarise one issue weekly", "Join debate or a model United Nations activity", "Read about how a law or policy is actually made", "Take part in student government", "Talk to someone working in public administration"],
+    "careerConnections": ["Civil services and public administration", "Policy analysis and research", "Law and judiciary", "Diplomacy and international relations", "Local government and urban planning"],
+    "parentTip": "Encourage broad, serious reading and real discussion of current affairs, since these careers reward general awareness accumulated over years. Discuss issues from more than one side rather than only your own view. Be realistic together about the length and competitiveness of public-service examination routes.",
+    "studentTip": "Read widely and seriously, starting now; these routes reward years of accumulated awareness rather than last-minute preparation. Practise arguing a position you disagree with, because understanding both sides is the actual skill. Get involved in student government to see how slow institutional processes really feel."
+  },
+
+  "HOSPITALITY": {
+    "dimensionCode": "HOSPITALITY",
+    "whatItMeasures": "Interest in hospitality describes attraction to travel, service, events and looking after people's experience. It covers enjoyment of making an occasion work, comfort with people from varied backgrounds, and satisfaction in service delivered well. It is an interest indicator rather than an assessment of suitability.",
+    "looksLike": ["Enjoys hosting, organising or looking after guests", "Comfortable with people from varied backgrounds", "Notices details that make an experience better", "Interested in travel, food or events", "Stays composed when something goes wrong"],
+    "learningImplications": "Hospitality interest benefits from languages, communication and practical experience. Helping run real events shows quickly whether the long hours and constant people contact appeal. The field rewards composure under pressure and attention to detail, both of which can be practised well before any formal training.",
+    "strengths": ["Service orientation and attention to detail", "Working with varied people", "Composure when things go wrong", "Practical organisation"],
+    "development": ["Sustaining energy through long shifts", "Handling difficult customers calmly", "Understanding the commercial side", "Learning additional languages"],
+    "activities": ["Help organise a real event start to finish", "Learn an additional language", "Work or volunteer in a service role if permitted", "Study how a hotel or restaurant actually operates", "Practise staying composed when a plan fails"],
+    "careerConnections": ["Hotel and resort management", "Travel and tourism", "Event management", "Food and beverage operations", "Airlines and cruise operations"],
+    "parentTip": "Hospitality is an international industry with structured management careers, not only front-line service work. Let them help run real events, which tests interest quickly. Be realistic together about hours and shift patterns, since that is what most often surprises people entering the field.",
+    "studentTip": "Help run a real event from start to finish; that will tell you within a weekend whether this suits you. Learn another language, it opens the international side of the field. Practise composure when things go wrong, because in this work something always does and that moment is the job."
+  },
+
+  "ENVIRONMENT": {
+    "dimensionCode": "ENVIRONMENT",
+    "whatItMeasures": "Interest in the environment describes attraction to the natural world, sustainability and the systems that connect them. It covers concern about environmental issues, curiosity about ecosystems and climate, and motivation to work on problems at that scale. It indicates interest rather than scientific aptitude.",
+    "looksLike": ["Concerned about environmental and climate issues", "Curious about ecosystems and how they interact", "Prefers outdoor and field-based activity", "Notices waste and inefficiency", "Wants work with a visible environmental purpose"],
+    "learningImplications": "Environmental interest is supported by biology, chemistry, geography and increasingly by data skills, since much environmental work is measurement and analysis. Fieldwork and citizen-science projects give realistic exposure. Understanding that the field spans science, policy, engineering and law helps a student find the entry route that suits them.",
+    "strengths": ["Systems thinking", "Field observation and data collection", "Long-term perspective", "Motivation from purpose"],
+    "development": ["Building the data and analysis skills the field requires", "Balancing advocacy with evidence", "Understanding economic and policy trade-offs", "Sustaining effort on slow-moving problems"],
+    "activities": ["Join a citizen-science or conservation project", "Run a waste or energy audit at school or home", "Keep field observation records properly", "Learn basic data analysis", "Explore the policy and legal side, not only the science"],
+    "careerConnections": ["Environmental science and conservation", "Climate and sustainability consulting", "Renewable energy engineering", "Environmental law and policy", "Agriculture and forestry"],
+    "parentTip": "Support real involvement rather than only concern: a conservation project, a garden, a measured audit of household energy. Point out that this field includes engineering, law, data and policy as well as field science, which widens the realistic routes in considerably.",
+    "studentTip": "Get involved in something measurable rather than only caring about the issue. Learn data skills, since much environmental work is measurement and analysis. Explore the policy, law and engineering sides too, as they often have more direct routes in and more influence than field science alone."
+  }
+}

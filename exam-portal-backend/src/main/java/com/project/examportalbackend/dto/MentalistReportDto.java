@@ -104,6 +104,123 @@ public class MentalistReportDto {
         private String date;
     }
 
+    /**
+     * One dimension type rendered as its own report section (see
+     * {@link com.project.examportalbackend.services.DimensionCategoryCatalog}).
+     * Scores inside are already-computed {@link DimensionScoreView}s -- nothing
+     * in this tree is recalculated for display.
+     */
+    @Getter @Setter @NoArgsConstructor
+    public static class DimensionGroup {
+        private String type;
+        private String title;
+        private String subtitle;
+        private List<DimensionScoreView> dimensions;
+        /** Highest-scoring dimensions in this group, already ranked upstream. */
+        private List<DimensionScoreView> top;
+        /**
+         * True when the group's scores are shares of the student's own profile
+         * (MI) rather than an absolute 0-100 mastery scale. Interpretation bands
+         * are not meaningful on such a scale, so the report shows rank instead.
+         */
+        private boolean relativeScale;
+        /**
+         * Introduction for this dimension type (what it is, how to read it),
+         * from classpath:content/report-content.json. Null when unauthored,
+         * in which case the template omits the intro block.
+         */
+        private java.util.Map<String, Object> intro;
+
+        public static DimensionGroup of(String type, String title, String subtitle,
+                                        List<DimensionScoreView> dimensions, List<DimensionScoreView> top) {
+            return of(type, title, subtitle, dimensions, top, false);
+        }
+
+        public static DimensionGroup of(String type, String title, String subtitle,
+                                        List<DimensionScoreView> dimensions, List<DimensionScoreView> top,
+                                        boolean relativeScale) {
+            DimensionGroup g = new DimensionGroup();
+            g.type = type;
+            g.title = title;
+            g.subtitle = subtitle;
+            g.dimensions = dimensions;
+            g.top = top;
+            g.relativeScale = relativeScale;
+            return g;
+        }
+    }
+
+    /** Executive summary for "Your report at a glance". */
+    @Getter @Setter @NoArgsConstructor
+    public static class AtAGlance {
+        private List<DimensionScoreView> keyStrengths;
+        private List<DimensionScoreView> areasToDevelop;
+    }
+
+    /** Class/grade-driven framing, from AssessmentContext -- never hardcoded in the template. */
+    @Getter @Setter @NoArgsConstructor
+    public static class ClassGuidance {
+        private String className;
+        private Integer grade;
+        private String stageTitle;
+        private String stageFocus;
+        private boolean showStreamGuidance;
+    }
+
+    /** One matched cross-dimension theme, with the dimensions that triggered it. */
+    @Getter @Setter @NoArgsConstructor
+    public static class SynthesisTheme {
+        private String code;
+        private String title;
+        private String narrative;
+        private String suggestion;
+        /** Display names of the student's dimensions that matched this theme. */
+        private List<String> matchedDimensions;
+    }
+
+    /** Output of the cross-dimension synthesis: themes plus the written narratives. */
+    @Getter @Setter @NoArgsConstructor
+    public static class SynthesisResult {
+        private List<SynthesisTheme> themes;
+        /** "How your strengths work together" - 1-2 paragraphs. */
+        private String strengthsTogether;
+        /** "Your personal profile" - roughly 150-300 words. */
+        private String personalProfile;
+        /** Counsellor-style synthesis, roughly 250-400 words. */
+        private String counsellorNarrative;
+    }
+
+    /** A career cluster with the reason it surfaced for this student. */
+    @Getter @Setter @NoArgsConstructor
+    public static class CareerClusterView {
+        private String field;
+        private String label;
+        private double score;
+        private int stars;
+        private String whatItIs;
+        /** Which of the student's strengths put this cluster on the list. */
+        private String whyItAppears;
+        private List<String> exampleRoles;
+        private List<String> subjectsToExplore;
+    }
+
+    /** A stream option with its reasoning; only shown when the class stage warrants it. */
+    @Getter @Setter @NoArgsConstructor
+    public static class StreamView {
+        private String name;
+        private String whatItIs;
+        private String whyItAppears;
+        private List<String> exploreBy;
+    }
+
+    /** Final "Your next steps" page. */
+    @Getter @Setter @NoArgsConstructor
+    public static class ActionPlan {
+        private List<String> buildOnStrengths;
+        private List<String> developAreas;
+        private List<String> practicalActions;
+    }
+
     // -- report identity --------------------------------------------------
     private Long reportId;
     private String reportNumber;
@@ -135,4 +252,28 @@ public class MentalistReportDto {
     private DevelopmentPlan developmentPlan;
     private CareerGuidance careerGuidance;
     private CounsellorSummary counsellorSummary;
+
+    // -- Phase D presentation layer (added, nothing above was removed) ------
+    /** Platform logo as a data URL; null renders the wordmark fallback. */
+    private String companyLogo;
+    private AtAGlance atAGlance;
+    /** Published interpretation scale, straight from InterpretationEngine.bandScale(). */
+    private List<com.project.examportalbackend.services.InterpretationEngine.BandRange> bandScale;
+    /** Dimension sections that have real dimension_results / engine values behind them. */
+    private List<DimensionGroup> dimensionGroups;
+    private ClassGuidance classGuidance;
+    private List<String> parentGuide;
+    private ActionPlan nextSteps;
+
+    // -- Content Engine V2: interpretation & personalisation ----------------
+    /** Cross-dimension themes plus the personal/counsellor narratives. */
+    private SynthesisResult synthesis;
+    /** Career clusters with the reasoning behind each, replacing the bare list. */
+    private List<CareerClusterView> careerClusters;
+    /** Stream options; empty when the class stage makes stream guidance premature. */
+    private List<StreamView> streamOptions;
+    /** Editorial blocks straight from classpath:content/report-content.json. */
+    private java.util.Map<String, Object> parentGuideContent;
+    private java.util.Map<String, Object> teacherGuideContent;
+    private java.util.Map<String, Object> howToReadContent;
 }
