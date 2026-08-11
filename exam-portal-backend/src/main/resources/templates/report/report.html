@@ -12,7 +12,10 @@
 
   @page {
     size: A4;
-    margin: 20mm 16mm 16mm;
+    /* Top margin has to clear the running header logo: the logo is square, so a
+       22mm image needs more than 20mm of margin or it hangs into the text box
+       and collides with the first block on the page. */
+    margin: 30mm 16mm 16mm;
     @bottom-left  { content: element(footerLeft); }
     @bottom-right { content: "Page " counter(page) " of " counter(pages);
                     font-family: Helvetica, Arial, sans-serif; font-size: 7.5pt; color: #8A97A6; }
@@ -57,7 +60,7 @@
   /* Small logo repeated in the top-right of every content page. The image is
      embedded once and referenced by the running element, so this does not
      multiply the PDF size per page. */
-  #headerRight img { width: 22mm; height: auto; }
+  #headerRight img { width: 18mm; height: auto; }
   #headerRight .hdr-tag { display: block; margin-top: 0.8mm; }
 
   /* ---- cover -------------------------------------------------------------
@@ -225,7 +228,7 @@
   .b-CRITICAL .pill { background: #D9534F; color: #FFFFFF; }
 
   /* one dimension row: name | score, then bar */
-  .dim { margin-bottom: 4.5mm; page-break-inside: avoid; }
+  .dim { margin-bottom: 3.4mm; page-break-inside: avoid; }
   /* The trailing gap inside a card pushed a full profile list a millimetre past
      the text box, which cost a whole blank page at the next section break. */
   .card .dim:last-child, .card .gauge:last-child, .card .meter:last-child { margin-bottom: 0; }
@@ -308,17 +311,22 @@
      The six trait sections sat at ~93% of a page and spilled their last card,
      leaving a page holding one orphan line. Trimming the block gaps and card
      padding pulls them back onto a single page; the trailing card also refuses
-     to split so a spill can never be a lone line again. */
-  .traitsec .card { padding: 3.6mm 4mm; }
-  .traitsec .acard { padding: 3.6mm 4mm; margin-bottom: 3mm; }
-  .traitsec .card + .card { margin-top: 3mm; }
-  .traitsec table.two { margin-top: 3mm !important; }
-  .traitsec .card.tint { margin-top: 3mm !important; }
-  .traitsec .whathelps { margin-top: 3mm !important; page-break-inside: avoid; }
-  .traitsec ul.tight li { margin-bottom: 1.4mm; line-height: 1.38; }
-  .traitsec .meter { padding: 3mm 4mm; margin-bottom: 2.4mm; }
-  .traitsec .gauge { margin-bottom: 3mm; }
-  .traitsec .dim { margin-bottom: 3.4mm; }
+     to split so a spill can never be a lone line again.
+
+     Re-tightened after the page top margin grew to 30mm to clear the header
+     logo: that took ~10mm off every text box and pushed the trailing card of
+     these sections onto a page of its own again. */
+  .traitsec .card { padding: 3mm 4mm; }
+  .traitsec .acard { padding: 3mm 4mm; margin-bottom: 2.4mm; }
+  .traitsec .card + .card { margin-top: 2.4mm; }
+  .traitsec table.two { margin-top: 2.4mm !important; }
+  .traitsec .card.tint { margin-top: 2.4mm !important; }
+  .traitsec .whathelps { margin-top: 2.4mm !important; page-break-inside: avoid; }
+  .traitsec ul.tight li { margin-bottom: 1.2mm; line-height: 1.34; }
+  .traitsec .meter { padding: 2.4mm 4mm; margin-bottom: 1.8mm; }
+  .traitsec .gauge { margin-bottom: 2.4mm; }
+  .traitsec .dim { margin-bottom: 2.8mm; }
+  .traitsec .card > h3:first-child { margin: -3mm -4mm 2.4mm; padding: 2mm 4mm; }
 
   /* ---- accent cards ------------------------------------------------------
      Tinted panel with a thick coloured left edge. Accents rotate so a run of

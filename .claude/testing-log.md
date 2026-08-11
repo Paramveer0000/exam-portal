@@ -1676,3 +1676,11 @@ gotchas, and open issues that are NOT in the source code or git history.
 - fixed while here: a blank page appeared between two dimension-group sections. Cause was the trailing .dim margin inside a full-height profile card pushing about a millimetre past the text box. `.card .dim:last-child { margin-bottom: 0 }` (also .gauge/.meter) removed it -- 22 pages down to 21.
 - GOTCHA (second one in this area): the openhtmltopdf XHTML parse also rejects `--` inside an HTML comment. Between this and the earlier `<h3>`-in-a-CSS-comment break, treat report.html comments as XML-strict: no `--`, no tags.
 - result: harness renders 21 pages, 518KB. Inspected p3 (parents letter), p8 (RIASEC analysis head, summary, domain code, R/I cards), p9 (A/S/E/C cards). Full suite 81/82; the single failure is ExamPortalBackendApplicationTests.contextLoads, which needs MySQL on :3306 and is unrelated.
+
+### 2026-08-11 18:40 — Page top margin raised to clear the header logo  [type: change]
+- what: client screenshot showed the running-header logo hanging into the text box and nearly touching the section masthead on most pages.
+- cause: @page margin-top was 20mm but the header logo is SQUARE and was 22mm wide, so it was taller than the margin it lived in.
+- fix: header logo 22mm -> 18mm, @page margin-top 20mm -> 30mm. Tried 26mm and 28mm first: both cleared the logo but left a near-empty page (the MI profile card and the trait sections both sit at ~95% of a page, so a few millimetres decides whether they spill). 30mm is the value that clears the logo AND leaves no orphan page.
+- knock-on: the lost 10mm of text box pushed the trait sections' trailing card and the MI detail card's last row onto pages of their own. Re-tightened .traitsec block gaps/padding and dropped the global .dim gap 4.5mm -> 3.4mm. Back to 21 pages with no sparse page.
+- IMPORTANT for anyone changing page margins here: check the page count and scan for sparse pages afterwards. Several sections are tuned to fill almost exactly one page, so a margin change of 2mm can cost two pages.
+- result: harness renders 21 pages, no sparse pages. Inspected p8 (RIASEC group, clear gap under the logo) and p12 (EI section, still one page).
