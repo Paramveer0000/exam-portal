@@ -226,6 +226,29 @@
   /* Leading rows get the darker brand navy so the top of the list reads first */
   .rank .top div { background: #16365A; }
 
+  /* ---- column chart ------------------------------------------------------
+     Vertical bars for a whole dimension group, giving the profile pages a
+     visual centrepiece instead of another stack of horizontal bars.
+
+     Built from a table because openhtmltopdf renders CSS 2.1: no flexbox, no
+     grid. Each column is a fixed-height plot cell with the bar bottom-aligned
+     inside it, so the bar heights are directly comparable across columns.
+     A true line chart would need inline SVG, which needs the Batik
+     svg-support module this project does not ship -- a column chart carries
+     the same comparison without a new dependency. */
+  .colchart { margin: 2mm 0 0; page-break-inside: avoid; }
+  table.cc { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  table.cc td { vertical-align: bottom; padding: 0 1mm; text-align: center; }
+  /* Fixed plot height: the bar is a bottom-anchored block inside it. */
+  .cc-plot { height: 32mm; position: relative; }
+  .cc-bar { position: absolute; bottom: 0; left: 12%; width: 76%;
+            background: #16365A; border-radius: 1mm 1mm 0 0; }
+  .cc-top .cc-bar { background: #1F6B5E; }
+  .cc-val { font-size: 7pt; font-weight: bold; color: #16365A; padding-bottom: 1mm; }
+  .cc-axis { border-top: 1px solid #E3E9F0; }
+  .cc-lbl { font-size: 6.5pt; color: #6B7A8C; padding-top: 1.4mm; line-height: 1.2;
+            word-wrap: break-word; }
+
   /* ---- chips -------------------------------------------------------------
      Tag pills used for career roles / subjects, grouped under a small label. */
   .chipgroup { margin-bottom: 3mm; }
@@ -521,7 +544,28 @@
     </table>
   </div>
 
-  <h3 style="margin-top:7mm;">Your Profile</h3>
+  <div class="subhead">Your Profile at a Glance</div>
+  <!-- Column chart over the same d.barWidth the presentation layer already
+       computed; the detailed rows below repeat the exact values as text. -->
+  <div class="colchart">
+    <table class="cc">
+      <tr>
+        <td th:each="d : ${g.dimensions}" th:classappend="${d.rank &lt;= 3} ? 'cc-top' : ''">
+          <div class="cc-val" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</div>
+          <div class="cc-plot">
+            <div class="cc-bar" th:style="'height:' + ${d.barWidth} + '%'"></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="cc-axis" th:each="d : ${g.dimensions}">
+          <div class="cc-lbl" th:text="${d.dimensionName}">Dimension</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="subhead">Your Profile in Detail</div>
   <div class="card">
     <div th:each="d : ${g.dimensions}" class="dim" th:classappend="${g.relativeScale} ? '' : 'b-' + ${d.interpretationBand}">
       <table>
