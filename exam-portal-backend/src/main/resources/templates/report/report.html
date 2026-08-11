@@ -64,10 +64,7 @@
      Fixed vertical budget for A4 (297mm). Spacing is deliberately generous:
      the cover is the one page that should feel empty rather than dense. */
   .cover { page: cover; height: 297mm; width: 210mm; padding: 0 22mm; text-align: center; }
-  /* --primary-dark over --secondary: a two-tone bleed band, no image needed */
-  .cover-rule { height: 7mm; background: #0E2440; margin: 0 -22mm; }
-  .cover-rule-accent { height: 1.6mm; background: #1F6B5E; margin: 0 -22mm 0; }
-  .cover-logo { width: 54mm; height: auto; margin: 15mm auto 0; display: block; }
+  .cover-logo { width: 54mm; height: auto; margin: 30mm auto 0; display: block; }
   .cover-wordmark { margin: 24mm 0 0; font-size: 26pt; letter-spacing: 3px; color: #16365A; }
   /* Brand block: name is only printed as text when there is no logo image,
      otherwise the logo already carries the wordmark and repeating it looks cheap. */
@@ -191,6 +188,22 @@
   .gauge-nm { font-size: 9.5pt; font-weight: bold; color: #23303D; margin-bottom: 1.5mm; }
   .gauge-sc { text-align: right; white-space: nowrap; width: 32mm; padding-left: 3mm;
               font-size: 9.5pt; font-weight: bold; color: #16365A; }
+
+  /* ---- trait-section density ---------------------------------------------
+     The six trait sections sat at ~93% of a page and spilled their last card,
+     leaving a page holding one orphan line. Trimming the block gaps and card
+     padding pulls them back onto a single page; the trailing card also refuses
+     to split so a spill can never be a lone line again. */
+  .traitsec .card { padding: 3.6mm 4mm; }
+  .traitsec .acard { padding: 3.6mm 4mm; margin-bottom: 3mm; }
+  .traitsec .card + .card { margin-top: 3mm; }
+  .traitsec table.two { margin-top: 3mm !important; }
+  .traitsec .card.tint { margin-top: 3mm !important; }
+  .traitsec .whathelps { margin-top: 3mm !important; page-break-inside: avoid; }
+  .traitsec ul.tight li { margin-bottom: 1.4mm; line-height: 1.38; }
+  .traitsec .meter { padding: 3mm 4mm; margin-bottom: 2.4mm; }
+  .traitsec .gauge { margin-bottom: 3mm; }
+  .traitsec .dim { margin-bottom: 3.4mm; }
 
   /* ---- accent cards ------------------------------------------------------
      Tinted panel with a thick coloured left edge. Accents rotate so a run of
@@ -346,9 +359,6 @@
 
 <!-- ============================ 1. COVER ============================ -->
 <div class="cover">
-  <div class="cover-rule"></div>
-  <div class="cover-rule-accent"></div>
-
   <!-- The logo already contains the wordmark, so the text name is the fallback,
        not a duplicate of it. -->
   <img class="cover-logo" th:if="${companyLogo}" th:src="${companyLogo}" alt="Company logo"/>
@@ -835,9 +845,10 @@
     </tr>
   </table>
 
-  <!-- Deliberate second parent page: these three blocks together fill it,
-       rather than spilling one card onto a near-empty page. -->
-  <div style="page-break-before: always;">
+  <!-- These three blocks used to be forced onto a second page. That was tuned
+       for long content: when the guidance is short it produced two near-empty
+       pages instead of one full one. Let them flow and break naturally. -->
+  <div>
   <div class="card" style="margin-top:4mm;" th:if="${parentGuideContent != null and parentGuideContent.whatNotToDo != null}">
     <h3>What to Avoid</h3>
     <ul class="tight"><li th:each="p : ${parentGuideContent.whatNotToDo}" th:text="${p}">-</li></ul>

@@ -189,7 +189,30 @@ class ReportRenderHarnessTest {
 
         // One dimension group so the profile column chart actually renders and
         // can be inspected; without it the whole section is skipped.
-        dto.setDimensionGroups(java.util.Collections.singletonList(miGroup()));
+        MentalistReportDto.DimensionGroup group = miGroup();
+        dto.setDimensionGroups(java.util.Collections.singletonList(group));
+
+        // Content-engine output. These blocks are optional, but leaving them
+        // null makes the summary/how-to-read/parent/next-steps pages look
+        // half empty in QA when a real report fills them -- which would push
+        // us to "fix" a density problem that does not exist.
+        MentalistReportDto.AtAGlance glance = new MentalistReportDto.AtAGlance();
+        glance.setKeyStrengths(group.getDimensions().subList(0, 3));
+        glance.setAreasToDevelop(group.getDimensions().subList(6, 9));
+        dto.setAtAGlance(glance);
+        dto.setBandScale(new com.project.examportalbackend.services.InterpretationEngine().bandScale());
+
+        MentalistReportDto.ActionPlan steps = new MentalistReportDto.ActionPlan();
+        steps.setBuildOnStrengths(Arrays.asList(
+                "Keep a sketchbook for working problems out visually before writing them up.",
+                "Offer to design the visuals for a group project."));
+        steps.setDevelopAreas(Arrays.asList(
+                "Read one page aloud each day, then say what it meant in your own words.",
+                "Explain one piece of your own work to someone each week."));
+        steps.setPracticalActions(Arrays.asList(
+                "Join an activity that mixes making things with presenting them.",
+                "Ask a teacher which subjects lean on design thinking."));
+        dto.setNextSteps(steps);
 
         return dto;
     }
