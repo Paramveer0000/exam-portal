@@ -3,6 +3,7 @@ import "./App.css";
 import Header from "./components/Header";
 import IdleTimeout from "./components/IdleTimeout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { applyStoredTheme } from "./hooks/useTheme";
 import RequireStudentOnboarding from "./components/RequireStudentOnboarding";
 import AdminAddCategoryPage from "./pages/admin/categories/AdminAddCategoryPage";
 import AdminCategoriesPage from "./pages/admin/categories/AdminCategoriesPage";
@@ -51,6 +52,11 @@ const superAdminRoute = (element) => (
 );
 
 const App = () => {
+  // Apply the saved theme before anything renders. The landing page owns the
+  // toggle, so without this an inner route opened directly had no data-theme
+  // and anything theme-aware (the header logo) fell back to a guess.
+  applyStoredTheme();
+
   return (
     <Router>
       <Header />

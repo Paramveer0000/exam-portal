@@ -374,9 +374,11 @@ const LandingPage = () => {
       <nav className={`${styles.navbar} ${scrolled ? styles.navbarScrolled : ""}`}>
         <div className={`${styles.container} ${styles.navContainer}`}>
           <a href="#hero" className={styles.navBrand}>
-            <div className={styles.brandIcon}>
-              <i className="fa-solid fa-brain" />
-            </div>
+            <img
+              className={styles.brandIcon}
+              src={theme === "light" ? "/mentalist/logo-light.png" : "/mentalist/logo-dark.png"}
+              alt=""
+            />
             <span>
               THE <span className={styles.textGradient}>MENTALIST</span>
             </span>
@@ -992,9 +994,11 @@ const LandingPage = () => {
           <div className={styles.footerGrid}>
             <div className={styles.footerBrand}>
               <a href="#hero" className={styles.navBrand}>
-                <div className={styles.brandIcon}>
-                  <i className="fa-solid fa-brain" />
-                </div>
+                <img
+                  className={styles.brandIcon}
+                  src={theme === "light" ? "/mentalist/logo-light.png" : "/mentalist/logo-dark.png"}
+                  alt=""
+                />
                 <span>THE <span className={styles.textGradient}>MENTALIST</span></span>
               </a>
               <p style={{ color: "var(--mt-text-secondary)", fontSize: "0.95rem", marginTop: 12, maxWidth: 320 }}>

@@ -7,6 +7,7 @@ import platformServices from "../services/platformServices";
 import adminServices from "../services/adminServices";
 import { homePathForRoles } from "./ProtectedRoute";
 import { logout } from "../actions/authActions";
+import useTheme, { logoForTheme } from "../hooks/useTheme";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Header = () => {
   const loginReducer = useSelector((state) => state.loginReducer);
   const [isLoggedIn, setIsLoggedIn] = useState(loginReducer.loggedIn);
   const [companyLogo, setCompanyLogo] = useState(null);
+  const theme = useTheme();
 
   const isImpersonating = !!localStorage.getItem("impersonatorBackup");
 
@@ -76,22 +78,27 @@ const Header = () => {
 
   return (
     <header>
-      <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
+      {/* The bar follows the theme too: a white-background logo on a
+          permanently dark bar would read as a white block. */}
+      <Navbar
+        bg={theme === "light" ? "light" : "dark"}
+        variant={theme === "light" ? "light" : "dark"}
+        expand="lg"
+        collapseOnSelect
+      >
         <Container>
             <Navbar.Brand
               onClick={goHome}
               style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
               title="Go to dashboard"
             >
-              {companyLogo ? (
-                <img
-                  src={companyLogo}
-                  alt="Home"
-                  style={{ height: "40px", objectFit: "contain" }}
-                />
-              ) : (
-                "The Mentalist"
-              )}
+              {/* An uploaded logo wins so white-labelling still works; with
+                  none, fall back to the variant that suits the theme. */}
+              <img
+                src={companyLogo || logoForTheme(theme)}
+                alt="The Mentalist - go to dashboard"
+                style={{ height: "40px", objectFit: "contain" }}
+              />
             </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
