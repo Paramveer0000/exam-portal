@@ -511,7 +511,7 @@
      when no logo is configured. -->
 <div id="headerRight">
   <img th:if="${companyLogo}" th:src="${companyLogo}" alt=""/>
-  <span class="hdr-tag" th:unless="${companyLogo}">Psychometric &amp; Mental Skill Assessment Report</span>
+  <span class="hdr-tag" th:unless="${companyLogo}" th:text="${reportTitle}">Psychometric &amp; Mental Skill Assessment Report</span>
 </div>
 <div id="footerLeft">
   <span th:text="${brand.name} ?: 'The Mentalist'">The Mentalist</span>
@@ -532,7 +532,7 @@
 
   <div class="cover-div"></div>
 
-  <h1>PSYCHOMETRIC &amp; MENTAL SKILL<br/>ASSESSMENT REPORT</h1>
+  <h1 th:text="${reportTitle}">PSYCHOMETRIC &amp; MENTAL SKILL ASSESSMENT REPORT</h1>
   <div class="quote">&#8220;Understanding Your Strengths,<br/>Interests &amp; Growth Potential&#8221;</div>
 
   <div class="cover-meta">
