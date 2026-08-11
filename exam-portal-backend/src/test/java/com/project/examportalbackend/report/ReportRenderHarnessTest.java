@@ -187,7 +187,42 @@ class ReportRenderHarnessTest {
                 + "attached to work the student already cares about rather than practised in isolation.");
         dto.setSynthesis(synth);
 
+        // One dimension group so the profile column chart actually renders and
+        // can be inspected; without it the whole section is skipped.
+        dto.setDimensionGroups(java.util.Collections.singletonList(miGroup()));
+
         return dto;
+    }
+
+    private com.project.examportalbackend.dto.DimensionScoreView dim(
+            String name, double percent, int rank, String band, String label) {
+        com.project.examportalbackend.dto.DimensionScoreView v =
+                new com.project.examportalbackend.dto.DimensionScoreView();
+        v.setDimensionCode(name.toUpperCase());
+        v.setDimensionName(name);
+        v.setDimensionType("MI");
+        v.setPercentage(percent);
+        v.setRank(rank);
+        v.setInterpretationBand(band);
+        v.setInterpretationLabel(label);
+        // Relative bar length within the group, as the presentation layer supplies it.
+        v.setBarWidth(percent * 5);
+        return v;
+    }
+
+    private MentalistReportDto.DimensionGroup miGroup() {
+        List<com.project.examportalbackend.dto.DimensionScoreView> dims = Arrays.asList(
+                dim("Spatial", 19, 1, "STRONG", "Strong"),
+                dim("Musical", 17, 2, "STRONG", "Strong"),
+                dim("Kinesthetic", 15, 3, "GOOD", "Good"),
+                dim("Logical", 12, 4, "GOOD", "Good"),
+                dim("Interpersonal", 11, 5, "AVERAGE", "Average"),
+                dim("Naturalist", 10, 6, "AVERAGE", "Average"),
+                dim("Intrapersonal", 8, 7, "AVERAGE", "Average"),
+                dim("Existential", 6, 8, "NEEDS_IMPROVEMENT", "Needs Improvement"),
+                dim("Verbal", 2, 9, "NEEDS_IMPROVEMENT", "Needs Improvement"));
+        return MentalistReportDto.DimensionGroup.of("MI", "Multiple Intelligences",
+                "How You Take In the World", dims, dims.subList(0, 3), true);
     }
 
     @Test
