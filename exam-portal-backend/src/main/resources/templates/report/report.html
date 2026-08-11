@@ -91,77 +91,99 @@
      The masthead is a soft tinted panel with a solid accent edge, so every
      section opens with colour instead of a hairline rule. */
   .section { page-break-before: always; }
-  .section-head { background: #EFF6F4; border-left: 2.4mm solid #1F6B5E;
-                  border-radius: 0 3mm 3mm 0; padding: 4.5mm 5mm;
+  /* Masthead is a SOLID colour band with reversed type: the report read grey
+     because every page opened with a pale tint. Each theme below only swaps the
+     one background colour; the white type rules stay shared. */
+  .section-head { background: #1F6B5E; border-radius: 3mm; padding: 5mm 5.5mm;
                   margin: 0 0 6mm; page-break-after: avoid; }
-  .section-head .eyebrow { font-size: 8pt; letter-spacing: 2px; text-transform: uppercase; color: #1F6B5E; margin-bottom: 1.5mm; }
-  .section-head h2 { font-size: 19pt; letter-spacing: 0.5px; }
+  .section-head .eyebrow { font-size: 8pt; letter-spacing: 2px; text-transform: uppercase;
+                           color: #FFFFFF; margin-bottom: 1.5mm; }
+  .section-head h2 { font-size: 20pt; letter-spacing: 0.5px; color: #FFFFFF; }
 
   /* ---- section colour themes ---------------------------------------------
      Hues are taken from the company logo itself: the navy ring and green
      wordmark, plus the icon colours around it (focus orange, empathy rose,
      adaptability blue, creativity lime, the teal of the profile gradient).
-     Each is used at low saturation as a tint behind the masthead, with the
-     full-strength hue only on the accent edge and the eyebrow, which keeps
-     pages colourful but calm and leaves body copy on white.
+     The hue runs at full strength on the masthead band and the section's
+     charts, so every page opens on colour; body copy stays on white.
 
-     Score bars are deliberately NOT themed: their colour already encodes the
-     interpretation band (green strong, amber developing) and recolouring them
-     per section would destroy that meaning. */
-  .thm-green   .section-head { background: #EFF6F4; border-left-color: #1F6B5E; }
-  .thm-green   .section-head .eyebrow { color: #1F6B5E; }
-  .thm-green   .section-head h2, .thm-green .subhead { color: #16544A; }
-  .thm-green   .subhead { border-bottom-color: #1F6B5E; }
+     Band-coded score bars (.bar-fill) are deliberately NOT themed: their colour
+     already encodes the interpretation band (green strong, amber developing)
+     and recolouring them per section would destroy that meaning. Rank/share
+     charts carry no band meaning, so those DO take the section hue.
 
-  .thm-navy    .section-head { background: #EEF2F8; border-left-color: #16365A; }
-  .thm-navy    .section-head .eyebrow { color: #16365A; }
-  .thm-navy    .section-head h2, .thm-navy .subhead { color: #16365A; }
-  .thm-navy    .subhead { border-bottom-color: #16365A; }
+     Each theme sets four things and nothing else:
+       .section-head background   the solid masthead band
+       .subhead                   colour + rule under in-page dividers
+       .cc-bar / .rbar div        chart colour (rank/share data, no band meaning)
+       .card-hd                   tinted heading strip on cards
+     ------------------------------------------------------------------------ */
+  .thm-green   .section-head { background: #1F8A6E; }
+  .thm-green   .subhead { color: #16644F; border-bottom-color: #1F8A6E; }
+  .thm-green   .cc-bar, .thm-green .chip { background: #1F8A6E; color: #FFFFFF; }
+  .thm-green .card > h3:first-child,   .thm-green .card-hd { background: #E6F5F0; color: #16644F; }
 
-  .thm-teal    .section-head { background: #EDF4F6; border-left-color: #2C7A8C; }
-  .thm-teal    .section-head .eyebrow { color: #23606E; }
-  .thm-teal    .section-head h2, .thm-teal .subhead { color: #23606E; }
-  .thm-teal    .subhead { border-bottom-color: #2C7A8C; }
+  .thm-navy    .section-head { background: #16365A; }
+  .thm-navy    .subhead { color: #16365A; border-bottom-color: #16365A; }
+  .thm-navy    .cc-bar, .thm-navy .chip { background: #16365A; color: #FFFFFF; }
+  .thm-navy .card > h3:first-child,   .thm-navy .card-hd { background: #E9EFF8; color: #16365A; }
 
-  .thm-blue    .section-head { background: #EEF3FC; border-left-color: #2F6FBF; }
-  .thm-blue    .section-head .eyebrow { color: #235699; }
-  .thm-blue    .section-head h2, .thm-blue .subhead { color: #235699; }
-  .thm-blue    .subhead { border-bottom-color: #2F6FBF; }
+  .thm-teal    .section-head { background: #1E8FA8; }
+  .thm-teal    .subhead { color: #1B7086; border-bottom-color: #1E8FA8; }
+  .thm-teal    .cc-bar, .thm-teal .chip { background: #1E8FA8; color: #FFFFFF; }
+  .thm-teal .card > h3:first-child,   .thm-teal .card-hd { background: #E4F3F7; color: #1B7086; }
 
-  .thm-violet  .section-head { background: #F2F0F8; border-left-color: #6B5CA5; }
-  .thm-violet  .section-head .eyebrow { color: #554791; }
-  .thm-violet  .section-head h2, .thm-violet .subhead { color: #554791; }
-  .thm-violet  .subhead { border-bottom-color: #6B5CA5; }
+  .thm-blue    .section-head { background: #2F6FBF; }
+  .thm-blue    .subhead { color: #235699; border-bottom-color: #2F6FBF; }
+  .thm-blue    .cc-bar, .thm-blue .chip { background: #2F6FBF; color: #FFFFFF; }
+  .thm-blue .card > h3:first-child,   .thm-blue .card-hd { background: #E8F0FC; color: #235699; }
 
-  .thm-rose    .section-head { background: #FBF0F3; border-left-color: #B8425F; }
-  .thm-rose    .section-head .eyebrow { color: #9B3651; }
-  .thm-rose    .section-head h2, .thm-rose .subhead { color: #9B3651; }
-  .thm-rose    .subhead { border-bottom-color: #B8425F; }
+  .thm-violet  .section-head { background: #7B4FA8; }
+  .thm-violet  .subhead { color: #5E3B82; border-bottom-color: #7B4FA8; }
+  .thm-violet  .cc-bar, .thm-violet .chip { background: #7B4FA8; color: #FFFFFF; }
+  .thm-violet .card > h3:first-child,   .thm-violet .card-hd { background: #F1EAF8; color: #5E3B82; }
 
-  .thm-amber   .section-head { background: #FBF4EA; border-left-color: #B4762A; }
-  .thm-amber   .section-head .eyebrow { color: #8A5A1D; }
-  .thm-amber   .section-head h2, .thm-amber .subhead { color: #8A5A1D; }
-  .thm-amber   .subhead { border-bottom-color: #B4762A; }
+  .thm-rose    .section-head { background: #C43F63; }
+  .thm-rose    .subhead { color: #9B3651; border-bottom-color: #C43F63; }
+  .thm-rose    .cc-bar, .thm-rose .chip { background: #C43F63; color: #FFFFFF; }
+  .thm-rose .card > h3:first-child,   .thm-rose .card-hd { background: #FBEAEF; color: #9B3651; }
 
-  .thm-lime    .section-head { background: #F2F6EA; border-left-color: #5B8C2A; }
-  .thm-lime    .section-head .eyebrow { color: #476E21; }
-  .thm-lime    .section-head h2, .thm-lime .subhead { color: #476E21; }
-  .thm-lime    .subhead { border-bottom-color: #5B8C2A; }
+  .thm-amber   .section-head { background: #E07B1E; }
+  .thm-amber   .subhead { color: #A8590F; border-bottom-color: #E07B1E; }
+  .thm-amber   .cc-bar, .thm-amber .chip { background: #E07B1E; color: #FFFFFF; }
+  .thm-amber .card > h3:first-child,   .thm-amber .card-hd { background: #FDF0E1; color: #A8590F; }
+
+  .thm-lime    .section-head { background: #6BA023; }
+  .thm-lime    .subhead { color: #4E7719; border-bottom-color: #6BA023; }
+  .thm-lime    .cc-bar, .thm-lime .chip { background: #6BA023; color: #FFFFFF; }
+  .thm-lime .card > h3:first-child,   .thm-lime .card-hd { background: #F0F6E4; color: #4E7719; }
 
   /* The six trait sections theme themselves off their layout variant, so no
      extra fragment parameter is needed. */
-  .thm-bars    .section-head { background: #EEF2F8; border-left-color: #16365A; }
-  .thm-bars    .section-head .eyebrow, .thm-bars .section-head h2 { color: #16365A; }
-  .thm-tiles   .section-head { background: #EEF3FC; border-left-color: #2F6FBF; }
-  .thm-tiles   .section-head .eyebrow, .thm-tiles .section-head h2 { color: #235699; }
-  .thm-meter   .section-head { background: #FBF0F3; border-left-color: #B8425F; }
-  .thm-meter   .section-head .eyebrow, .thm-meter .section-head h2 { color: #9B3651; }
-  .thm-split   .section-head { background: #FBF4EA; border-left-color: #B4762A; }
-  .thm-split   .section-head .eyebrow, .thm-split .section-head h2 { color: #8A5A1D; }
-  .thm-compact .section-head { background: #F2F0F8; border-left-color: #6B5CA5; }
-  .thm-compact .section-head .eyebrow, .thm-compact .section-head h2 { color: #554791; }
-  .thm-gauge   .section-head { background: #EDF4F6; border-left-color: #2C7A8C; }
-  .thm-gauge   .section-head .eyebrow, .thm-gauge .section-head h2 { color: #23606E; }
+  .thm-bars    .section-head { background: #16365A; }
+  .thm-bars .card > h3:first-child,   .thm-bars .card-hd { background: #E9EFF8; color: #16365A; }
+  .thm-tiles   .section-head { background: #2F6FBF; }
+  .thm-tiles .card > h3:first-child,   .thm-tiles .card-hd { background: #E8F0FC; color: #235699; }
+  .thm-meter   .section-head { background: #C43F63; }
+  .thm-meter .card > h3:first-child,   .thm-meter .card-hd { background: #FBEAEF; color: #9B3651; }
+  .thm-split   .section-head { background: #E07B1E; }
+  .thm-split .card > h3:first-child,   .thm-split .card-hd { background: #FDF0E1; color: #A8590F; }
+  .thm-compact .section-head { background: #7B4FA8; }
+  .thm-compact .card > h3:first-child,   .thm-compact .card-hd { background: #F1EAF8; color: #5E3B82; }
+  .thm-gauge   .section-head { background: #1E8FA8; }
+  .thm-gauge .card > h3:first-child,   .thm-gauge .card-hd { background: #E4F3F7; color: #1B7086; }
+
+  /* Coloured heading strip inside a card. Applied via :first-child rather than a
+     class so every existing card-with-a-leading-h3 gets it without touching
+     ~40 template blocks; the themes above only override its two colours.
+     Negative margins bleed the strip to the card edge, so they must track the
+     card padding -- hence the traitsec/dimpage override below. */
+  .card > h3:first-child, .card-hd {
+      background: #E6F5F0; color: #16644F; margin: -5mm -5mm 4mm; padding: 3mm 5mm;
+      border-radius: 3mm 3mm 0 0; font-size: 11pt; font-weight: bold; }
+  .traitsec .card > h3:first-child, .dimpage .card > h3:first-child, .traitsec .card-hd {
+      margin: -3.6mm -4mm 3mm; padding: 2.4mm 4mm; font-size: 10pt; }
+  .dimpage .card > h3:first-child { margin: -2.6mm -2.6mm 2.2mm; padding: 2mm 2.6mm; }
   h3 { font-size: 12.5pt; margin-bottom: 3mm; page-break-after: avoid; }
 
   /* One dimension's detailed write-up, sized to sit on a single page */
@@ -186,17 +208,21 @@
 
   /* ---- score bars -------------------------------------------------------- */
   .bar-track { height: 3.2mm; background: #EDF1F6; border-radius: 2mm; margin-top: 1.5mm; }
-  .bar-fill { height: 3.2mm; border-radius: 2mm; background: #16365A; }
-  .b-EXCELLENT .bar-fill, .b-STRONG .bar-fill { background: #1F6B5E; }
-  .b-AVERAGE .bar-fill { background: #16365A; }
-  .b-NEEDS_IMPROVEMENT .bar-fill { background: #B4762A; }
-  .b-CRITICAL .bar-fill { background: #9B3A34; }
+  /* Band colours run at full saturation: at the old muted values every bar in
+     the report read as the same grey-blue smudge. */
+  .bar-fill { height: 3.2mm; border-radius: 2mm; background: #2F6FBF; }
+  .b-EXCELLENT .bar-fill, .b-STRONG .bar-fill { background: #22B573; }
+  .b-AVERAGE .bar-fill { background: #2F6FBF; }
+  .b-NEEDS_IMPROVEMENT .bar-fill { background: #E8A020; }
+  .b-CRITICAL .bar-fill { background: #D9534F; }
 
+  /* Pills are solid chips, not pale tints -- they are the band legend and need
+     to be findable at a glance. */
   .pill { font-size: 7.5pt; font-weight: bold; padding: 0.8mm 2.5mm; border-radius: 6mm;
-          background: #EDF1F6; color: #16365A; }
-  .b-EXCELLENT .pill, .b-STRONG .pill { background: #E6F1EE; color: #1F6B5E; }
-  .b-NEEDS_IMPROVEMENT .pill { background: #FBF1E3; color: #8A5A1D; }
-  .b-CRITICAL .pill { background: #F9E9E8; color: #8C302A; }
+          background: #2F6FBF; color: #FFFFFF; }
+  .b-EXCELLENT .pill, .b-STRONG .pill { background: #22B573; color: #FFFFFF; }
+  .b-NEEDS_IMPROVEMENT .pill { background: #E8A020; color: #FFFFFF; }
+  .b-CRITICAL .pill { background: #D9534F; color: #FFFFFF; }
 
   /* one dimension row: name | score, then bar */
   .dim { margin-bottom: 4.5mm; page-break-inside: avoid; }
@@ -210,8 +236,14 @@
      visible card is an inner div rather than a bordered cell. */
   table.cards { width: 100%; border-collapse: collapse; table-layout: fixed; }
   table.cards > tbody > tr > td { width: 25%; vertical-align: top; padding-right: 3mm; }
-  .rankcard { border: 1px solid #E3E9F0; border-radius: 3mm; padding: 4mm; page-break-inside: avoid; }
-  .rankcard .no { font-size: 8pt; font-weight: bold; color: #1F6B5E; letter-spacing: 1px; }
+  /* Card body is tinted with the band colour and carries a solid top edge, so a
+     row of four cards reads as coloured blocks rather than four white boxes. */
+  .rankcard { border: 1px solid #E3E9F0; border-top: 2.4mm solid #2F6FBF; border-radius: 3mm;
+              padding: 4mm; background: #EEF3FC; page-break-inside: avoid; }
+  .b-EXCELLENT .rankcard, .b-STRONG .rankcard { border-top-color: #22B573; background: #E8F7F0; }
+  .b-NEEDS_IMPROVEMENT .rankcard { border-top-color: #E8A020; background: #FDF3E2; }
+  .b-CRITICAL .rankcard { border-top-color: #D9534F; background: #FBECEB; }
+  .rankcard .no { font-size: 8pt; font-weight: bold; color: #1F8A6E; letter-spacing: 1px; }
   .rankcard .nm { font-size: 9.5pt; font-weight: bold; color: #16365A; margin-top: 1.5mm; line-height: 1.3; height: 11mm; }
   .rankcard .pc { font-size: 17pt; font-weight: bold; color: #16365A; }
 
@@ -221,8 +253,12 @@
      from the band classes above, so a variant never invents its own palette. */
 
   /* meter: full-width labelled meter per trait (--background surface) */
-  .meter { background: #F4F7FA; border: 1px solid #E3E9F0; border-radius: 3mm;
+  .meter { background: #EEF3FC; border: 1px solid #E3E9F0; border-left: 2.4mm solid #2F6FBF;
+           border-radius: 3mm;
            padding: 3.5mm 4mm; margin-bottom: 3mm; page-break-inside: avoid; }
+  .b-EXCELLENT.meter, .b-STRONG.meter { border-left-color: #22B573; background: #E8F7F0; }
+  .b-NEEDS_IMPROVEMENT.meter { border-left-color: #E8A020; background: #FDF3E2; }
+  .b-CRITICAL.meter { border-left-color: #D9534F; background: #FBECEB; }
   .meter table { width: 100%; }
   .meter .nm { font-size: 10pt; font-weight: bold; color: #23303D; }
   .meter .sc { text-align: right; white-space: nowrap; width: 34mm; }
@@ -233,15 +269,21 @@
   /* tiles: 2-up cards with a large number */
   table.tiles { width: 100%; border-collapse: collapse; table-layout: fixed; }
   table.tiles > tbody > tr > td { width: 50%; vertical-align: top; padding: 0 3mm 3mm 0; }
-  .tile { border: 1px solid #E3E9F0; border-radius: 3mm; padding: 4mm; page-break-inside: avoid; }
+  .tile { border: 1px solid #E3E9F0; border-left: 2.4mm solid #2F6FBF; border-radius: 3mm;
+          padding: 4mm; background: #EEF3FC; page-break-inside: avoid; }
+  .b-EXCELLENT .tile, .b-STRONG .tile { border-left-color: #22B573; background: #E8F7F0; }
+  .b-NEEDS_IMPROVEMENT .tile { border-left-color: #E8A020; background: #FDF3E2; }
+  .b-CRITICAL .tile { border-left-color: #D9534F; background: #FBECEB; }
   .tile table { width: 100%; }
   .tile-nm { font-size: 9.5pt; font-weight: bold; color: #16365A; line-height: 1.3; }
   .tile-pc { text-align: right; font-size: 15pt; font-weight: bold; color: #16365A;
              white-space: nowrap; vertical-align: top; width: 18mm; }
 
   /* split: leading trait pulled out above the rest */
-  .leadcard { border: 1px solid #E3E9F0; border-left: 3mm solid #1F6B5E; border-radius: 3mm;
-              padding: 5mm; background: #F4F7FA; page-break-inside: avoid; }
+  .leadcard { border: 1px solid #E3E9F0; border-left: 3mm solid #22B573; border-radius: 3mm;
+              padding: 5mm; background: #E8F7F0; page-break-inside: avoid; }
+  .b-NEEDS_IMPROVEMENT.leadcard { border-left-color: #E8A020; background: #FDF3E2; }
+  .b-CRITICAL.leadcard { border-left-color: #D9534F; background: #FBECEB; }
   .leadcard table { width: 100%; }
   .lead-label { font-size: 7.5pt; letter-spacing: 1.5px; text-transform: uppercase; color: #1F6B5E; }
   .lead-nm { font-size: 14pt; font-weight: bold; color: #16365A; margin-top: 1.5mm; }
@@ -286,14 +328,14 @@
   .acard h3 { font-size: 11.5pt; margin-bottom: 2mm; color: #16365A; }
   .acard p:last-child { margin-bottom: 0; }
   .acard .val { font-size: 15pt; font-weight: bold; color: #16365A; }
-  .acard-1 { border-left-color: #16365A; background: #F1F5FA; }
-  .acard-1 h3, .acard-1 .val { color: #16365A; }
-  .acard-2 { border-left-color: #1F6B5E; background: #EFF6F4; }
-  .acard-2 h3, .acard-2 .val { color: #1F6B5E; }
-  .acard-3 { border-left-color: #2C7A8C; background: #EEF5F7; }
-  .acard-3 h3, .acard-3 .val { color: #23606E; }
-  .acard-4 { border-left-color: #B4762A; background: #FBF4E9; }
-  .acard-4 h3, .acard-4 .val { color: #8A5A1D; }
+  .acard-1 { border-left-color: #2F6FBF; background: #EAF1FC; }
+  .acard-1 h3, .acard-1 .val { color: #235699; }
+  .acard-2 { border-left-color: #22B573; background: #E7F7EF; }
+  .acard-2 h3, .acard-2 .val { color: #16764C; }
+  .acard-3 { border-left-color: #1E8FA8; background: #E4F3F7; }
+  .acard-3 h3, .acard-3 .val { color: #1B7086; }
+  .acard-4 { border-left-color: #E07B1E; background: #FDF1E3; }
+  .acard-4 h3, .acard-4 .val { color: #A8590F; }
 
   /* ---- ranked bar chart --------------------------------------------------
      Label column right-aligned, rounded pill bar, value at the far right.
@@ -305,9 +347,10 @@
   table.rank td.vl { width: 14mm; text-align: right; padding-left: 2.5mm;
                      font-size: 9pt; font-weight: bold; color: #1F6B5E; white-space: nowrap; }
   .rbar { height: 3.6mm; background: #EDF1F6; border-radius: 1.8mm; }
-  .rbar div { height: 3.6mm; border-radius: 1.8mm; background: #1F6B5E; }
-  /* Leading rows get the darker brand navy so the top of the list reads first */
-  .rank .top div { background: #16365A; }
+  .rbar div { height: 3.6mm; border-radius: 1.8mm; background: #22B573; }
+  /* Leading rows get a deeper shade of the same hue so the top reads first */
+  .rank .top div { background: #16764C; }
+  table.rank td.vl { color: #16764C; }
 
   /* ---- column chart ------------------------------------------------------
      Vertical bars for a whole dimension group, giving the profile pages a
@@ -326,8 +369,10 @@
   .cc-plot { height: 32mm; position: relative; }
   .cc-bar { position: absolute; bottom: 0; left: 12%; width: 76%;
             background: #16365A; border-radius: 1mm 1mm 0 0; }
-  .cc-top .cc-bar { background: #1F6B5E; }
+  /* The whole chart takes the section hue; the top-3 columns are distinguished
+     by their value label, not by a second colour that fought the theme. */
   .cc-val { font-size: 7pt; font-weight: bold; color: #16365A; padding-bottom: 1mm; }
+  .cc-top .cc-val { font-size: 7.5pt; }
   .cc-axis { border-top: 1px solid #E3E9F0; }
   .cc-lbl { font-size: 6.5pt; color: #6B7A8C; padding-top: 1.4mm; line-height: 1.2;
             word-wrap: break-word; }
@@ -341,11 +386,11 @@
   .chip-alt { background: #F1F5FA; color: #16365A; }
 
   /* ---- callout ----------------------------------------------------------- */
-  .callout { border: 1px solid #CFE4DE; border-left: 2.4mm solid #1F6B5E;
-             background: #F3FAF8; border-radius: 3mm; padding: 4mm 4.5mm;
+  .callout { border: 1px solid #B7E5CE; border-left: 2.4mm solid #22B573;
+             background: #E7F7EF; border-radius: 3mm; padding: 4mm 4.5mm;
              page-break-inside: avoid; }
   .callout .clabel { font-size: 8pt; font-weight: bold; letter-spacing: 1.5px;
-                     text-transform: uppercase; color: #1F6B5E; margin-bottom: 2mm; }
+                     text-transform: uppercase; color: #16764C; margin-bottom: 2mm; }
 
   /* ---- subhead with a coloured rule (reference-style section divider) ----- */
   .subhead { font-size: 11.5pt; font-weight: bold; color: #16365A;
@@ -366,14 +411,18 @@
 
   .swot { width: 100%; border-collapse: separate; border-spacing: 3mm; }
   .swot td { width: 50%; vertical-align: top; padding: 4mm; border-radius: 3mm; page-break-inside: avoid; }
-  .swot .s { background: #E6F1EE; }
-  .swot .w { background: #FBF1E3; }
-  .swot .o { background: #EDF1F6; }
-  .swot .t { background: #F9E9E8; }
+  /* Solid colour headers on each quadrant: the four pale panels used to read as
+     one grey block on the page. */
+  .swot td { border: 1px solid #E3E9F0; }
+  .swot .s { background: #E7F7EF; border-top: 2.4mm solid #22B573; }
+  .swot .w { background: #FDF3E2; border-top: 2.4mm solid #E8A020; }
+  .swot .o { background: #EAF1FC; border-top: 2.4mm solid #2F6FBF; }
+  .swot .t { background: #FBECEB; border-top: 2.4mm solid #D9534F; }
   .swot h4 { font-size: 10pt; margin-bottom: 2.5mm; }
 
-  .step { border-left: 3px solid #1F6B5E; padding: 0 0 0 4mm; margin-bottom: 5mm; page-break-inside: avoid; }
-  .step .no { font-size: 8pt; font-weight: bold; letter-spacing: 1.5px; color: #1F6B5E; }
+  .step { border-left: 2.4mm solid #22B573; background: #F7FBF9; border-radius: 0 3mm 3mm 0;
+          padding: 3.5mm 4mm; margin-bottom: 4mm; page-break-inside: avoid; }
+  .step .no { font-size: 8pt; font-weight: bold; letter-spacing: 1.5px; color: #16764C; }
   .step h4 { font-size: 11pt; margin: 1mm 0 2mm; }
 
   .career { margin-bottom: 4mm; page-break-inside: avoid; }
@@ -605,7 +654,10 @@
 </div>
 
 <!-- ==================== 4. DIMENSION GROUP SECTIONS ==================== -->
-<div th:each="g : ${dimensionGroups}" class="section thm-lime">
+<!-- Theme rotates by group index: every group used to render thm-lime, so this
+     run of pages was the one long stretch of identical colour in the report. -->
+<div th:each="g,gi : ${dimensionGroups}" class="section"
+     th:classappend="${ {'thm-lime','thm-teal','thm-violet','thm-amber','thm-blue','thm-rose','thm-green','thm-navy'}[gi.index % 8] }">
   <div class="section-head">
     <div class="eyebrow" th:text="${g.subtitle}">Profile</div>
     <h2 th:text="${g.title}">Group</h2>
