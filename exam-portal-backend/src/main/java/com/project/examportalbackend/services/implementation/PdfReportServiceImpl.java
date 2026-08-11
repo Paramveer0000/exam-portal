@@ -11,6 +11,8 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class PdfReportServiceImpl implements PdfReportService {
@@ -80,6 +82,29 @@ public class PdfReportServiceImpl implements PdfReportService {
         ctx.setVariable("parentGuideContent", dto.getParentGuideContent());
         ctx.setVariable("teacherGuideContent", dto.getTeacherGuideContent());
         ctx.setVariable("howToReadContent", dto.getHowToReadContent());
+        ctx.setVariable("reportTitle", reportTitleFor(
+                dto.getProfile() != null ? dto.getProfile().getClassName() : null));
         return ctx;
+    }
+
+    /** Cover/header title varies by class band; unknown class keeps the generic title. */
+    public static String reportTitleFor(String className) {
+        Integer grade = null;
+        if (className != null) {
+            Matcher m = Pattern.compile("\\d+").matcher(className);
+            if (m.find()) {
+                grade = Integer.parseInt(m.group());
+            }
+        }
+        if (grade == null) {
+            return "Psychometric & Mental Skill Assessment Report";
+        }
+        if (grade <= 8) {
+            return "IQ Plus Assessment Report";
+        }
+        if (grade <= 10) {
+            return "Student Development Assessment Report";
+        }
+        return "Brain Benchmark Report";
     }
 }
