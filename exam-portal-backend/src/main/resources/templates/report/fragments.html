@@ -21,7 +21,8 @@
        default  - the original single-column bar list         (personality)
      Every variant renders the SAME t.score / t.band values; only the layout
      differs. No score is computed, rounded or reinterpreted here. -->
-<div th:fragment="traitSection(title, subtitle, section, variant)" class="section traitsec">
+<div th:fragment="traitSection(title, subtitle, section, variant)" class="section traitsec"
+     th:classappend="${variant != null} ? 'thm-' + ${variant} : 'thm-bars'">
   <div class="section-head">
     <div class="eyebrow" th:text="${subtitle}">Profile</div>
     <h2 th:text="${title}">Section</h2>

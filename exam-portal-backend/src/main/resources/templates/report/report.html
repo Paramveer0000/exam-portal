@@ -87,11 +87,81 @@
                    font-size: 8.5pt; color: #6B7A8C; line-height: 1.75; }
   .cover-contact .sep { color: #E3E9F0; }
 
-  /* ---- section scaffolding ---------------------------------------------- */
+  /* ---- section scaffolding ----------------------------------------------
+     The masthead is a soft tinted panel with a solid accent edge, so every
+     section opens with colour instead of a hairline rule. */
   .section { page-break-before: always; }
-  .section-head { border-bottom: 2px solid #1F6B5E; padding-bottom: 4mm; margin-bottom: 6mm; page-break-after: avoid; }
+  .section-head { background: #EFF6F4; border-left: 2.4mm solid #1F6B5E;
+                  border-radius: 0 3mm 3mm 0; padding: 4.5mm 5mm;
+                  margin: 0 0 6mm; page-break-after: avoid; }
   .section-head .eyebrow { font-size: 8pt; letter-spacing: 2px; text-transform: uppercase; color: #1F6B5E; margin-bottom: 1.5mm; }
   .section-head h2 { font-size: 19pt; letter-spacing: 0.5px; }
+
+  /* ---- section colour themes ---------------------------------------------
+     Hues are taken from the company logo itself: the navy ring and green
+     wordmark, plus the icon colours around it (focus orange, empathy rose,
+     adaptability blue, creativity lime, the teal of the profile gradient).
+     Each is used at low saturation as a tint behind the masthead, with the
+     full-strength hue only on the accent edge and the eyebrow, which keeps
+     pages colourful but calm and leaves body copy on white.
+
+     Score bars are deliberately NOT themed: their colour already encodes the
+     interpretation band (green strong, amber developing) and recolouring them
+     per section would destroy that meaning. */
+  .thm-green   .section-head { background: #EFF6F4; border-left-color: #1F6B5E; }
+  .thm-green   .section-head .eyebrow { color: #1F6B5E; }
+  .thm-green   .section-head h2, .thm-green .subhead { color: #16544A; }
+  .thm-green   .subhead { border-bottom-color: #1F6B5E; }
+
+  .thm-navy    .section-head { background: #EEF2F8; border-left-color: #16365A; }
+  .thm-navy    .section-head .eyebrow { color: #16365A; }
+  .thm-navy    .section-head h2, .thm-navy .subhead { color: #16365A; }
+  .thm-navy    .subhead { border-bottom-color: #16365A; }
+
+  .thm-teal    .section-head { background: #EDF4F6; border-left-color: #2C7A8C; }
+  .thm-teal    .section-head .eyebrow { color: #23606E; }
+  .thm-teal    .section-head h2, .thm-teal .subhead { color: #23606E; }
+  .thm-teal    .subhead { border-bottom-color: #2C7A8C; }
+
+  .thm-blue    .section-head { background: #EEF3FC; border-left-color: #2F6FBF; }
+  .thm-blue    .section-head .eyebrow { color: #235699; }
+  .thm-blue    .section-head h2, .thm-blue .subhead { color: #235699; }
+  .thm-blue    .subhead { border-bottom-color: #2F6FBF; }
+
+  .thm-violet  .section-head { background: #F2F0F8; border-left-color: #6B5CA5; }
+  .thm-violet  .section-head .eyebrow { color: #554791; }
+  .thm-violet  .section-head h2, .thm-violet .subhead { color: #554791; }
+  .thm-violet  .subhead { border-bottom-color: #6B5CA5; }
+
+  .thm-rose    .section-head { background: #FBF0F3; border-left-color: #B8425F; }
+  .thm-rose    .section-head .eyebrow { color: #9B3651; }
+  .thm-rose    .section-head h2, .thm-rose .subhead { color: #9B3651; }
+  .thm-rose    .subhead { border-bottom-color: #B8425F; }
+
+  .thm-amber   .section-head { background: #FBF4EA; border-left-color: #B4762A; }
+  .thm-amber   .section-head .eyebrow { color: #8A5A1D; }
+  .thm-amber   .section-head h2, .thm-amber .subhead { color: #8A5A1D; }
+  .thm-amber   .subhead { border-bottom-color: #B4762A; }
+
+  .thm-lime    .section-head { background: #F2F6EA; border-left-color: #5B8C2A; }
+  .thm-lime    .section-head .eyebrow { color: #476E21; }
+  .thm-lime    .section-head h2, .thm-lime .subhead { color: #476E21; }
+  .thm-lime    .subhead { border-bottom-color: #5B8C2A; }
+
+  /* The six trait sections theme themselves off their layout variant, so no
+     extra fragment parameter is needed. */
+  .thm-bars    .section-head { background: #EEF2F8; border-left-color: #16365A; }
+  .thm-bars    .section-head .eyebrow, .thm-bars .section-head h2 { color: #16365A; }
+  .thm-tiles   .section-head { background: #EEF3FC; border-left-color: #2F6FBF; }
+  .thm-tiles   .section-head .eyebrow, .thm-tiles .section-head h2 { color: #235699; }
+  .thm-meter   .section-head { background: #FBF0F3; border-left-color: #B8425F; }
+  .thm-meter   .section-head .eyebrow, .thm-meter .section-head h2 { color: #9B3651; }
+  .thm-split   .section-head { background: #FBF4EA; border-left-color: #B4762A; }
+  .thm-split   .section-head .eyebrow, .thm-split .section-head h2 { color: #8A5A1D; }
+  .thm-compact .section-head { background: #F2F0F8; border-left-color: #6B5CA5; }
+  .thm-compact .section-head .eyebrow, .thm-compact .section-head h2 { color: #554791; }
+  .thm-gauge   .section-head { background: #EDF4F6; border-left-color: #2C7A8C; }
+  .thm-gauge   .section-head .eyebrow, .thm-gauge .section-head h2 { color: #23606E; }
   h3 { font-size: 12.5pt; margin-bottom: 3mm; page-break-after: avoid; }
 
   /* One dimension's detailed write-up, sized to sit on a single page */
@@ -406,7 +476,7 @@
 </div>
 
 <!-- ==================== 2. YOUR REPORT AT A GLANCE ==================== -->
-<div class="section">
+<div class="section thm-navy">
   <div class="section-head">
     <div class="eyebrow">Executive Summary</div>
     <h2>Your Report at a Glance</h2>
@@ -462,7 +532,7 @@
 </div>
 
 <!-- ==================== 3. HOW TO READ YOUR REPORT ==================== -->
-<div class="section">
+<div class="section thm-teal">
   <div class="section-head">
     <div class="eyebrow">Before You Begin</div>
     <h2>How to Read Your Report</h2>
@@ -508,7 +578,7 @@
 </div>
 
 <!-- ============ 3b. YOUR PERSONAL PROFILE + HOW STRENGTHS WORK TOGETHER ============ -->
-<div class="section" th:if="${synthesis != null and synthesis.personalProfile != null}">
+<div class="section thm-green" th:if="${synthesis != null and synthesis.personalProfile != null}">
   <div class="section-head">
     <div class="eyebrow">Written for You</div>
     <h2>Your Personal Profile</h2>
@@ -535,7 +605,7 @@
 </div>
 
 <!-- ==================== 4. DIMENSION GROUP SECTIONS ==================== -->
-<div th:each="g : ${dimensionGroups}" class="section">
+<div th:each="g : ${dimensionGroups}" class="section thm-lime">
   <div class="section-head">
     <div class="eyebrow" th:text="${g.subtitle}">Profile</div>
     <h2 th:text="${g.title}">Group</h2>
@@ -689,7 +759,7 @@
 <div th:replace="~{report/fragments :: traitSection('Wellbeing Indicators', 'How You Are Doing', ${mentalWellness}, 'gauge')}"></div>
 
 <!-- ==================== 6. CAREER EXPLORATION ==================== -->
-<div class="section">
+<div class="section thm-blue">
   <div class="section-head">
     <div class="eyebrow">Areas That May Be Worth Exploring</div>
     <h2>Career Exploration</h2>
@@ -774,7 +844,7 @@
 </div>
 
 <!-- ==================== 7. PERSONAL DEVELOPMENT MAP (SWOT) ==================== -->
-<div class="section">
+<div class="section thm-violet">
   <div class="section-head">
     <div class="eyebrow">Bringing It Together</div>
     <h2>Your Personal Development Map</h2>
@@ -823,7 +893,7 @@
 </div>
 
 <!-- ==================== 8. A NOTE FOR PARENTS ==================== -->
-<div class="section">
+<div class="section thm-rose">
   <div class="section-head">
     <div class="eyebrow">For Families</div>
     <h2>A Note for Parents</h2>
@@ -867,7 +937,7 @@
 </div>
 
 <!-- ==================== 8b. TEACHER & COUNSELLOR GUIDANCE ==================== -->
-<div class="section" th:if="${teacherGuideContent != null}">
+<div class="section thm-amber" th:if="${teacherGuideContent != null}">
   <div class="section-head">
     <div class="eyebrow">For Educators</div>
     <h2>Guidance for Teachers &amp; Counsellors</h2>
@@ -896,7 +966,7 @@
 </div>
 
 <!-- ==================== 8c. COUNSELLOR'S SUMMARY ==================== -->
-<div class="section" th:if="${synthesis != null and synthesis.counsellorNarrative != null}">
+<div class="section thm-green" th:if="${synthesis != null and synthesis.counsellorNarrative != null}">
   <div class="section-head">
     <div class="eyebrow">Bringing It Together</div>
     <h2>Counsellor's Summary</h2>
@@ -950,7 +1020,7 @@
 </div>
 
 <!-- ==================== 9. YOUR NEXT STEPS ==================== -->
-<div class="section">
+<div class="section thm-navy">
   <div class="section-head">
     <div class="eyebrow">Where to Go From Here</div>
     <h2>Your Next Steps</h2>
