@@ -226,6 +226,9 @@
 
   /* one dimension row: name | score, then bar */
   .dim { margin-bottom: 4.5mm; page-break-inside: avoid; }
+  /* The trailing gap inside a card pushed a full profile list a millimetre past
+     the text box, which cost a whole blank page at the next section break. */
+  .card .dim:last-child, .card .gauge:last-child, .card .meter:last-child { margin-bottom: 0; }
   .dim table { width: 100%; }
   .dim .nm { font-size: 9.5pt; font-weight: bold; color: #23303D; }
   .dim .sc { text-align: right; font-size: 9.5pt; font-weight: bold; color: #16365A; width: 30mm; white-space: nowrap; }
@@ -384,6 +387,38 @@
   .chip { display: inline-block; font-size: 7.5pt; padding: 1mm 2.6mm; margin: 0 1.6mm 1.6mm 0;
           border-radius: 5mm; background: #EFF6F4; color: #1F6B5E; }
   .chip-alt { background: #F1F5FA; color: #16365A; }
+
+  /* ---- RIASEC theory cards ----------------------------------------------
+     Solid colour panel carrying the letter, with a white inner card for the
+     copy. One colour per Holland letter, fixed by convention (the same six
+     hues the model is normally printed in), so the letter is recognisable
+     across reports. Table layout, not flex: openhtmltopdf renders CSS 2.1. */
+  .rcard { border-radius: 3mm; padding: 3mm; margin-bottom: 3.5mm; background: #6B7A8C;
+           page-break-inside: avoid; }
+  .rcard table { width: 100%; }
+  .rcard .rl { width: 26mm; text-align: center; vertical-align: middle; color: #FFFFFF; }
+  .rcard .rl .letter { font-size: 26pt; font-weight: bold; line-height: 1.1; }
+  .rcard .rl .rname { font-size: 6.5pt; letter-spacing: 1.2px; text-transform: uppercase; }
+  .rcard .rbody { background: #FFFFFF; border-radius: 2mm; padding: 3mm 3.5mm; }
+  .rcard .rbody ul.tight li { font-size: 8pt; margin-bottom: 1.2mm; line-height: 1.35; }
+  .rcard .rsc { text-align: right; font-size: 9.5pt; font-weight: bold; margin-bottom: 1.5mm; }
+  .ri-R { background: #8D7B6A; } .ri-R .rsc { color: #6E5F51; }
+  .ri-I { background: #2C9FB3; } .ri-I .rsc { color: #1F7686; }
+  .ri-A { background: #E8801F; } .ri-A .rsc { color: #B36117; }
+  .ri-S { background: #3F76BF; } .ri-S .rsc { color: #2F5990; }
+  .ri-E { background: #9C3A96; } .ri-E .rsc { color: #782C74; }
+  .ri-C { background: #82A83A; } .ri-C .rsc { color: #62802B; }
+  /* Summary row: letter chip + name + score, two per row */
+  .rsum { border: 1px solid #E3E9F0; border-radius: 5mm; padding: 1.6mm 3mm; margin-bottom: 2.5mm; }
+  .rsum table { width: 100%; }
+  .rsum .rtag { border-radius: 5mm; padding: 1mm 3mm; color: #FFFFFF; font-size: 7.5pt;
+                font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
+  .rsum .rval { text-align: right; width: 16mm; font-size: 11pt; font-weight: bold; color: #16365A; }
+  .domain { border: 1px solid #E3E9F0; border-top: 2.4mm solid #E8801F; border-radius: 3mm;
+            padding: 4mm 4.5mm; page-break-inside: avoid; }
+  .domain .dlabel { font-size: 8pt; font-weight: bold; letter-spacing: 1.5px;
+                    text-transform: uppercase; color: #B36117; margin-bottom: 2mm; }
+  .domain .dcode { font-size: 10.5pt; font-weight: bold; color: #16365A; line-height: 1.6; }
 
   /* ---- callout ----------------------------------------------------------- */
   .callout { border: 1px solid #B7E5CE; border-left: 2.4mm solid #22B573;
@@ -578,6 +613,60 @@
       </td>
     </tr>
   </table>
+</div>
+
+<!-- ==================== 2b. MESSAGE TO PARENTS ====================
+     Fixed editorial copy supplied by the client, not generated content: it is
+     the same letter in every report, so it lives in the template rather than
+     in report-content.json (which holds per-report variable copy). Only the
+     sign-off tracks the configured brand name. -->
+<div class="section thm-rose">
+  <div class="section-head">
+    <div class="eyebrow">A Letter Before You Read On</div>
+    <h2>Message to Parents</h2>
+  </div>
+
+  <p class="lead">Dear Parents,</p>
+
+  <div class="callout">
+    <div class="clabel">Every child is unique</div>
+    <p style="margin:0;">Academic marks tell only a small part of your child&#8217;s story. Their confidence,
+       emotional strength, personality, decision-making ability, communication skills, learning style
+       and career interests play an equally important role in future success.</p>
+  </div>
+
+  <p style="margin-top:5mm;">This report has been prepared after a scientific psychometric assessment
+     to help you understand your child&#8217;s strengths and the areas that need support.</p>
+
+  <div class="card">
+    <h3>Please Remember</h3>
+    <ul class="tight">
+      <li>There are no &#8220;good&#8221; or &#8220;bad&#8221; personalities.</li>
+      <li>Every child has unique abilities.</li>
+      <li>The purpose of this report is not to judge, but to guide.</li>
+      <li>With proper guidance, every child can become successful.</li>
+    </ul>
+  </div>
+
+  <div class="acard acard-2" style="margin-top:4mm;">
+    <h3>How to Use It</h3>
+    <p style="margin:0;">We encourage parents to discuss this report positively with their child and to
+       use it as a roadmap for future growth.</p>
+  </div>
+
+  <p class="disclaimer" style="margin-top:6mm;">This report is not for medical use. It is an educational
+     guidance tool and is not a clinical or medical diagnosis.</p>
+
+  <div class="signature-row">
+    <table>
+      <tr>
+        <td>
+          <div class="sig-label">Warm Regards</div>
+          <div class="sig-name" th:text="${brand.name} ?: 'The Mentalist'">The Mentalist</div>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
 
 <!-- ==================== 3. HOW TO READ YOUR REPORT ==================== -->
@@ -798,6 +887,119 @@
       </tr>
     </table>
   </div>
+</div>
+
+<!-- ==================== 4b. R.I.A.S.E.C ANALYSIS ====================
+     Holland-model read-out of the RIASEC dimension group. The scores are the
+     ones the group section already printed; nothing is recomputed here. The
+     letters are only re-presented in theory order (R I A S E C) with the fixed
+     descriptive copy for each type. The whole section disappears when the
+     assessment carried no RIASEC dimensions. -->
+<div th:with="rgs=${dimensionGroups == null} ? null : ${dimensionGroups.?[type == 'RIASEC']}">
+<div th:if="${rgs != null and !rgs.isEmpty()}" th:with="rg=${rgs[0]}" class="section thm-amber">
+  <div class="section-head">
+    <div class="eyebrow">Your Interest Types</div>
+    <h2>R.I.A.S.E.C Analysis</h2>
+  </div>
+
+  <p class="lead">Holland Codes describe six interest types &#8212; Realistic, Investigative, Artistic,
+     Social, Enterprising and Conventional. Most people are a blend of several. Recognising your leading
+     types helps you understand which kinds of work and study are likely to feel natural to you.</p>
+
+  <!-- Score summary, two per row, in theory order -->
+  <table class="two">
+    <tr>
+      <td th:each="col : ${#numbers.sequence(0, 1)}">
+        <div th:each="d,di : ${rg.dimensions.?[dimensionCode != null]}" th:if="${di.index % 2 == col}"
+             class="rsum">
+          <table>
+            <tr>
+              <td style="width:32mm;">
+                <span class="rtag" th:classappend="'ri-' + ${d.dimensionCode}" th:text="${d.dimensionName}">Type</span>
+              </td>
+              <td class="rval" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="domain" style="margin-top:2mm;" th:if="${rg.top != null and !rg.top.isEmpty()}">
+    <div class="dlabel">Domain Code</div>
+    <div class="dcode">
+      <span th:each="t,ti : ${rg.top}" th:if="${ti.index &lt; 3}">
+        <span th:text="${t.dimensionCode}">R</span>&#160;(<span th:text="${t.dimensionName}">Realistic</span>)<span th:if="${ti.index &lt; 2 and ti.index &lt; rg.top.size() - 1}">&#160;&#183;&#160;</span>
+      </span>
+    </div>
+    <p class="small muted" style="margin:2mm 0 0;">Your three leading interest types, strongest first.</p>
+  </div>
+
+  <!-- The six types. Copy is fixed theory, identical in every report, so it is
+       held in this map rather than in the content JSON (which holds per-report
+       wording). Keys are the seeded dimension codes from V26. -->
+  <div class="subhead">The Six Interest Types</div>
+  <div th:with="rt=${ {
+        'R' : {'per':'Realistic types tend to be practical, genuine and hands-on. They like action and visible results.',
+               'val':'Common sense, pragmatism and effort.',
+               'apt':'Dexterity, comfort with technical tasks, mechanical reasoning and physical stamina.',
+               'lrn':'Learns through a concrete, practical approach by applying examples.',
+               'env':'Settings that allow concrete results, technical equipment or work on site.'},
+        'I' : {'per':'Investigative types tend to be curious about everything. They are precise, intellectual and have a scientific mindset.',
+               'val':'Intellectual curiosity, critical thinking and logic.',
+               'apt':'Research, logical reasoning, learning and analytical capability.',
+               'lrn':'Learns by theory and systematic research.',
+               'env':'Changing, thought-oriented settings that favour expertise over speed.'},
+        'A' : {'per':'Artistic types tend to be intuitive, creative, idealistic and independent. They are attuned to art and aesthetics.',
+               'val':'Beauty, originality, imagination and freedom.',
+               'apt':'Creativity, artistic expression and intuition.',
+               'lrn':'Learns by intuition and by experimenting.',
+               'env':'Nonconformist settings with informal communication that require creativity.'},
+        'S' : {'per':'Social types are generally patient, understanding and attentive to others. They tend to be kind, warm and welcoming.',
+               'val':'Altruism, cooperation and generosity.',
+               'apt':'Empathy, listening and communication.',
+               'lrn':'Learns by sharing with others and by working as a team.',
+               'env':'Social settings that encourage personal contact and collaboration.'},
+        'E' : {'per':'Enterprising types tend to be open, dynamic, assertive and entrepreneurial.',
+               'val':'Initiative, status and healthy competition.',
+               'apt':'Initiative, and the ability to lead and motivate others.',
+               'lrn':'Learns by doing and by putting themselves into the action.',
+               'env':'Competitive settings where they can take initiative and move quickly.'},
+        'C' : {'per':'Conventional types tend to be meticulous, organised and methodical, and rather reserved.',
+               'val':'Accuracy, stability and efficiency.',
+               'apt':'Data analysis, attention to detail and the ability to work with numbers.',
+               'lrn':'Learns by following rules, instructions and established procedures.',
+               'env':'Structured settings where rules and procedures are clearly defined.'}
+      } }">
+    <div th:each="d : ${rg.dimensions}" th:if="${rt.containsKey(d.dimensionCode)}"
+         class="rcard" th:classappend="'ri-' + ${d.dimensionCode}"
+         th:with="c=${rt[d.dimensionCode]}">
+      <table>
+        <tr>
+          <td class="rl">
+            <div class="letter" th:text="${d.dimensionCode}">R</div>
+            <div class="rname" th:text="${d.dimensionName}">Realistic</div>
+          </td>
+          <td>
+            <div class="rbody">
+              <div class="rsc" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</div>
+              <ul class="tight">
+                <li><strong>Personality. </strong><span th:text="${c.per}">-</span></li>
+                <li><strong>Values. </strong><span th:text="${c.val}">-</span></li>
+                <li><strong>Potential aptitudes. </strong><span th:text="${c.apt}">-</span></li>
+                <li><strong>Learning style. </strong><span th:text="${c.lrn}">-</span></li>
+                <li><strong>Environment. </strong><span th:text="${c.env}">-</span></li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <p class="small muted" style="margin-top:3mm;">These types describe preferences, not ability. A lower
+     score simply means that kind of work appeals to you less at the moment.</p>
+</div>
 </div>
 
 <!-- ============ 5. LEGACY TRAIT SECTIONS (personality / behaviour / wellness / learning style) ============ -->

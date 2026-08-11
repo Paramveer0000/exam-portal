@@ -190,7 +190,9 @@ class ReportRenderHarnessTest {
         // One dimension group so the profile column chart actually renders and
         // can be inspected; without it the whole section is skipped.
         MentalistReportDto.DimensionGroup group = miGroup();
-        dto.setDimensionGroups(java.util.Collections.singletonList(group));
+        // RIASEC too: the R.I.A.S.E.C analysis section keys off a group of this
+        // type, so without it that section would never be seen in QA.
+        dto.setDimensionGroups(Arrays.asList(group, riasecGroup()));
 
         // Content-engine output. These blocks are optional, but leaving them
         // null makes the summary/how-to-read/parent/next-steps pages look
@@ -246,6 +248,30 @@ class ReportRenderHarnessTest {
                 dim("Verbal", 2, 9, "NEEDS_IMPROVEMENT", "Needs Improvement"));
         return MentalistReportDto.DimensionGroup.of("MI", "Multiple Intelligences",
                 "How You Take In the World", dims, dims.subList(0, 3), true);
+    }
+
+    /** Codes here are the V26 seeded RIASEC codes -- the theory copy is keyed on them. */
+    private MentalistReportDto.DimensionGroup riasecGroup() {
+        List<com.project.examportalbackend.dto.DimensionScoreView> dims = Arrays.asList(
+                riasecDim("R", "Realistic", 41, 5, "AVERAGE", "Average"),
+                riasecDim("I", "Investigative", 68, 2, "STRONG", "Strong"),
+                riasecDim("A", "Artistic", 76, 1, "STRONG", "Strong"),
+                riasecDim("S", "Social", 52, 4, "AVERAGE", "Average"),
+                riasecDim("E", "Enterprising", 61, 3, "GOOD", "Good"),
+                riasecDim("C", "Conventional", 34, 6, "NEEDS_IMPROVEMENT", "Needs Improvement"));
+        List<com.project.examportalbackend.dto.DimensionScoreView> top = Arrays.asList(
+                dims.get(2), dims.get(1), dims.get(4));
+        return MentalistReportDto.DimensionGroup.of("RIASEC", "What Interests You",
+                "Your Interest Profile", dims, top);
+    }
+
+    private com.project.examportalbackend.dto.DimensionScoreView riasecDim(
+            String code, String name, double percent, int rank, String band, String label) {
+        com.project.examportalbackend.dto.DimensionScoreView v = dim(name, percent, rank, band, label);
+        v.setDimensionCode(code);
+        v.setDimensionType("RIASEC");
+        v.setBarWidth(percent);
+        return v;
     }
 
     @Test
