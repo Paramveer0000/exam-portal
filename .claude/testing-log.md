@@ -1635,3 +1635,28 @@ gotchas, and open issues that are NOT in the source code or git history.
 - files: templates/report/report.html (theme CSS + 10 section classes); templates/report/fragments.html (classappend off variant).
 - result: harness renders, 17 pages, inspected p8 (rose masthead, bands intact). Full non-DB suite 10/10 classes green, no failures. ReportPdfRenderHarnessTest (score preservation) still green. Presentation only: no Java, DTO, query or migration change.
 - notes: minor cosmetic seen on p8 -- a long band label ("Needs Improvement") wraps to a second line inside the meter row and makes that row slightly taller. Harmless.
+
+### 2026-08-11 17:30 — Full-colour pass: solid mastheads, saturated bands, coloured cards  [type: change]
+- what: client compared our PDF against reference report screenshots (MINDGenics) and called ours "very dull". Root cause: every colour was applied as a pale tint. Mastheads were tints with a thin accent edge, band colours were desaturated (#1F6B5E / #16365A), pills were pale chips, all cards were white.
+- changes (report.html CSS + 2 template lines, no Java/DTO/query change):
+  - .section-head is now a SOLID theme-colour band with reversed white type.
+  - Band palette saturated: Excellent/Strong #22B573, Average #2F6FBF, Needs Improvement #E8A020, Critical #D9534F. Pills became solid chips with white text.
+  - rankcard / tile / meter / leadcard take a band-tinted body plus a solid band-coloured edge, so card rows read as coloured blocks.
+  - Cards get a coloured heading strip via `.card > h3:first-child` (a rule, NOT a class) so ~40 existing card blocks were themed without editing any of them. Strip colour comes from the section theme.
+  - Column chart (.cc-bar) and chips take the section hue; removed .cc-top's second colour, which fought the theme (top-3 now marked by a larger value label).
+  - SWOT quadrants, .step, .callout, .acard-1..4 all moved to the saturated palette.
+- KEY DECISION unchanged: band-coded .bar-fill is still NOT themed per section -- colour there means the interpretation band. Rank/share charts (.cc-bar, .rbar) carry no band meaning, so those DO take the section hue.
+- dimensionGroups used to render every group as thm-lime; the theme now rotates by group index so that run of pages is not one colour.
+- GOTCHA: an XHTML-invalid `<h3>` inside a CSS comment broke the openhtmltopdf parse ("element type h3 must be terminated"). The <style> block is parsed as XML -- never put raw tags in its comments.
+- result: ReportRenderHarnessTest renders 18 pages, 493KB. Inspected p2 (rank cards), p5 (column chart), p9 (EI meters), p13 (career alignment, now matches the reference look), p14 (SWOT). Bands still legible per colour.
+- notes: pre-existing cosmetic remains -- "Needs Improvement" pill wraps in the meter row.
+
+### 2026-08-11 17:30 — Theme-aware logo across the app + white logo on the PDF cover  [type: change]
+- what: user supplied the white-background logo variant at resources/brand/"white logo.png". Built two 320px web assets (public/mentalist/logo-light.png, logo-dark.png) and replaced the PDF's bundled 600px classpath:brand/mentalist-logo.png with the WHITE-background render, which stops the cover showing a heavy navy block on a white page.
+- theme plumbing: data-theme was only ever set inside LandingPage, so opening an inner route directly (bookmarked /adminQuizzes) left every other page with no theme to read. Added src/hooks/useTheme.js: applyStoredTheme() called once in App, plus a useTheme() hook that watches the data-theme attribute with a MutationObserver -- deliberately NOT shared React state, so LandingPage's existing toggle keeps working untouched.
+- logo selection: an admin-uploaded logo still wins (white-labelling preserved). PlatformController.getBranding() returns the RAW platform_settings column, not the bundled fallback, so it is null unless someone uploaded -- which means the theme-aware fallback is genuinely what renders by default. Verified that.
+- gotcha found and fixed: the inner-app Navbar was hardcoded bg="dark"/variant="dark". A white-background logo on a permanently dark bar reads as a white block, so the bar now follows the theme too.
+- landing page: brand mark was a Font Awesome fa-brain glyph in a gradient tile, in BOTH the nav and the footer. Both now render the real logo; .brandIcon lost its gradient/box-shadow/flex-centering (it framed a round badge in a square tile) and became a plain 40px round image slot.
+- verification: `npx react-scripts build` exit 0. Served the build and drove it in a browser rather than assuming -- landing toggle flips nav AND footer logos light<->dark; on /login the Header reacts live to a data-theme change, swapping navbar-dark/bg-dark + logo-dark.png <-> navbar-light/bg-light + logo-light.png. Backend harness re-rendered: 18 pages, cover inspected, white logo correct.
+- NOTE: a first JS probe that set data-theme directly reported "no swap" on the landing page. That was a test artifact, not a bug -- LandingPage reads its own React state, so bypassing the toggle cannot re-render it. Clicking the real toggle works. Do not "fix" that.
+- ALSO: report.html / fragments.html carry uncommitted changes made outside this session (tinted section mastheads replaced with solid colour bands + reversed type). Left untouched and NOT committed here.
