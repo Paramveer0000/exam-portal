@@ -93,11 +93,19 @@ const Header = () => {
               title="Go to dashboard"
             >
               {/* An uploaded logo wins so white-labelling still works; with
-                  none, fall back to the variant that suits the theme. */}
+                  none, fall back to the variant that suits the theme.
+                  Clipped to a circle: every variant (and any uploaded PNG)
+                  carries square corners in its own background colour, which
+                  read as a pale block against the bar. */}
               <img
                 src={companyLogo || logoForTheme(theme)}
                 alt="The Mentalist - go to dashboard"
-                style={{ height: "40px", objectFit: "contain" }}
+                style={{
+                  height: "44px",
+                  width: "44px",
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                }}
               />
             </Navbar.Brand>
 
