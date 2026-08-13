@@ -222,6 +222,13 @@
   .card + .card { margin-top: 4mm; }
   .tint { background: #F4F7FA; }
   .lead { font-size: 10.5pt; color: #3C4A5A; margin-bottom: 5mm; }
+  /* Identifying record on page 2. Fixed 25% columns so the three rows line up
+     as a grid; long values (school names) wrap inside their cell rather than
+     pushing the column widths around. */
+  .profile-grid { width: 100%; table-layout: fixed; }
+  .profile-grid td { vertical-align: top; padding: 0 3mm 4.5mm 0; }
+  .profile-grid tr:last-child td { padding-bottom: 0; }
+  .profile-grid .v { font-weight: bold; color: #16365A; word-wrap: break-word; }
 
   /* ---- score bars -------------------------------------------------------- */
   .bar-track { height: 3.2mm; background: #EDF1F6; border-radius: 2mm; margin-top: 1.5mm; }
@@ -266,6 +273,15 @@
   .rankcard .no { font-size: 8pt; font-weight: bold; color: #1F8A6E; letter-spacing: 1px; }
   .rankcard .nm { font-size: 9.5pt; font-weight: bold; color: #16365A; margin-top: 1.5mm; line-height: 1.3; height: 11mm; }
   .rankcard .pc { font-size: 17pt; font-weight: bold; color: #16365A; }
+  /* The strengths page carries only two card rows, so the cards are scaled up
+     there to fill the page instead of floating in the top third. Scoped to the
+     section: every other page still uses the compact card above. */
+  .strengthpage table.cards > tbody > tr > td { padding-right: 4mm; }
+  .strengthpage .rankcard { padding: 6mm 5mm; border-top-width: 3mm; }
+  .strengthpage .rankcard .no { font-size: 9pt; }
+  .strengthpage .rankcard .nm { font-size: 11.5pt; height: 16mm; margin-top: 2.5mm; }
+  .strengthpage .rankcard .pc { font-size: 25pt; }
+  .strengthpage .rankcard .pill { margin-top: 1.5mm; }
 
   /* ---- trait-section variants -------------------------------------------
      Six sections share one Thymeleaf fragment; these give each a different
@@ -588,14 +604,29 @@
     <h2>Your Report at a Glance</h2>
   </div>
 
+  <!-- Full identifying record. The assembler populates every StudentProfile
+       field, so all of them print here rather than the four this page used to
+       show; a blank stays as "-" so the grid never loses its alignment. -->
   <div class="card tint">
-    <table style="width:100%;">
+    <table class="profile-grid">
       <tr>
-        <td><div class="small muted">STUDENT</div><div style="font-weight:bold;" th:text="${profile.studentName} ?: '-'">-</div></td>
-        <td><div class="small muted">CLASS</div><div style="font-weight:bold;" th:text="${profile.className} ?: '-'">-</div></td>
-        <td><div class="small muted">ASSESSMENT DATE</div><div style="font-weight:bold;" th:text="${assessmentDate} ?: '-'">-</div></td>
+        <td><div class="small muted">STUDENT</div><div class="v" th:text="${profile.studentName} ?: '-'">-</div></td>
+        <td><div class="small muted">PARENT / GUARDIAN</div><div class="v" th:text="${profile.guardianName} ?: '-'">-</div></td>
+        <td><div class="small muted">GENDER</div><div class="v" th:text="${profile.gender} ?: '-'">-</div></td>
+        <td><div class="small muted">AGE</div><div class="v" th:text="${profile.age} ?: '-'">-</div></td>
+      </tr>
+      <tr>
+        <td><div class="small muted">DATE OF BIRTH</div><div class="v" th:text="${profile.dob} ?: '-'">-</div></td>
+        <td><div class="small muted">CLASS</div><div class="v" th:text="${profile.className} ?: '-'">-</div></td>
+        <td><div class="small muted">SCHOOL</div><div class="v" th:text="${profile.school} ?: '-'">-</div></td>
+        <td><div class="small muted">CITY</div><div class="v" th:text="${profile.city} ?: '-'">-</div></td>
+      </tr>
+      <tr>
+        <td><div class="small muted">ASSESSMENT</div><div class="v" th:text="${profile.subjectName} ?: '-'">-</div></td>
+        <td><div class="small muted">ASSESSMENT DATE</div><div class="v" th:text="${assessmentDate} ?: '-'">-</div></td>
         <!-- Report ID moved off the cover; it belongs with the identifying row. -->
-        <td><div class="small muted">REPORT ID</div><div style="font-weight:bold;" th:text="${reportNumber} ?: '-'">-</div></td>
+        <td><div class="small muted">REPORT ID</div><div class="v" th:text="${reportNumber} ?: '-'">-</div></td>
+        <td><div class="small muted">COUNSELLOR</div><div class="v" th:text="${profile.counsellorName} ?: '-'">-</div></td>
       </tr>
     </table>
   </div>
@@ -671,11 +702,15 @@
      so the strengths get room to breathe instead of sharing the identifying
      page, and so the body starts on a positive note before the interest
      types. Same atAGlance data as before; nothing is recomputed. -->
-<div class="section thm-green" th:if="${atAGlance}">
+<div class="section thm-green strengthpage" th:if="${atAGlance}">
   <div class="section-head">
     <div class="eyebrow">Where You Are Strongest</div>
     <h2>Your Key Strengths</h2>
   </div>
+
+  <p class="lead">These are the four areas where you scored highest across the whole assessment.
+     They are your natural advantages &#8212; the abilities you already rely on without much effort,
+     and the ones worth building your subject choices, projects and career exploration around.</p>
 
   <table class="cards">
     <tr>
@@ -692,7 +727,11 @@
     </tr>
   </table>
 
-  <h3 style="margin-top:9mm;">Areas to Develop</h3>
+  <h3 style="margin-top:10mm;">Areas to Develop</h3>
+  <p class="lead" style="margin-bottom:4mm;">These scored lowest &#8212; which is not a weakness or a
+     verdict. They are the areas where focused practice will produce the fastest visible improvement,
+     and where a little support from a teacher or parent goes a long way.</p>
+
   <!-- Always four fixed columns so both card rows line up, empty cells included. -->
   <table class="cards">
     <tr>
@@ -708,6 +747,14 @@
       </td>
     </tr>
   </table>
+
+  <div class="acard acard-2" style="margin-top:10mm;">
+    <h3>How to read these numbers</h3>
+    <p style="margin:0;">Each percentage shows how strongly that ability came through in your answers,
+       not a mark out of a hundred and not a comparison against your classmates. A high score means the
+       trait is already working for you; a lower one simply means there is room to grow. Nothing here is
+       fixed &#8212; every one of these areas responds to practice.</p>
+  </div>
 </div>
 
 <!-- ==================== 2d. R.I.A.S.E.C ANALYSIS ====================
@@ -739,7 +786,9 @@
               <td style="width:32mm;">
                 <span class="rtag" th:classappend="'ri-' + ${d.dimensionCode}" th:text="${d.dimensionName}">Type</span>
               </td>
-              <td class="rval" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</td>
+              <!-- No score printed: RIASEC reports preference, not ability, and a
+                   percentage invites reading it as a mark. Order carries the signal. -->
+              <td class="rval"></td>
             </tr>
           </table>
         </div>
@@ -804,7 +853,6 @@
           </td>
           <td>
             <div class="rbody">
-              <div class="rsc" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</div>
               <ul class="tight">
                 <li><strong>Personality. </strong><span th:text="${c.per}">-</span></li>
                 <li><strong>Values. </strong><span th:text="${c.val}">-</span></li>
