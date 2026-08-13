@@ -77,7 +77,7 @@
   .cover-band-row { text-align: center; margin-top: 4mm; }
   .cover-tagline { font-size: 14pt; color: #16365A; letter-spacing: 0.6px;
                    font-weight: bold; display: inline-block; white-space: nowrap;
-                   background: #D9EDE7; padding: 1.8mm 7mm; }
+                   background: #D9EDE7; padding: 1.8mm 7mm; text-transform: uppercase; }
   .cover-subtagline { font-size: 8pt; letter-spacing: 2px;
                       text-transform: uppercase; color: #16365A; font-weight: bold;
                       display: inline-block; white-space: nowrap;
@@ -876,6 +876,12 @@
 </div>
 </div>
 
+<!-- The interest group belongs beside the R.I.A.S.E.C pages it expands on, so
+     it is pulled out of the group run further down and printed here. -->
+<th:block th:each="g,gi : ${dimensionGroups}" th:if="${g.type == 'RIASEC'}">
+  <div th:replace="~{report/fragments :: dimensionGroupSection(${g}, ${gi.index})}"></div>
+</th:block>
+
 <!-- ==================== 3. HOW TO READ YOUR REPORT ==================== -->
 <div class="section thm-teal">
   <div class="section-head">
@@ -922,11 +928,11 @@
   <p class="small muted" style="margin-top:4mm;">The same scale is used everywhere in this report.</p>
 </div>
 
-<!-- ============ 3b. YOUR PERSONAL PROFILE + HOW STRENGTHS WORK TOGETHER ============ -->
+<!-- ============ 3b. YOUR LEARNING STYLE + HOW STRENGTHS WORK TOGETHER ============ -->
 <div class="section thm-green" th:if="${synthesis != null and synthesis.personalProfile != null}">
   <div class="section-head">
     <div class="eyebrow">Written for You</div>
-    <h2>Your Personal Profile</h2>
+    <h2>Your Learning Style</h2>
   </div>
 
   <div class="card tint">
@@ -940,166 +946,42 @@
     </div>
   </div>
 
-  <div th:each="t : ${synthesis.themes}" class="card" style="margin-top:4mm;">
-    <h3 th:text="${t.title}">Theme</h3>
-    <p class="small muted" style="margin:0 0 2mm;">
-      Based on: <span th:text="${#strings.listJoin(t.matchedDimensions, ', ')}">-</span>
-    </p>
-    <p class="small" style="margin:0;"><strong>What to do with it. </strong><span th:text="${t.suggestion}">-</span></p>
+  <!-- The two modality pairs read off the same learningStyle traits the
+       "How You Learn Best" page uses, so the two pages can never disagree.
+       Selection expressions rather than a lookup helper: four fixed names. -->
+  <div th:if="${learningStyle != null and learningStyle.traits != null
+                and learningStyle.traits.?[name == 'Visual' or name == 'Auditory'
+                    or name == 'Reading/Writing' or name == 'Kinesthetic'].size() == 4}"
+       th:with="visual=${learningStyle.traits.?[name == 'Visual'][0]},
+                auditory=${learningStyle.traits.?[name == 'Auditory'][0]},
+                reading=${learningStyle.traits.?[name == 'Reading/Writing'][0]},
+                kinesthetic=${learningStyle.traits.?[name == 'Kinesthetic'][0]}">
+    <div class="card" style="margin-top:4mm;">
+      <h3>Visual (charts and images), Auditory (listening and discussion)</h3>
+      <p class="small" style="margin:0;">
+        Visual <strong th:text="${#numbers.formatDecimal(visual.score, 1, 0)} + '%'">0%</strong>
+        &#183;
+        Auditory <strong th:text="${#numbers.formatDecimal(auditory.score, 1, 0)} + '%'">0%</strong>
+      </p>
+    </div>
+    <div class="card" style="margin-top:4mm;">
+      <h3>Reading/Writing (text-based notes), and Kinesthetic (hands-on practice)</h3>
+      <p class="small" style="margin:0;">
+        Reading/Writing <strong th:text="${#numbers.formatDecimal(reading.score, 1, 0)} + '%'">0%</strong>
+        &#183;
+        Kinesthetic <strong th:text="${#numbers.formatDecimal(kinesthetic.score, 1, 0)} + '%'">0%</strong>
+      </p>
+    </div>
   </div>
 </div>
 
 <!-- ==================== 4. DIMENSION GROUP SECTIONS ==================== -->
 <!-- Theme rotates by group index: every group used to render thm-lime, so this
-     run of pages was the one long stretch of identical colour in the report. -->
-<div th:each="g,gi : ${dimensionGroups}" class="section"
-     th:classappend="${ {'thm-lime','thm-teal','thm-violet','thm-amber','thm-blue','thm-rose','thm-green','thm-navy'}[gi.index % 8] }">
-  <div class="section-head">
-    <div class="eyebrow" th:text="${g.subtitle}">Profile</div>
-    <h2 th:text="${g.title}">Group</h2>
-  </div>
-
-  <!-- Section introduction: what this group of dimensions actually is -->
-  <div th:if="${g.intro != null}">
-    <p class="lead" th:text="${g.intro.whatItIs}">What this section is.</p>
-    <table class="two">
-      <tr>
-        <td><div class="card"><h3>How to Read This Section</h3>
-          <p class="small" style="margin:0;" th:text="${g.intro.howToRead}">-</p></div></td>
-        <td><div class="card tint"><h3>Why Profiles Differ</h3>
-          <p class="small" style="margin:0;" th:text="${g.intro.whyItVaries}">-</p></div></td>
-      </tr>
-    </table>
-  </div>
-
-  <div class="subhead">Your Profile at a Glance</div>
-  <!-- Column chart over the same d.barWidth the presentation layer already
-       computed; the detailed rows below repeat the exact values as text. -->
-  <div class="colchart">
-    <table class="cc">
-      <tr>
-        <td th:each="d : ${g.dimensions}" th:classappend="${d.rank &lt;= 3} ? 'cc-top' : ''">
-          <div class="cc-val" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</div>
-          <div class="cc-plot">
-            <div class="cc-bar" th:style="'height:' + ${d.barWidth} + '%'"></div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td class="cc-axis" th:each="d : ${g.dimensions}">
-          <div class="cc-lbl" th:text="${d.dimensionName}">Dimension</div>
-        </td>
-      </tr>
-    </table>
-  </div>
-
-  <!-- No forced break here. It cost 43% of a page (measured), and the rows
-       below carry their own page-break-inside guard, so the list breaks
-       between rows instead. keep-with-next stops the heading being orphaned
-       at the foot of a page. -->
-  <div class="subhead" style="page-break-after: avoid;">Your Profile in Detail</div>
-  <div class="card">
-    <div th:each="d : ${g.dimensions}" class="dim" th:classappend="${g.relativeScale} ? '' : 'b-' + ${d.interpretationBand}">
-      <table>
-        <tr>
-          <td class="nm" th:text="${d.dimensionName}">Dimension</td>
-          <td class="sc">
-            <span th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</span>
-            <span class="pill" th:unless="${g.relativeScale}" th:text="${d.interpretationLabel}">Band</span>
-            <span class="pill" th:if="${g.relativeScale}" th:text="'#' + ${d.rank}">#1</span>
-          </td>
-        </tr>
-      </table>
-      <div class="bar-track"><div class="bar-fill" th:style="'width:' + ${d.barWidth} + '%'"></div></div>
-      <div class="desc" th:if="${d.description}" th:text="${d.description}">What this measures.</div>
-    </div>
-  </div>
-
-  <!-- One detailed page per leading dimension, only where content was authored -->
-  <div th:each="t : ${g.top}" th:if="${t.hasContent}" class="dimpage">
-    <div class="dim-head">
-      <table style="width:100%;">
-        <tr>
-          <td>
-            <div class="eyebrow" th:text="${g.subtitle}">Profile</div>
-            <h2 style="font-size:16pt;" th:text="${t.dimensionName}">Dimension</h2>
-          </td>
-          <!-- No percentage in the heading: the band label and the bar below
-               already say where the score sits, and a big number beside the
-               dimension name reads as a mark out of a hundred. -->
-          <td style="text-align:right;vertical-align:bottom;white-space:nowrap;">
-            <span class="pill" th:unless="${g.relativeScale}" th:text="${t.interpretationLabel}">Band</span>
-            <span class="pill" th:if="${g.relativeScale}" th:text="'Rank #' + ${t.rank} + ' of ' + ${g.dimensions.size()}">#1</span>
-          </td>
-        </tr>
-      </table>
-      <div class="bar-track" th:classappend="${g.relativeScale} ? '' : 'b-' + ${t.interpretationBand}">
-        <div class="bar-fill" th:style="'width:' + ${t.barWidth} + '%'"></div>
-      </div>
-    </div>
-
-    <h3>What Does This Measure?</h3>
-    <p th:text="${t.content.whatItMeasures}">Explanation.</p>
-
-    <div class="card tint" th:if="${t.bandNarrative}">
-      <h3>What Your Result May Mean</h3>
-      <p style="margin:0;" th:text="${t.bandNarrative}">Band-specific interpretation.</p>
-    </div>
-    <div class="card tint" th:if="${t.bandNarrative == null and g.relativeScale}">
-      <h3>What Your Result May Mean</h3>
-      <p style="margin:0;">This is one of your leading areas within this profile. It takes up a larger share
-         than the others, which suggests tasks drawing on it tend to feel more natural to you.</p>
-    </div>
-
-    <table class="two" style="margin-top:2.2mm;">
-      <tr>
-        <td>
-          <div class="card"><h3>What This May Look Like</h3>
-            <ul class="tight"><li th:each="l : ${t.content.looksLike}" th:text="${l}">-</li></ul></div>
-        </td>
-        <td>
-          <div class="card"><h3>Possible Strengths</h3>
-            <ul class="tight"><li th:each="s : ${t.content.strengths}" th:text="${s}">-</li></ul></div>
-        </td>
-      </tr>
-    </table>
-
-    <div class="card" style="margin-top:2.2mm;">
-      <h3>How This May Support Learning</h3>
-      <p class="small" style="margin:0;" th:text="${t.content.learningImplications}">-</p>
-    </div>
-
-    <table class="two" style="margin-top:2.2mm;">
-      <tr>
-        <td>
-          <div class="card"><h3>Development Opportunities</h3>
-            <ul class="tight"><li th:each="d : ${t.content.development}" th:text="${d}">-</li></ul></div>
-        </td>
-        <td>
-          <div class="card"><h3>Activities to Try</h3>
-            <ul class="tight"><li th:each="a : ${t.content.activities}" th:text="${a}">-</li></ul></div>
-        </td>
-      </tr>
-    </table>
-
-    <div class="card" style="margin-top:2.2mm;">
-      <h3>Career Connections</h3>
-      <p class="small muted" style="margin:0 0 2mm;">Areas worth exploring, not recommendations.</p>
-      <div class="chipgroup" style="margin:0;">
-        <span th:each="c : ${t.content.careerConnections}" class="chip" th:text="${c}">-</span>
-      </div>
-    </div>
-
-    <table class="two tips" style="margin-top:2.2mm;">
-      <tr>
-        <td><div class="acard acard-2" style="margin:0;"><h3>Parent Tip</h3>
-          <p style="margin:0;" th:text="${t.content.parentTip}">-</p></div></td>
-        <td><div class="acard acard-3" style="margin:0;"><h3>Student Tip</h3>
-          <p style="margin:0;" th:text="${t.content.studentTip}">-</p></div></td>
-      </tr>
-    </table>
-  </div>
-</div>
+     run of pages was the one long stretch of identical colour in the report.
+     RIASEC is skipped here; it prints earlier, next to the interest analysis. -->
+<th:block th:each="g,gi : ${dimensionGroups}" th:if="${g.type != 'RIASEC'}">
+  <div th:replace="~{report/fragments :: dimensionGroupSection(${g}, ${gi.index})}"></div>
+</th:block>
 
 
 <!-- ============ 5. LEGACY TRAIT SECTIONS (personality / behaviour / wellness / learning style) ============ -->
