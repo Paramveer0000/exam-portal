@@ -12,10 +12,11 @@
 
   @page {
     size: A4;
-    /* Top margin has to clear the running header logo: the logo is square, so a
-       22mm image needs more than 20mm of margin or it hangs into the text box
-       and collides with the first block on the page. */
-    margin: 30mm 16mm 16mm;
+    /* Top margin only has to clear the running header logo, which is 14mm
+       square. 30mm was sized for an older 22mm logo and cost every page 8mm of
+       text box -- the trait sections were re-tightened twice to win that back.
+       22mm clears the 14mm logo with room to spare. */
+    margin: 22mm 16mm 16mm;
     @bottom-left  { content: element(footerLeft); }
     @bottom-right { content: "Page " counter(page) " of " counter(pages);
                     font-family: Helvetica, Arial, sans-serif; font-size: 7.5pt; color: #8A97A6; }
@@ -60,7 +61,7 @@
   /* Small logo repeated in the top-right of every content page. The image is
      embedded once and referenced by the running element, so this does not
      multiply the PDF size per page. */
-  #headerRight img { width: 18mm; height: auto; }
+  #headerRight img { width: 14mm; height: auto; }
   #headerRight .hdr-tag { display: block; margin-top: 0.8mm; }
 
   /* ---- cover -------------------------------------------------------------
