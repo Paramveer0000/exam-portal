@@ -30,10 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class PageFillAuditTest {
 
-    /** A4 with the template's @page margin: 30mm 16mm 16mm. */
+    /** A4 with the template's @page margin: 22mm 16mm 16mm. Keep in step with it. */
     private static final float MM = 72f / 25.4f;
     private static final float PAGE_H_MM = 297f;
-    private static final float TOP_MARGIN_MM = 30f;
+    private static final float TOP_MARGIN_MM = 22f;
     private static final float BOTTOM_MARGIN_MM = 16f;
     private static final float USABLE_MM = PAGE_H_MM - TOP_MARGIN_MM - BOTTOM_MARGIN_MM;
     /** Ignore the running header/footer: they sit in the @page margin boxes. */

@@ -174,9 +174,23 @@
     </tr>
   </table>
 
+  <!-- Suggestions run in two columns. As one full-width list this card was the
+       tallest trailing block in the section, and it was the block that spilled
+       onto a page of its own (measured at 11% fill). Two columns halve its
+       height, which fits it back under the row above, and it matches the
+       two-column treatment those cards already use. -->
   <div class="card whathelps" style="margin-top:4mm;">
     <h3>What Helps</h3>
-    <ul class="tight"><li th:each="s : ${section.content.suggestions}" th:text="${s}">Suggestion</li></ul>
+    <table class="two">
+      <tr>
+        <td th:each="col : ${#numbers.sequence(0, 1)}">
+          <ul class="tight">
+            <li th:each="s,si : ${section.content.suggestions}" th:if="${si.index % 2 == col}"
+                th:text="${s}">Suggestion</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>
 
