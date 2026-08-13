@@ -113,6 +113,8 @@ class ReportRenderHarnessTest {
         dto.setReportNumber("TM-1042-20260810");
         dto.setAssessmentDate("10 Aug 2026");
         dto.setCompanyLogo(bundledLogoDataUrl());
+        dto.setCoverImage(new com.project.examportalbackend.services.implementation.ReportBrandingServiceImpl()
+                .coverImageDataUrl());
 
         StudentProfile p = new StudentProfile();
         p.setStudentName("Aarav Raghunathan Krishnamurthy"); // deliberately long: wrap check
@@ -297,7 +299,9 @@ class ReportRenderHarnessTest {
         assertTrue(html.contains("thementalistofficial21@gmail.com"), "brand email missing from cover");
         assertTrue(html.contains("Guiding Minds. Shaping Futures"), "brand tagline missing");
         assertTrue(html.contains("TM-1042-20260810"), "report id missing");
-        assertTrue(html.contains("Confidential Student Report"), "confidentiality indicator missing");
+        // Cover no longer carries this line; the running footer does.
+        assertTrue(html.contains("Confidential Student Assessment Report"), "confidentiality indicator missing");
+        assertTrue(html.contains("data:image/jpeg;base64,"), "cover artwork did not embed");
         // The bundled logo must actually resolve and embed, not silently fall
         // back to the text wordmark.
         assertTrue(html.contains("data:image/png;base64,"), "company logo did not embed on the cover");

@@ -161,6 +161,27 @@ class ReportPresentationServiceImplTest {
         assertEquals("Strong", riasec.getDimensions().get(0).getInterpretationLabel());
     }
 
+    @Test
+    void riasecPrintsInHollandOrder_butRankAndTopStayStrongestFirst() {
+        List<DimensionGroup> groups = service.buildDimensionGroups(1L, psych(
+                Collections.emptyList(),
+                Arrays.asList(
+                        RiasecRow.of("C", "Conventional", 8.8, true),
+                        RiasecRow.of("E", "Enterprising", 8.3, true),
+                        RiasecRow.of("I", "Investigative", 7.6, true),
+                        RiasecRow.of("A", "Artistic", 7.6, true),
+                        RiasecRow.of("S", "Social", 7.0, true),
+                        RiasecRow.of("R", "Realistic", 6.4, true))));
+
+        DimensionGroup riasec = groups.stream().filter(g -> "RIASEC".equals(g.getType())).findFirst().orElseThrow();
+        assertEquals(Arrays.asList("R", "I", "A", "S", "E", "C"),
+                riasec.getDimensions().stream().map(DimensionScoreView::getDimensionCode)
+                        .collect(java.util.stream.Collectors.toList()));
+        // Realistic is printed first but is the weakest, so its rank is last.
+        assertEquals(6, riasec.getDimensions().get(0).getRank());
+        assertEquals("C", riasec.getTop().get(0).getDimensionCode());
+    }
+
     // ---------------------------------------------------------- gap handling
 
     @Test

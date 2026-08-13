@@ -28,14 +28,16 @@ import java.util.Base64;
 public class ReportBrandingServiceImpl implements ReportBrandingService {
 
     static final String BUNDLED_LOGO = "brand/mentalist-logo.png";
+    /** Cover artwork; optional -- the cover just drops the image when absent. */
+    static final String BUNDLED_COVER_IMAGE = "brand/confused-child.jpg";
     private static final long PLATFORM_SETTINGS_ID = 1L;
     private static final Logger log = LoggerFactory.getLogger(ReportBrandingServiceImpl.class);
 
     @Autowired private PlatformSettingsRepository platformSettingsRepository;
 
-    /** Cached after first read; the bundled file cannot change at runtime. */
-    private String bundledLogoCache;
-    private boolean bundledLogoLoaded;
+    /** Cached after first read; the bundled files cannot change at runtime. */
+    private final java.util.Map<String, String> bundledCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final String NONE = "";
 
     @Override
     public String companyLogoDataUrl() {
@@ -44,7 +46,12 @@ public class ReportBrandingServiceImpl implements ReportBrandingService {
             // Stored already as a data URL by PlatformController.
             return uploaded;
         }
-        return bundledLogo();
+        return bundled(BUNDLED_LOGO);
+    }
+
+    @Override
+    public String coverImageDataUrl() {
+        return bundled(BUNDLED_COVER_IMAGE);
     }
 
     private String uploadedLogo() {
@@ -59,24 +66,23 @@ public class ReportBrandingServiceImpl implements ReportBrandingService {
         }
     }
 
-    private synchronized String bundledLogo() {
-        if (bundledLogoLoaded) {
-            return bundledLogoCache;
-        }
-        bundledLogoLoaded = true;
-        ClassPathResource resource = new ClassPathResource(BUNDLED_LOGO);
-        if (!resource.exists()) {
-            log.warn("No bundled report logo at classpath:{} - report will render the text wordmark", BUNDLED_LOGO);
-            bundledLogoCache = null;
-            return null;
-        }
-        try (InputStream in = resource.getInputStream()) {
-            byte[] bytes = in.readAllBytes();
-            bundledLogoCache = "data:image/png;base64," + Base64.getEncoder().encodeToString(bytes);
-        } catch (Exception e) {
-            log.warn("Failed to read bundled report logo: {}", e.getMessage());
-            bundledLogoCache = null;
-        }
-        return bundledLogoCache;
+    /** Bundled classpath image as a data URL, or null when missing/unreadable. */
+    private String bundled(String path) {
+        String cached = bundledCache.computeIfAbsent(path, p -> {
+            ClassPathResource resource = new ClassPathResource(p);
+            if (!resource.exists()) {
+                log.warn("No bundled report image at classpath:{} - it will be omitted", p);
+                return NONE;
+            }
+            try (InputStream in = resource.getInputStream()) {
+                String mime = p.endsWith(".png") ? "image/png" : "image/jpeg";
+                return "data:" + mime + ";base64,"
+                        + Base64.getEncoder().encodeToString(in.readAllBytes());
+            } catch (Exception e) {
+                log.warn("Failed to read bundled report image {}: {}", p, e.getMessage());
+                return NONE;
+            }
+        });
+        return NONE.equals(cached) ? null : cached;
     }
 }

@@ -1684,3 +1684,15 @@ gotchas, and open issues that are NOT in the source code or git history.
 - knock-on: the lost 10mm of text box pushed the trait sections' trailing card and the MI detail card's last row onto pages of their own. Re-tightened .traitsec block gaps/padding and dropped the global .dim gap 4.5mm -> 3.4mm. Back to 21 pages with no sparse page.
 - IMPORTANT for anyone changing page margins here: check the page count and scan for sparse pages afterwards. Several sections are tuned to fill almost exactly one page, so a margin change of 2mm can cost two pages.
 - result: harness renders 21 pages, no sparse pages. Inspected p8 (RIASEC group, clear gap under the logo) and p12 (EI section, still one page).
+
+## 2026-08-13 — report cover rework
+- Cover taglines now bold on tinted bands (`.cover-tagline`, `.cover-subtagline`).
+- Removed cover meta block (Prepared For / Class / Assessment Date / Report ID), programme line, and "Confidential Student Report" — same data still opens "Report at a Glance".
+- Added optional cover artwork: `classpath:brand/cover-art.jpg` → `coverImageDataUrl()` → `coverImage` template var. File not yet present, so the image is silently omitted.
+- `./mvnw -o compile` clean. PDF not re-rendered (no artwork file yet).
+- Artwork now bundled: `brand/confused-child.jpg`, framed in navy plate + caption band; brand bands stacked, nowrap.
+- `ReportRenderHarnessTest` green (4 tests); cover page 1 rendered and visually checked.
+- Page 2 identity row now 4 columns: STUDENT / CLASS / ASSESSMENT DATE / REPORT ID.
+- R.I.A.S.E.C Analysis section moved to sit directly after "Your Report at a Glance" (QA PDF: pages 3-4, was 8-9).
+- RIASEC dimensions print in Holland order R-I-A-S-E-C; rank and group `top` (Domain Code) stay strongest-first. Also changes the "What Interests You" group listing to serial order.
+- Green: ReportPresentationServiceImplTest (10, incl. new order test), ReportRenderHarnessTest (4), ReportPdfRenderHarnessTest (2). `contextLoads` still fails without MySQL (pre-existing).
