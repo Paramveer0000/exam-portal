@@ -118,6 +118,14 @@ class ReportRenderHarnessTest {
 
         StudentProfile p = new StudentProfile();
         p.setStudentName("Aarav Raghunathan Krishnamurthy"); // deliberately long: wrap check
+        p.setGuardianName("Lakshmi Raghunathan");
+        p.setGender("Male");
+        p.setAge(16);
+        p.setDob("14 Mar 2010");
+        // Also deliberately long: the identifying grid must wrap, not widen.
+        p.setSchool("Sri Venkateswara Higher Secondary School");
+        p.setCity("Coimbatore");
+        p.setCounsellorName("Dr. Meera Iyer");
         p.setClassName("Class 11");
         p.setSubjectName("Psychometric & Mental Skill Assessment");
         p.setReportNumber("TM-1042-20260810");
