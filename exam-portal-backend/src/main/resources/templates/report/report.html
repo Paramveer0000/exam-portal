@@ -986,7 +986,10 @@
     </table>
   </div>
 
-  <div class="subhead">Your Profile in Detail</div>
+  <!-- Detail list starts a new page: the chart above and the full dimension
+       list together overflow, and a break here keeps each group's chart and
+       its detail rows whole instead of splitting the list mid-run. -->
+  <div class="subhead" style="page-break-before: always;">Your Profile in Detail</div>
   <div class="card">
     <div th:each="d : ${g.dimensions}" class="dim" th:classappend="${g.relativeScale} ? '' : 'b-' + ${d.interpretationBand}">
       <table>
