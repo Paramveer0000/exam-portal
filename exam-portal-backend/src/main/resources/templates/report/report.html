@@ -81,13 +81,36 @@
                       text-transform: uppercase; color: #16365A; font-weight: bold;
                       display: inline-block; white-space: nowrap;
                       background: #E8ECF3; padding: 1.5mm 7mm; }
-  /* Artwork plate: a dark image needs a frame or it reads as a hole punched in
-     the page. Navy keyline + tinted mat + caption band tie it to the brand. */
-  .cover-art-plate { width: 140mm; margin: 9mm auto 0; background: #16365A;
-                     padding: 2mm 0 0; }
-  .cover-art { display: block; width: 136mm; height: auto; margin: 0 auto; }
+  /* Artwork plate: drawn in CSS rather than placed as a photo. A stock raster
+     softens at print resolution and dates the report; flat type on navy stays
+     sharp at any zoom and costs no asset. Question marks scatter around a
+     single teal mark, which the caption reads as "questions -> a direction".
+     No transforms or opacity here: openhtmltopdf renders neither reliably. */
+  .cover-art-plate { width: 140mm; margin: 9mm auto 0; background: #16365A; }
+  .cover-art { position: relative; height: 62mm; }
+  .cover-art .q { position: absolute; font-weight: bold; line-height: 1; }
+  /* Muted navy tints recede; the field should read as texture, not as content. */
+  .q1 { top: 6mm;  left: 10mm; font-size: 20pt; color: #24507F; }
+  .q2 { top: 4mm;  left: 40mm; font-size: 13pt; color: #2E5C8A; }
+  .q3 { top: 9mm;  right: 34mm; font-size: 27pt; color: #1E4470; }
+  .q4 { top: 5mm;  right: 11mm; font-size: 15pt; color: #2E5C8A; }
+  .q5 { top: 26mm; left: 7mm;  font-size: 15pt; color: #2E5C8A; }
+  .q6 { top: 30mm; right: 8mm;  font-size: 22pt; color: #24507F; }
+  .q7 { bottom: 8mm; left: 15mm; font-size: 25pt; color: #1E4470; }
+  .q8 { bottom: 6mm; left: 46mm; font-size: 14pt; color: #2E5C8A; }
+  .q9 { bottom: 10mm; right: 39mm; font-size: 18pt; color: #24507F; }
+  .q10 { bottom: 5mm; right: 13mm; font-size: 12pt; color: #2E5C8A; }
+  /* The one mark that resolves: teal, ringed, dead centre of the plate. */
+  .cover-art-focus { position: absolute; top: 15mm; left: 50mm; width: 40mm;
+                     height: 32mm; border: 0.6mm solid #1F6B5E; background: #16365A;
+                     text-align: center; }
+  .cover-art-focus .mark { font-size: 40pt; font-weight: bold; color: #FFFFFF;
+                           line-height: 1; margin-top: 5mm; }
+  .cover-art-focus .rule { width: 12mm; height: 0.7mm; background: #1F6B5E;
+                           margin: 3.5mm auto 0; }
   .cover-art-caption { font-size: 7.5pt; letter-spacing: 1.6px; text-transform: uppercase;
-                       color: #FFFFFF; padding: 2.4mm 0; text-align: center; }
+                       color: #FFFFFF; padding: 2.4mm 0; text-align: center;
+                       border-top: 0.4mm solid #24507F; }
   /* Short centred divider, a lighter separator than a full rule */
   .cover-div { width: 26mm; height: 0.7mm; background: #1F6B5E; margin: 9mm auto 0; }
   .cover h1 { font-size: 23pt; line-height: 1.28; letter-spacing: 1px; margin-top: 8mm; }
@@ -558,8 +581,17 @@
   <!-- Cover artwork, framed as a plate with a caption so it reads as part of
        the design. Student/class/date/report-id are not repeated here: they
        already open the "Report at a Glance" section on the next page. -->
-  <div class="cover-art-plate" th:if="${coverImage}">
-    <img class="cover-art" th:src="${coverImage}" alt=""/>
+  <div class="cover-art-plate">
+    <div class="cover-art">
+      <span class="q q1">?</span><span class="q q2">?</span><span class="q q3">?</span>
+      <span class="q q4">?</span><span class="q q5">?</span><span class="q q6">?</span>
+      <span class="q q7">?</span><span class="q q8">?</span><span class="q q9">?</span>
+      <span class="q q10">?</span>
+      <div class="cover-art-focus">
+        <div class="mark">?</div>
+        <div class="rule"></div>
+      </div>
+    </div>
     <div class="cover-art-caption">Every question is the start of a direction</div>
   </div>
 
@@ -605,8 +637,79 @@
     <p class="small" style="margin:0;" th:text="${classGuidance.stageFocus}">Focus for this class.</p>
   </div>
 
-  <h3 style="margin-top:7mm;">Your Key Strengths</h3>
-  <table class="cards" th:if="${atAGlance}">
+  <!-- Key strengths / areas to develop are NOT here: they open the report body
+       on their own page, after the parents' letter. This page stays the
+       identifying summary. -->
+</div>
+
+<!-- ==================== 2b. MESSAGE TO PARENTS ====================
+     Placed immediately after the executive summary: parents read the letter
+     before any scores, so it frames the numbers rather than trailing them.
+     Fixed editorial copy supplied by the client, not generated content: it is
+     the same letter in every report, so it lives in the template rather than
+     in report-content.json (which holds per-report variable copy). Only the
+     sign-off tracks the configured brand name. -->
+<div class="section thm-rose">
+  <div class="section-head">
+    <div class="eyebrow">A Letter Before You Read On</div>
+    <h2>Message to Parents</h2>
+  </div>
+
+  <p class="lead">Dear Parents,</p>
+
+  <div class="callout">
+    <div class="clabel">Every child is unique</div>
+    <p style="margin:0;">Academic marks tell only a small part of your child&#8217;s story. Their confidence,
+       emotional strength, personality, decision-making ability, communication skills, learning style
+       and career interests play an equally important role in future success.</p>
+  </div>
+
+  <p style="margin-top:5mm;">This report has been prepared after a scientific psychometric assessment
+     to help you understand your child&#8217;s strengths and the areas that need support.</p>
+
+  <div class="card">
+    <h3>Please Remember</h3>
+    <ul class="tight">
+      <li>There are no &#8220;good&#8221; or &#8220;bad&#8221; personalities.</li>
+      <li>Every child has unique abilities.</li>
+      <li>The purpose of this report is not to judge, but to guide.</li>
+      <li>With proper guidance, every child can become successful.</li>
+    </ul>
+  </div>
+
+  <div class="acard acard-2" style="margin-top:4mm;">
+    <h3>How to Use It</h3>
+    <p style="margin:0;">We encourage parents to discuss this report positively with their child and to
+       use it as a roadmap for future growth.</p>
+  </div>
+
+  <p class="disclaimer" style="margin-top:6mm;">This report is not for medical use. It is an educational
+     guidance tool and is not a clinical or medical diagnosis.</p>
+
+  <div class="signature-row">
+    <table>
+      <tr>
+        <td>
+          <div class="sig-label">Warm Regards</div>
+          <div class="sig-name" th:text="${brand.name} ?: 'The Mentalist'">The Mentalist</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== 2c. YOUR KEY STRENGTHS ====================
+     Opens the report body on its own page. Split out of the executive summary
+     so the strengths get room to breathe instead of sharing the identifying
+     page, and so the body starts on a positive note before the interest
+     types. Same atAGlance data as before; nothing is recomputed. -->
+<div class="section thm-green" th:if="${atAGlance}">
+  <div class="section-head">
+    <div class="eyebrow">Where You Are Strongest</div>
+    <h2>Your Key Strengths</h2>
+  </div>
+
+  <table class="cards">
     <tr>
       <td th:each="i : ${#numbers.sequence(0, 3)}"
           th:with="s=${i &lt; atAGlance.keyStrengths.size()} ? ${atAGlance.keyStrengths[i]} : null"
@@ -621,9 +724,9 @@
     </tr>
   </table>
 
-  <h3 style="margin-top:7mm;">Areas to Develop</h3>
+  <h3 style="margin-top:9mm;">Areas to Develop</h3>
   <!-- Always four fixed columns so both card rows line up, empty cells included. -->
-  <table class="cards" th:if="${atAGlance}">
+  <table class="cards">
     <tr>
       <td th:each="i : ${#numbers.sequence(0, 3)}"
           th:with="a=${i &lt; atAGlance.areasToDevelop.size()} ? ${atAGlance.areasToDevelop[i]} : null"
@@ -639,9 +742,9 @@
   </table>
 </div>
 
-<!-- ==================== 2b. R.I.A.S.E.C ANALYSIS ====================
-     Holland-model read-out of the RIASEC dimension group, placed right after
-     the executive summary because the interest types frame everything that
+<!-- ==================== 2d. R.I.A.S.E.C ANALYSIS ====================
+     Holland-model read-out of the RIASEC dimension group, placed directly
+     after the key strengths because the interest types frame everything that
      follows. The scores are the same ones the dimension group section prints
      later; nothing is recomputed here. Types are listed in theory order
      (R I A S E C) with fixed descriptive copy. The whole section disappears
@@ -751,60 +854,6 @@
   <p class="small muted" style="margin-top:3mm;">These types describe preferences, not ability. A lower
      score simply means that kind of work appeals to you less at the moment.</p>
 </div>
-</div>
-
-<!-- ==================== 2c. MESSAGE TO PARENTS ====================
-     Fixed editorial copy supplied by the client, not generated content: it is
-     the same letter in every report, so it lives in the template rather than
-     in report-content.json (which holds per-report variable copy). Only the
-     sign-off tracks the configured brand name. -->
-<div class="section thm-rose">
-  <div class="section-head">
-    <div class="eyebrow">A Letter Before You Read On</div>
-    <h2>Message to Parents</h2>
-  </div>
-
-  <p class="lead">Dear Parents,</p>
-
-  <div class="callout">
-    <div class="clabel">Every child is unique</div>
-    <p style="margin:0;">Academic marks tell only a small part of your child&#8217;s story. Their confidence,
-       emotional strength, personality, decision-making ability, communication skills, learning style
-       and career interests play an equally important role in future success.</p>
-  </div>
-
-  <p style="margin-top:5mm;">This report has been prepared after a scientific psychometric assessment
-     to help you understand your child&#8217;s strengths and the areas that need support.</p>
-
-  <div class="card">
-    <h3>Please Remember</h3>
-    <ul class="tight">
-      <li>There are no &#8220;good&#8221; or &#8220;bad&#8221; personalities.</li>
-      <li>Every child has unique abilities.</li>
-      <li>The purpose of this report is not to judge, but to guide.</li>
-      <li>With proper guidance, every child can become successful.</li>
-    </ul>
-  </div>
-
-  <div class="acard acard-2" style="margin-top:4mm;">
-    <h3>How to Use It</h3>
-    <p style="margin:0;">We encourage parents to discuss this report positively with their child and to
-       use it as a roadmap for future growth.</p>
-  </div>
-
-  <p class="disclaimer" style="margin-top:6mm;">This report is not for medical use. It is an educational
-     guidance tool and is not a clinical or medical diagnosis.</p>
-
-  <div class="signature-row">
-    <table>
-      <tr>
-        <td>
-          <div class="sig-label">Warm Regards</div>
-          <div class="sig-name" th:text="${brand.name} ?: 'The Mentalist'">The Mentalist</div>
-        </td>
-      </tr>
-    </table>
-  </div>
 </div>
 
 <!-- ==================== 3. HOW TO READ YOUR REPORT ==================== -->

@@ -301,7 +301,11 @@ class ReportRenderHarnessTest {
         assertTrue(html.contains("TM-1042-20260810"), "report id missing");
         // Cover no longer carries this line; the running footer does.
         assertTrue(html.contains("Confidential Student Assessment Report"), "confidentiality indicator missing");
-        assertTrue(html.contains("data:image/jpeg;base64,"), "cover artwork did not embed");
+        // Cover artwork is drawn in CSS, not embedded as a raster: assert the
+        // plate and its focal mark render rather than looking for a data URL.
+        assertTrue(html.contains("cover-art-focus"), "cover artwork plate did not render");
+        assertTrue(html.contains("Every question is the start of a direction"),
+                "cover artwork caption missing");
         // The bundled logo must actually resolve and embed, not silently fall
         // back to the text wordmark.
         assertTrue(html.contains("data:image/png;base64,"), "company logo did not embed on the cover");
