@@ -204,7 +204,13 @@
   h3 { font-size: 12.5pt; margin-bottom: 3mm; page-break-after: avoid; }
 
   /* One dimension's detailed write-up, sized to sit on a single page */
-  .dimpage { page-break-before: always; font-size: 9pt; }
+  /* Dimension detail blocks FLOW; they do not each claim a page. Forcing a
+     break here meant every block spilled its last card ("Parent Tip") onto an
+     otherwise empty page -- measured at 11-16% fill across four pages. The
+     block still starts clear of the previous one via the margin, and the
+     head keeps its first card with it. */
+  .dimpage { font-size: 9pt; margin-top: 9mm; }
+  .dimpage:first-of-type { margin-top: 0; }
   .dim-head { border-bottom: 2px solid #1F6B5E; padding-bottom: 3mm; margin-bottom: 4mm; page-break-after: avoid; }
   .dim-head h2 { letter-spacing: 0.3px; }
   .dimpage h3 { font-size: 10.5pt; margin-bottom: 1.4mm; }
@@ -986,10 +992,11 @@
     </table>
   </div>
 
-  <!-- Detail list starts a new page: the chart above and the full dimension
-       list together overflow, and a break here keeps each group's chart and
-       its detail rows whole instead of splitting the list mid-run. -->
-  <div class="subhead" style="page-break-before: always;">Your Profile in Detail</div>
+  <!-- No forced break here. It cost 43% of a page (measured), and the rows
+       below carry their own page-break-inside guard, so the list breaks
+       between rows instead. keep-with-next stops the heading being orphaned
+       at the foot of a page. -->
+  <div class="subhead" style="page-break-after: avoid;">Your Profile in Detail</div>
   <div class="card">
     <div th:each="d : ${g.dimensions}" class="dim" th:classappend="${g.relativeScale} ? '' : 'b-' + ${d.interpretationBand}">
       <table>
