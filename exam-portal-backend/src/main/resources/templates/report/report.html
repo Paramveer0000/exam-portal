@@ -74,43 +74,20 @@
   /* Both brand lines are highlighted: bold type on a tinted band, so they read
      as one deliberate lockup rather than fading into the cover whitespace. */
   .cover-band-row { text-align: center; margin-top: 4mm; }
-  .cover-tagline { font-size: 11pt; color: #16365A; letter-spacing: 0.6px;
+  .cover-tagline { font-size: 14pt; color: #16365A; letter-spacing: 0.6px;
                    font-weight: bold; display: inline-block; white-space: nowrap;
                    background: #D9EDE7; padding: 1.8mm 7mm; }
   .cover-subtagline { font-size: 8pt; letter-spacing: 2px;
                       text-transform: uppercase; color: #16365A; font-weight: bold;
                       display: inline-block; white-space: nowrap;
                       background: #E8ECF3; padding: 1.5mm 7mm; }
-  /* Artwork plate: drawn in CSS rather than placed as a photo. A stock raster
-     softens at print resolution and dates the report; flat type on navy stays
-     sharp at any zoom and costs no asset. Question marks scatter around a
-     single teal mark, which the caption reads as "questions -> a direction".
-     No transforms or opacity here: openhtmltopdf renders neither reliably. */
-  .cover-art-plate { width: 140mm; margin: 9mm auto 0; background: #16365A; }
-  .cover-art { position: relative; height: 62mm; }
-  .cover-art .q { position: absolute; font-weight: bold; line-height: 1; }
-  /* Muted navy tints recede; the field should read as texture, not as content. */
-  .q1 { top: 6mm;  left: 10mm; font-size: 20pt; color: #24507F; }
-  .q2 { top: 4mm;  left: 40mm; font-size: 13pt; color: #2E5C8A; }
-  .q3 { top: 9mm;  right: 34mm; font-size: 27pt; color: #1E4470; }
-  .q4 { top: 5mm;  right: 11mm; font-size: 15pt; color: #2E5C8A; }
-  .q5 { top: 26mm; left: 7mm;  font-size: 15pt; color: #2E5C8A; }
-  .q6 { top: 30mm; right: 8mm;  font-size: 22pt; color: #24507F; }
-  .q7 { bottom: 8mm; left: 15mm; font-size: 25pt; color: #1E4470; }
-  .q8 { bottom: 6mm; left: 46mm; font-size: 14pt; color: #2E5C8A; }
-  .q9 { bottom: 10mm; right: 39mm; font-size: 18pt; color: #24507F; }
-  .q10 { bottom: 5mm; right: 13mm; font-size: 12pt; color: #2E5C8A; }
-  /* The one mark that resolves: teal, ringed, dead centre of the plate. */
-  .cover-art-focus { position: absolute; top: 15mm; left: 50mm; width: 40mm;
-                     height: 32mm; border: 0.6mm solid #1F6B5E; background: #16365A;
-                     text-align: center; }
-  .cover-art-focus .mark { font-size: 40pt; font-weight: bold; color: #FFFFFF;
-                           line-height: 1; margin-top: 5mm; }
-  .cover-art-focus .rule { width: 12mm; height: 0.7mm; background: #1F6B5E;
-                           margin: 3.5mm auto 0; }
+  /* Artwork: a white-background cutout, so it carries no frame, keyline or
+     mat. Any border here would draw a box around white space and read as a
+     printing error rather than a design choice. */
+  .cover-art-plate { width: 150mm; margin: 7mm auto 0; }
+  .cover-art { display: block; width: 150mm; height: auto; margin: 0 auto; }
   .cover-art-caption { font-size: 7.5pt; letter-spacing: 1.6px; text-transform: uppercase;
-                       color: #FFFFFF; padding: 2.4mm 0; text-align: center;
-                       border-top: 0.4mm solid #24507F; }
+                       color: #16365A; padding: 3mm 0 0; text-align: center; }
   /* Short centred divider, a lighter separator than a full rule */
   .cover-div { width: 26mm; height: 0.7mm; background: #1F6B5E; margin: 9mm auto 0; }
   .cover h1 { font-size: 23pt; line-height: 1.28; letter-spacing: 1px; margin-top: 8mm; }
@@ -581,17 +558,8 @@
   <!-- Cover artwork, framed as a plate with a caption so it reads as part of
        the design. Student/class/date/report-id are not repeated here: they
        already open the "Report at a Glance" section on the next page. -->
-  <div class="cover-art-plate">
-    <div class="cover-art">
-      <span class="q q1">?</span><span class="q q2">?</span><span class="q q3">?</span>
-      <span class="q q4">?</span><span class="q q5">?</span><span class="q q6">?</span>
-      <span class="q q7">?</span><span class="q q8">?</span><span class="q q9">?</span>
-      <span class="q q10">?</span>
-      <div class="cover-art-focus">
-        <div class="mark">?</div>
-        <div class="rule"></div>
-      </div>
-    </div>
+  <div class="cover-art-plate" th:if="${coverImage}">
+    <img class="cover-art" th:src="${coverImage}" alt=""/>
     <div class="cover-art-caption">Every question is the start of a direction</div>
   </div>
 
