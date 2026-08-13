@@ -29,7 +29,7 @@ public class ReportBrandingServiceImpl implements ReportBrandingService {
 
     static final String BUNDLED_LOGO = "brand/mentalist-logo.png";
     /** Cover artwork; optional -- the cover just drops the image when absent. */
-    static final String BUNDLED_COVER_IMAGE = "brand/confused-child.jpg";
+    static final String BUNDLED_COVER_IMAGE = "brand/cover-artwork.png";
     private static final long PLATFORM_SETTINGS_ID = 1L;
     private static final Logger log = LoggerFactory.getLogger(ReportBrandingServiceImpl.class);
 
