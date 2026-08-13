@@ -1696,3 +1696,8 @@ gotchas, and open issues that are NOT in the source code or git history.
 - R.I.A.S.E.C Analysis section moved to sit directly after "Your Report at a Glance" (QA PDF: pages 3-4, was 8-9).
 - RIASEC dimensions print in Holland order R-I-A-S-E-C; rank and group `top` (Domain Code) stay strongest-first. Also changes the "What Interests You" group listing to serial order.
 - Green: ReportPresentationServiceImplTest (10, incl. new order test), ReportRenderHarnessTest (4), ReportPdfRenderHarnessTest (2). `contextLoads` still fails without MySQL (pre-existing).
+- Cover tagline now renders uppercase (`.cover-tagline { text-transform: uppercase }`); brand string in `application.properties` unchanged so tests still match "Guiding Minds. Shaping Futures".
+- Dimension group body extracted to `fragments.html :: dimensionGroupSection(g, idx)` (byte-identical move). RIASEC group pulled forward to print right after the R.I.A.S.E.C Analysis pages; the main run skips it. `th:replace` outranks `th:each` on one tag, so both call sites use a `th:block` wrapper.
+- Section 3b renamed "Your Personal Profile" -> "Your Learning Style"; the dynamic synthesis-theme cards replaced by two fixed VARK cards reading `learningStyle` traits (Visual/Auditory, Reading/Writing/Kinesthetic) with percentages. First cut used `traits.?[...][0]` unguarded and blew up on the leaner ReportPdfRenderHarnessTest fixture ("EL1025E: The collection has '0' elements") — block is now gated on all four names being present.
+- Green: 84 tests (`-Dtest='!ExamPortalBackendApplicationTests'`). `contextLoads` still fails without MySQL (pre-existing).
+- QA PDF order check: p5-6 R.I.A.S.E.C Analysis, p7 Your Interest Profile, p8 How to Read, p9 Your Learning Style.
