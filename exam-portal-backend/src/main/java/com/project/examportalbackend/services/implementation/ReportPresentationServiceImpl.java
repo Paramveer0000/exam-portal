@@ -77,11 +77,15 @@ public class ReportPresentationServiceImpl implements ReportPresentationService 
             boolean relative = RELATIVE_SCALE_TYPES.contains(type);
             applyBarWidths(views, relative);
             attachContent(views, relative);
+            // "top" is always strongest-first, even when the group prints in a
+            // fixed order (RIASEC) rather than by score.
+            List<DimensionScoreView> top = new ArrayList<>(views);
+            top.sort(Comparator.comparingDouble(DimensionScoreView::getPercentage).reversed());
             DimensionGroup group = DimensionGroup.of(type,
                     DimensionCategoryCatalog.titleFor(type),
                     DimensionCategoryCatalog.subtitleFor(type),
                     views,
-                    views.subList(0, Math.min(TOP_PER_GROUP, views.size())),
+                    new ArrayList<>(top.subList(0, Math.min(TOP_PER_GROUP, top.size()))),
                     relative);
             group.setIntro(dimensionContentService.categoryIntro(type));
             groups.add(group);
@@ -114,8 +118,17 @@ public class ReportPresentationServiceImpl implements ReportPresentationService 
         for (RiasecRow r : rows) {
             views.add(view(r.getLetter(), "RIASEC", r.getScore() * 10));
         }
-        return ranked(views);
+        // Rank first (rank + the group's "top" stay strongest-first), then print
+        // in Holland order R-I-A-S-E-C, which is how the model is always taught.
+        ranked(views);
+        views.sort(Comparator.comparingInt(v -> {
+            int i = RIASEC_ORDER.indexOf(v.getDimensionCode());
+            return i < 0 ? RIASEC_ORDER.length() : i;
+        }));
+        return views;
     }
+
+    private static final String RIASEC_ORDER = "RIASEC";
 
     /**
      * Builds one view, taking display name and description from the dimensions

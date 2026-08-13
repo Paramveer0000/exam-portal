@@ -256,6 +256,8 @@ public class MentalistReportDto {
     // -- Phase D presentation layer (added, nothing above was removed) ------
     /** Platform logo as a data URL; null renders the wordmark fallback. */
     private String companyLogo;
+    /** Cover artwork as a data URL; null simply omits the image. */
+    private String coverImage;
     private AtAGlance atAGlance;
     /** Published interpretation scale, straight from InterpretationEngine.bandScale(). */
     private List<com.project.examportalbackend.services.InterpretationEngine.BandRange> bandScale;

@@ -177,6 +177,7 @@ public class ReportDataAssemblerImpl implements ReportDataAssembler {
         // Phase D presentation layer: grouping/ordering/labelling of the values
         // already computed above. No score is produced here.
         dto.setCompanyLogo(reportBrandingService.companyLogoDataUrl());
+        dto.setCoverImage(reportBrandingService.coverImageDataUrl());
         dto.setBandScale(interpretationEngine.bandScale());
         List<MentalistReportDto.DimensionGroup> groups =
                 reportPresentationService.buildDimensionGroups(quizResId, psych);

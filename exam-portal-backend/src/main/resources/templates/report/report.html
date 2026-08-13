@@ -71,9 +71,23 @@
   .cover-wordmark { margin: 24mm 0 0; font-size: 26pt; letter-spacing: 3px; color: #16365A; }
   /* Brand block: name is only printed as text when there is no logo image,
      otherwise the logo already carries the wordmark and repeating it looks cheap. */
-  .cover-tagline { margin-top: 4mm; font-size: 11pt; color: #1F6B5E; letter-spacing: 0.6px; }
-  .cover-subtagline { margin-top: 1.5mm; font-size: 8pt; letter-spacing: 2px;
-                      text-transform: uppercase; color: #8A97A6; }
+  /* Both brand lines are highlighted: bold type on a tinted band, so they read
+     as one deliberate lockup rather than fading into the cover whitespace. */
+  .cover-band-row { text-align: center; margin-top: 4mm; }
+  .cover-tagline { font-size: 11pt; color: #16365A; letter-spacing: 0.6px;
+                   font-weight: bold; display: inline-block; white-space: nowrap;
+                   background: #D9EDE7; padding: 1.8mm 7mm; }
+  .cover-subtagline { font-size: 8pt; letter-spacing: 2px;
+                      text-transform: uppercase; color: #16365A; font-weight: bold;
+                      display: inline-block; white-space: nowrap;
+                      background: #E8ECF3; padding: 1.5mm 7mm; }
+  /* Artwork plate: a dark image needs a frame or it reads as a hole punched in
+     the page. Navy keyline + tinted mat + caption band tie it to the brand. */
+  .cover-art-plate { width: 140mm; margin: 9mm auto 0; background: #16365A;
+                     padding: 2mm 0 0; }
+  .cover-art { display: block; width: 136mm; height: auto; margin: 0 auto; }
+  .cover-art-caption { font-size: 7.5pt; letter-spacing: 1.6px; text-transform: uppercase;
+                       color: #FFFFFF; padding: 2.4mm 0; text-align: center; }
   /* Short centred divider, a lighter separator than a full rule */
   .cover-div { width: 26mm; height: 0.7mm; background: #1F6B5E; margin: 9mm auto 0; }
   .cover h1 { font-size: 23pt; line-height: 1.28; letter-spacing: 1px; margin-top: 8mm; }
@@ -527,27 +541,27 @@
   <div class="cover-wordmark" th:unless="${companyLogo}"
        th:text="${brand.name} ?: 'THE MENTALIST'">THE MENTALIST</div>
 
-  <div class="cover-tagline" th:if="${brand.tagline}" th:text="${brand.tagline}">Guiding Minds. Shaping Futures</div>
-  <div class="cover-subtagline" th:if="${brand.subTagline}" th:text="${brand.subTagline}">Empowering the New Generation</div>
+  <!-- Each band needs its own block line, otherwise the two inline-block
+       highlights sit side by side and the first one wraps. -->
+  <div class="cover-band-row" th:if="${brand.tagline}">
+    <span class="cover-tagline" th:text="${brand.tagline}">Guiding Minds. Shaping Futures</span>
+  </div>
+  <div class="cover-band-row" th:if="${brand.subTagline}">
+    <span class="cover-subtagline" th:text="${brand.subTagline}">Empowering the New Generation</span>
+  </div>
 
   <div class="cover-div"></div>
 
   <h1 th:text="${reportTitle}">PSYCHOMETRIC &amp; MENTAL SKILL ASSESSMENT REPORT</h1>
   <div class="quote">&#8220;Understanding Your Strengths,<br/>Interests &amp; Growth Potential&#8221;</div>
 
-  <div class="cover-meta">
-    <table>
-      <tr>
-        <td><div class="k">Prepared For</div><div class="v" th:text="${profile.studentName} ?: '-'">Student Name</div></td>
-        <td th:if="${profile.className}"><div class="k">Class</div><div class="v" th:text="${profile.className}">-</div></td>
-        <td th:if="${assessmentDate}"><div class="k">Assessment Date</div><div class="v" th:text="${assessmentDate}">-</div></td>
-        <td><div class="k">Report ID</div><div class="v" th:text="${reportNumber}">-</div></td>
-      </tr>
-    </table>
+  <!-- Cover artwork, framed as a plate with a caption so it reads as part of
+       the design. Student/class/date/report-id are not repeated here: they
+       already open the "Report at a Glance" section on the next page. -->
+  <div class="cover-art-plate" th:if="${coverImage}">
+    <img class="cover-art" th:src="${coverImage}" alt=""/>
+    <div class="cover-art-caption">Every question is the start of a direction</div>
   </div>
-
-  <div class="programme" th:if="${profile.subjectName}" th:text="${profile.subjectName}">Assessment</div>
-  <div class="confidential">Confidential Student Report</div>
 
   <!-- Hidden entirely when no contact channel is configured -->
   <div class="cover-contact" th:if="${brand.hasContact}">
@@ -580,6 +594,8 @@
         <td><div class="small muted">STUDENT</div><div style="font-weight:bold;" th:text="${profile.studentName} ?: '-'">-</div></td>
         <td><div class="small muted">CLASS</div><div style="font-weight:bold;" th:text="${profile.className} ?: '-'">-</div></td>
         <td><div class="small muted">ASSESSMENT DATE</div><div style="font-weight:bold;" th:text="${assessmentDate} ?: '-'">-</div></td>
+        <!-- Report ID moved off the cover; it belongs with the identifying row. -->
+        <td><div class="small muted">REPORT ID</div><div style="font-weight:bold;" th:text="${reportNumber} ?: '-'">-</div></td>
       </tr>
     </table>
   </div>
@@ -623,7 +639,121 @@
   </table>
 </div>
 
-<!-- ==================== 2b. MESSAGE TO PARENTS ====================
+<!-- ==================== 2b. R.I.A.S.E.C ANALYSIS ====================
+     Holland-model read-out of the RIASEC dimension group, placed right after
+     the executive summary because the interest types frame everything that
+     follows. The scores are the same ones the dimension group section prints
+     later; nothing is recomputed here. Types are listed in theory order
+     (R I A S E C) with fixed descriptive copy. The whole section disappears
+     when the assessment carried no RIASEC dimensions. -->
+<div th:with="rgs=${dimensionGroups == null} ? null : ${dimensionGroups.?[type == 'RIASEC']}">
+<div th:if="${rgs != null and !rgs.isEmpty()}" th:with="rg=${rgs[0]}" class="section thm-amber">
+  <div class="section-head">
+    <div class="eyebrow">Your Interest Types</div>
+    <h2>R.I.A.S.E.C Analysis</h2>
+  </div>
+
+  <p class="lead">Holland Codes describe six interest types &#8212; Realistic, Investigative, Artistic,
+     Social, Enterprising and Conventional. Most people are a blend of several. Recognising your leading
+     types helps you understand which kinds of work and study are likely to feel natural to you.</p>
+
+  <!-- Score summary, two per row, in theory order -->
+  <table class="two">
+    <tr>
+      <td th:each="col : ${#numbers.sequence(0, 1)}">
+        <div th:each="d,di : ${rg.dimensions.?[dimensionCode != null]}" th:if="${di.index % 2 == col}"
+             class="rsum">
+          <table>
+            <tr>
+              <td style="width:32mm;">
+                <span class="rtag" th:classappend="'ri-' + ${d.dimensionCode}" th:text="${d.dimensionName}">Type</span>
+              </td>
+              <td class="rval" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <div class="domain" style="margin-top:2mm;" th:if="${rg.top != null and !rg.top.isEmpty()}">
+    <div class="dlabel">Domain Code</div>
+    <div class="dcode">
+      <span th:each="t,ti : ${rg.top}" th:if="${ti.index &lt; 3}">
+        <span th:text="${t.dimensionCode}">R</span>&#160;(<span th:text="${t.dimensionName}">Realistic</span>)<span th:if="${ti.index &lt; 2 and ti.index &lt; rg.top.size() - 1}">&#160;&#183;&#160;</span>
+      </span>
+    </div>
+    <p class="small muted" style="margin:2mm 0 0;">Your three leading interest types, strongest first.</p>
+  </div>
+
+  <!-- The six types. Copy is fixed theory, identical in every report, so it is
+       held in this map rather than in the content JSON (which holds per-report
+       wording). Keys are the seeded dimension codes from V26. -->
+  <div class="subhead">The Six Interest Types</div>
+  <div th:with="rt=${ {
+        'R' : {'per':'Realistic types tend to be practical, genuine and hands-on. They like action and visible results.',
+               'val':'Common sense, pragmatism and effort.',
+               'apt':'Dexterity, comfort with technical tasks, mechanical reasoning and physical stamina.',
+               'lrn':'Learns through a concrete, practical approach by applying examples.',
+               'env':'Settings that allow concrete results, technical equipment or work on site.'},
+        'I' : {'per':'Investigative types tend to be curious about everything. They are precise, intellectual and have a scientific mindset.',
+               'val':'Intellectual curiosity, critical thinking and logic.',
+               'apt':'Research, logical reasoning, learning and analytical capability.',
+               'lrn':'Learns by theory and systematic research.',
+               'env':'Changing, thought-oriented settings that favour expertise over speed.'},
+        'A' : {'per':'Artistic types tend to be intuitive, creative, idealistic and independent. They are attuned to art and aesthetics.',
+               'val':'Beauty, originality, imagination and freedom.',
+               'apt':'Creativity, artistic expression and intuition.',
+               'lrn':'Learns by intuition and by experimenting.',
+               'env':'Nonconformist settings with informal communication that require creativity.'},
+        'S' : {'per':'Social types are generally patient, understanding and attentive to others. They tend to be kind, warm and welcoming.',
+               'val':'Altruism, cooperation and generosity.',
+               'apt':'Empathy, listening and communication.',
+               'lrn':'Learns by sharing with others and by working as a team.',
+               'env':'Social settings that encourage personal contact and collaboration.'},
+        'E' : {'per':'Enterprising types tend to be open, dynamic, assertive and entrepreneurial.',
+               'val':'Initiative, status and healthy competition.',
+               'apt':'Initiative, and the ability to lead and motivate others.',
+               'lrn':'Learns by doing and by putting themselves into the action.',
+               'env':'Competitive settings where they can take initiative and move quickly.'},
+        'C' : {'per':'Conventional types tend to be meticulous, organised and methodical, and rather reserved.',
+               'val':'Accuracy, stability and efficiency.',
+               'apt':'Data analysis, attention to detail and the ability to work with numbers.',
+               'lrn':'Learns by following rules, instructions and established procedures.',
+               'env':'Structured settings where rules and procedures are clearly defined.'}
+      } }">
+    <div th:each="d : ${rg.dimensions}" th:if="${rt.containsKey(d.dimensionCode)}"
+         class="rcard" th:classappend="'ri-' + ${d.dimensionCode}"
+         th:with="c=${rt[d.dimensionCode]}">
+      <table>
+        <tr>
+          <td class="rl">
+            <div class="letter" th:text="${d.dimensionCode}">R</div>
+            <div class="rname" th:text="${d.dimensionName}">Realistic</div>
+          </td>
+          <td>
+            <div class="rbody">
+              <div class="rsc" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</div>
+              <ul class="tight">
+                <li><strong>Personality. </strong><span th:text="${c.per}">-</span></li>
+                <li><strong>Values. </strong><span th:text="${c.val}">-</span></li>
+                <li><strong>Potential aptitudes. </strong><span th:text="${c.apt}">-</span></li>
+                <li><strong>Learning style. </strong><span th:text="${c.lrn}">-</span></li>
+                <li><strong>Environment. </strong><span th:text="${c.env}">-</span></li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <p class="small muted" style="margin-top:3mm;">These types describe preferences, not ability. A lower
+     score simply means that kind of work appeals to you less at the moment.</p>
+</div>
+</div>
+
+<!-- ==================== 2c. MESSAGE TO PARENTS ====================
      Fixed editorial copy supplied by the client, not generated content: it is
      the same letter in every report, so it lives in the template rather than
      in report-content.json (which holds per-report variable copy). Only the
@@ -897,118 +1027,6 @@
   </div>
 </div>
 
-<!-- ==================== 4b. R.I.A.S.E.C ANALYSIS ====================
-     Holland-model read-out of the RIASEC dimension group. The scores are the
-     ones the group section already printed; nothing is recomputed here. The
-     letters are only re-presented in theory order (R I A S E C) with the fixed
-     descriptive copy for each type. The whole section disappears when the
-     assessment carried no RIASEC dimensions. -->
-<div th:with="rgs=${dimensionGroups == null} ? null : ${dimensionGroups.?[type == 'RIASEC']}">
-<div th:if="${rgs != null and !rgs.isEmpty()}" th:with="rg=${rgs[0]}" class="section thm-amber">
-  <div class="section-head">
-    <div class="eyebrow">Your Interest Types</div>
-    <h2>R.I.A.S.E.C Analysis</h2>
-  </div>
-
-  <p class="lead">Holland Codes describe six interest types &#8212; Realistic, Investigative, Artistic,
-     Social, Enterprising and Conventional. Most people are a blend of several. Recognising your leading
-     types helps you understand which kinds of work and study are likely to feel natural to you.</p>
-
-  <!-- Score summary, two per row, in theory order -->
-  <table class="two">
-    <tr>
-      <td th:each="col : ${#numbers.sequence(0, 1)}">
-        <div th:each="d,di : ${rg.dimensions.?[dimensionCode != null]}" th:if="${di.index % 2 == col}"
-             class="rsum">
-          <table>
-            <tr>
-              <td style="width:32mm;">
-                <span class="rtag" th:classappend="'ri-' + ${d.dimensionCode}" th:text="${d.dimensionName}">Type</span>
-              </td>
-              <td class="rval" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</td>
-            </tr>
-          </table>
-        </div>
-      </td>
-    </tr>
-  </table>
-
-  <div class="domain" style="margin-top:2mm;" th:if="${rg.top != null and !rg.top.isEmpty()}">
-    <div class="dlabel">Domain Code</div>
-    <div class="dcode">
-      <span th:each="t,ti : ${rg.top}" th:if="${ti.index &lt; 3}">
-        <span th:text="${t.dimensionCode}">R</span>&#160;(<span th:text="${t.dimensionName}">Realistic</span>)<span th:if="${ti.index &lt; 2 and ti.index &lt; rg.top.size() - 1}">&#160;&#183;&#160;</span>
-      </span>
-    </div>
-    <p class="small muted" style="margin:2mm 0 0;">Your three leading interest types, strongest first.</p>
-  </div>
-
-  <!-- The six types. Copy is fixed theory, identical in every report, so it is
-       held in this map rather than in the content JSON (which holds per-report
-       wording). Keys are the seeded dimension codes from V26. -->
-  <div class="subhead">The Six Interest Types</div>
-  <div th:with="rt=${ {
-        'R' : {'per':'Realistic types tend to be practical, genuine and hands-on. They like action and visible results.',
-               'val':'Common sense, pragmatism and effort.',
-               'apt':'Dexterity, comfort with technical tasks, mechanical reasoning and physical stamina.',
-               'lrn':'Learns through a concrete, practical approach by applying examples.',
-               'env':'Settings that allow concrete results, technical equipment or work on site.'},
-        'I' : {'per':'Investigative types tend to be curious about everything. They are precise, intellectual and have a scientific mindset.',
-               'val':'Intellectual curiosity, critical thinking and logic.',
-               'apt':'Research, logical reasoning, learning and analytical capability.',
-               'lrn':'Learns by theory and systematic research.',
-               'env':'Changing, thought-oriented settings that favour expertise over speed.'},
-        'A' : {'per':'Artistic types tend to be intuitive, creative, idealistic and independent. They are attuned to art and aesthetics.',
-               'val':'Beauty, originality, imagination and freedom.',
-               'apt':'Creativity, artistic expression and intuition.',
-               'lrn':'Learns by intuition and by experimenting.',
-               'env':'Nonconformist settings with informal communication that require creativity.'},
-        'S' : {'per':'Social types are generally patient, understanding and attentive to others. They tend to be kind, warm and welcoming.',
-               'val':'Altruism, cooperation and generosity.',
-               'apt':'Empathy, listening and communication.',
-               'lrn':'Learns by sharing with others and by working as a team.',
-               'env':'Social settings that encourage personal contact and collaboration.'},
-        'E' : {'per':'Enterprising types tend to be open, dynamic, assertive and entrepreneurial.',
-               'val':'Initiative, status and healthy competition.',
-               'apt':'Initiative, and the ability to lead and motivate others.',
-               'lrn':'Learns by doing and by putting themselves into the action.',
-               'env':'Competitive settings where they can take initiative and move quickly.'},
-        'C' : {'per':'Conventional types tend to be meticulous, organised and methodical, and rather reserved.',
-               'val':'Accuracy, stability and efficiency.',
-               'apt':'Data analysis, attention to detail and the ability to work with numbers.',
-               'lrn':'Learns by following rules, instructions and established procedures.',
-               'env':'Structured settings where rules and procedures are clearly defined.'}
-      } }">
-    <div th:each="d : ${rg.dimensions}" th:if="${rt.containsKey(d.dimensionCode)}"
-         class="rcard" th:classappend="'ri-' + ${d.dimensionCode}"
-         th:with="c=${rt[d.dimensionCode]}">
-      <table>
-        <tr>
-          <td class="rl">
-            <div class="letter" th:text="${d.dimensionCode}">R</div>
-            <div class="rname" th:text="${d.dimensionName}">Realistic</div>
-          </td>
-          <td>
-            <div class="rbody">
-              <div class="rsc" th:text="${#numbers.formatDecimal(d.percentage, 1, 0)} + '%'">0%</div>
-              <ul class="tight">
-                <li><strong>Personality. </strong><span th:text="${c.per}">-</span></li>
-                <li><strong>Values. </strong><span th:text="${c.val}">-</span></li>
-                <li><strong>Potential aptitudes. </strong><span th:text="${c.apt}">-</span></li>
-                <li><strong>Learning style. </strong><span th:text="${c.lrn}">-</span></li>
-                <li><strong>Environment. </strong><span th:text="${c.env}">-</span></li>
-              </ul>
-            </div>
-          </td>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <p class="small muted" style="margin-top:3mm;">These types describe preferences, not ability. A lower
-     score simply means that kind of work appeals to you less at the moment.</p>
-</div>
-</div>
 
 <!-- ============ 5. LEGACY TRAIT SECTIONS (personality / behaviour / wellness / learning style) ============ -->
 <!-- Each passes a different `variant` so these six pages read as distinct

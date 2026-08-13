@@ -13,4 +13,10 @@ public interface ReportBrandingService {
      * text wordmark instead of a broken image).
      */
     String companyLogoDataUrl();
+
+    /**
+     * Cover artwork as a {@code data:} URL, or null when no artwork is bundled
+     * (the cover then simply omits the image).
+     */
+    String coverImageDataUrl();
 }

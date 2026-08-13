@@ -66,6 +66,7 @@ public class PdfReportServiceImpl implements PdfReportService {
         ctx.setVariable("counsellorSummary", dto.getCounsellorSummary());
         // Phase D presentation layer
         ctx.setVariable("companyLogo", dto.getCompanyLogo());
+        ctx.setVariable("coverImage", dto.getCoverImage());
         // Company details for the cover/footer. Blank fields are hidden by the
         // template rather than printed, so a partial brand block still reads well.
         ctx.setVariable("brand", brand != null ? brand : FALLBACK_BRAND);
