@@ -3,6 +3,7 @@ package com.project.examportalbackend.services.implementation;
 import com.project.examportalbackend.dto.MentalistReportDto;
 import com.project.examportalbackend.models.MentalistReport;
 import com.project.examportalbackend.repository.MentalistReportRepository;
+import com.project.examportalbackend.security.AuthFacade;
 import com.project.examportalbackend.services.MentalistReportService;
 import com.project.examportalbackend.services.PdfReportService;
 import com.project.examportalbackend.services.PsychometricReportService;
@@ -27,17 +28,20 @@ public class MentalistReportServiceImpl implements MentalistReportService {
     @Autowired private PdfReportService pdfReportService;
     @Autowired private MentalistReportRepository mentalistReportRepository;
     @Autowired private PsychometricReportService psychometricReportService;
+    @Autowired private AuthFacade authFacade;
 
     @Value("${mentalist.reports.dir}")
     private String reportsDir;
 
     @Override
     public MentalistReportDto preview(Long quizResId) {
+        requireSuperAdmin();
         return reportDataAssembler.assemble(quizResId);
     }
 
     @Override
     public MentalistReportDto generate(Long quizResId, String counsellorName, String counsellorRemarks, boolean regenerate) {
+        requireSuperAdmin();
         MentalistReport row = mentalistReportRepository.findByQuizResId(quizResId);
         boolean isNew = row == null;
         if (isNew) {
@@ -91,6 +95,13 @@ public class MentalistReportServiceImpl implements MentalistReportService {
             return file.toAbsolutePath().toString();
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to store generated report");
+        }
+    }
+
+    private void requireSuperAdmin() {
+        if (!authFacade.isSuperAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only a super admin may create or rebuild reports");
         }
     }
 }

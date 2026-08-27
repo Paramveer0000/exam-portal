@@ -40,6 +40,16 @@ const PsychometricReportPage = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState(null);
+  const currentUser = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch (_) {
+      return null;
+    }
+  })();
+  const isSuperAdmin = !!currentUser?.roles?.some(
+    (role) => role.roleName === "SUPER_ADMIN"
+  );
 
   const generateAi = (regenerate = false) => {
     setAiLoading(true);
@@ -56,28 +66,20 @@ const PsychometricReportPage = () => {
       });
   };
 
-  // Download only appears once the AI narrative exists. Generates the
-  // 15-page PDF server-side (or reuses the previously generated one) then
-  // saves it via the browser.
+  // Super admins prepare the PDF; schools and students can only download the
+  // stored premium report after it has been issued.
   // The server keeps the first PDF it rendered for an attempt so an issued
   // report stays reproducible. That also means a plain download can never pick
   // up a newer report layout, so `regenerate` is the explicit opt-in to
   // re-render this attempt from the current template.
-  const downloadPdf = async (regenerate = false) => {
-    setPdfLoading(true);
-    setPdfError(null);
-    const gen = await mentalistReportServices.generateReport(quizResId, { regenerate });
-    if (!gen.data) {
-      setPdfLoading(false);
-      setPdfError(gen.error || "Could not generate the report");
-      return;
-    }
+  const savePdf = async () => {
     const { blob, error } = await mentalistReportServices.downloadReport(quizResId);
-    setPdfLoading(false);
     if (!blob) {
+      setPdfLoading(false);
       setPdfError(error || "Could not download the report");
       return;
     }
+    setPdfLoading(false);
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -86,6 +88,24 @@ const PsychometricReportPage = () => {
     link.click();
     link.remove();
     window.URL.revokeObjectURL(url);
+  };
+
+  const downloadStoredPdf = async () => {
+    setPdfLoading(true);
+    setPdfError(null);
+    await savePdf();
+  };
+
+  const prepareAndDownloadPdf = async (regenerate = false) => {
+    setPdfLoading(true);
+    setPdfError(null);
+    const gen = await mentalistReportServices.generateReport(quizResId, { regenerate });
+    if (!gen.data) {
+      setPdfLoading(false);
+      setPdfError(gen.error || "Could not generate the report");
+      return;
+    }
+    await savePdf();
   };
 
   useEffect(() => {
@@ -129,11 +149,25 @@ const PsychometricReportPage = () => {
       </div>
 
       <div className="psychReport__actions">
-        {aiSummary && !aiSummary.startsWith("__error__:") ? (
+        {!isSuperAdmin ? (
+          <Button
+            variant="success"
+            onClick={downloadStoredPdf}
+            disabled={pdfLoading}
+          >
+            {pdfLoading ? (
+              <>
+                <Spinner as="span" size="sm" animation="border" /> Downloading PDF…
+              </>
+            ) : (
+              "Download The Mentalist Report (PDF)"
+            )}
+          </Button>
+        ) : aiSummary && !aiSummary.startsWith("__error__:") ? (
           <>
             <Button
               variant="success"
-              onClick={() => downloadPdf(false)}
+              onClick={() => prepareAndDownloadPdf(false)}
               disabled={pdfLoading}
             >
               {pdfLoading ? (
@@ -150,7 +184,7 @@ const PsychometricReportPage = () => {
             <Button
               variant="outline-secondary"
               className="ms-2"
-              onClick={() => downloadPdf(true)}
+              onClick={() => prepareAndDownloadPdf(true)}
               disabled={pdfLoading}
               title="Re-create the PDF using the latest report design. Scores are unchanged."
             >

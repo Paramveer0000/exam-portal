@@ -230,8 +230,8 @@ const SuperAdminAiSettingsPage = () => {
 
         <h4>AI Settings</h4>
         <p className="text-muted">
-          One platform-wide LLM key powers the "Generate AI Report" feature for
-          every school. Uses an OpenAI-compatible chat API. The key is stored
+          One platform-wide LLM key lets super admins prepare premium AI reports
+          for schools. Uses an OpenAI-compatible chat API. The key is stored
           securely on the server and never shown again after saving.
         </p>
         {!loaded ? (

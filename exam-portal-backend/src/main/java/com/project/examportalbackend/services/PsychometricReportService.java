@@ -17,8 +17,8 @@ public interface PsychometricReportService {
     PsychometricReportDto getReport(Long quizResId);
 
     /**
-     * LLM narrative for a report (same ownership scoping). Cached after first
-     * generation; {@code regenerate} forces a fresh call.
+     * SUPER_ADMIN-only LLM narrative generation. The result is cached after
+     * the first generation.
      */
     String getAiSummary(Long quizResId, boolean regenerate);
 }

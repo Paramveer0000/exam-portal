@@ -33,6 +33,15 @@ public class RefreshTokenService {
      */
     @Transactional
     public RefreshToken createRefreshToken(Long userId, boolean singleSession) {
+        return createRefreshToken(userId, singleSession, null);
+    }
+
+    @Transactional
+    public RefreshToken createImpersonationRefreshToken(Long userId, Long impersonatorId) {
+        return createRefreshToken(userId, false, impersonatorId);
+    }
+
+    private RefreshToken createRefreshToken(Long userId, boolean singleSession, Long impersonatorId) {
         if (singleSession) {
             revokeAllTokensForUser(userId);
         }
@@ -40,6 +49,7 @@ public class RefreshTokenService {
         RefreshToken rt = new RefreshToken();
         rt.setToken(hash(raw));
         rt.setUserId(userId);
+        rt.setImpersonatorId(impersonatorId);
         rt.setCreatedAt(LocalDateTime.now());
         rt.setExpiresAt(LocalDateTime.now().plusDays(expiryDays));
         rt.setRevoked(false);
@@ -72,6 +82,7 @@ public class RefreshTokenService {
         RefreshToken fresh = new RefreshToken();
         fresh.setToken(hash(raw));
         fresh.setUserId(existing.getUserId());
+        fresh.setImpersonatorId(existing.getImpersonatorId());
         fresh.setCreatedAt(LocalDateTime.now());
         fresh.setExpiresAt(LocalDateTime.now().plusDays(expiryDays));
         fresh.setRevoked(false);

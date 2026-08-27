@@ -50,6 +50,7 @@ api.interceptors.response.use(
         processQueue(refreshError);
         // Refresh failed: session expired. Clear state and redirect.
         localStorage.removeItem("user");
+        localStorage.removeItem("impersonatorBackup");
         // Dispatch a custom event so Redux can react.
         window.dispatchEvent(new Event("auth:session-expired"));
         if (

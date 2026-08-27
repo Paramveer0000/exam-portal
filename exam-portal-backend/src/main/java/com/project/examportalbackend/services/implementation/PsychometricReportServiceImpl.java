@@ -373,6 +373,10 @@ public class PsychometricReportServiceImpl implements PsychometricReportService 
 
     @Override
     public String getAiSummary(Long quizResId, boolean regenerate) {
+        if (!authFacade.isSuperAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Only a super admin may prepare AI reports");
+        }
         // getReport() enforces the same ownership scoping and gives us the
         // already-computed profile to feed the model.
         PsychometricReportDto dto = getReport(quizResId);

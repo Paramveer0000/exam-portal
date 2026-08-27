@@ -120,15 +120,18 @@ public class AdminController {
     public ResponseEntity<?> stopImpersonation(javax.servlet.http.HttpServletRequest request,
                                                javax.servlet.http.HttpServletResponse response) {
         Long impersonatorId = null;
+        String impersonatedRefreshToken = null;
         if (request.getCookies() != null) {
             for (javax.servlet.http.Cookie cookie : request.getCookies()) {
                 if (com.project.examportalbackend.security.CookieUtil.ACCESS_TOKEN_COOKIE.equals(cookie.getName())) {
                     impersonatorId = jwtUtil.extractImpersonatorId(cookie.getValue());
-                    break;
+                } else if (com.project.examportalbackend.security.CookieUtil.REFRESH_TOKEN_COOKIE.equals(cookie.getName())) {
+                    impersonatedRefreshToken = cookie.getValue();
                 }
             }
         }
-        return ResponseEntity.ok(adminService.stopImpersonation(impersonatorId, response));
+        return ResponseEntity.ok(adminService.stopImpersonation(
+                impersonatorId, impersonatedRefreshToken, response));
     }
 
     // --- Legacy ownership reassignment ---
