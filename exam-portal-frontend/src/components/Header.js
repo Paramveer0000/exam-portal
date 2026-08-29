@@ -8,6 +8,8 @@ import adminServices from "../services/adminServices";
 import { homePathForRoles } from "./ProtectedRoute";
 import { logout } from "../actions/authActions";
 import useTheme, { logoForTheme } from "../hooks/useTheme";
+import swal from "sweetalert";
+import * as authConstants from "../constants/authConstants";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -16,6 +18,7 @@ const Header = () => {
   const loginReducer = useSelector((state) => state.loginReducer);
   const [isLoggedIn, setIsLoggedIn] = useState(loginReducer.loggedIn);
   const [companyLogo, setCompanyLogo] = useState(null);
+  const [returningToSuperAdmin, setReturningToSuperAdmin] = useState(false);
   const theme = useTheme();
 
   const isImpersonating = !!localStorage.getItem("impersonatorBackup");
@@ -45,15 +48,35 @@ const Header = () => {
   };
 
   const returnToSuperAdmin = async () => {
-    const backup = JSON.parse(localStorage.getItem("impersonatorBackup"));
-    if (backup) {
-      const { data } = await adminServices.stopImpersonation();
-      if (data) {
-        localStorage.setItem("user", JSON.stringify(data.user));
-      }
-      localStorage.removeItem("impersonatorBackup");
+    if (returningToSuperAdmin) return;
+    let backup;
+    try {
+      backup = JSON.parse(localStorage.getItem("impersonatorBackup"));
+    } catch (_) {
+      backup = null;
     }
-    window.location.href = "/superadmin";
+    if (!backup) {
+      localStorage.removeItem("impersonatorBackup");
+      await swal("Could not return", "Session recovery data is missing. Please sign in again.", "error");
+      return;
+    }
+
+    setReturningToSuperAdmin(true);
+    const { data, error } = await adminServices.stopImpersonation();
+    if (!data || !data.user) {
+      setReturningToSuperAdmin(false);
+      await swal(
+        "Could not return",
+        error || "Could not restore the super-admin session",
+        "error"
+      );
+      return;
+    }
+
+    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.removeItem("impersonatorBackup");
+    dispatch({ type: authConstants.USER_LOGIN_SUCCESS, payload: data.user });
+    navigate("/superadmin", { replace: true });
   };
 
   useEffect(() => {
@@ -115,9 +138,10 @@ const Header = () => {
               {isImpersonating && (
                 <Nav.Link
                   onClick={returnToSuperAdmin}
+                  disabled={returningToSuperAdmin}
                   style={{ color: "#ffc107", fontWeight: 600 }}
                 >
-                  ← Return to Super Admin
+                  {returningToSuperAdmin ? "Returning…" : "← Return to Super Admin"}
                 </Nav.Link>
               )}
               {isLoggedIn ? (

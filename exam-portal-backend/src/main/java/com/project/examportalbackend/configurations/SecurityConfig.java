@@ -151,11 +151,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/quizResult/**").hasAnyAuthority("USER", "ADMIN")
 
                 .antMatchers(HttpMethod.GET, "/api/psychometric-report/**").hasAnyAuthority("USER", "ADMIN")
-                .antMatchers(HttpMethod.POST, "/api/psychometric-report/**").hasAnyAuthority("USER", "ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/psychometric-report/**").hasAuthority("SUPER_ADMIN")
 
                 // The Mentalist PDF report: same ownership scoping as psychometric-report.
-                .antMatchers(HttpMethod.GET, "/api/mentalist-report/**").hasAnyAuthority("USER", "ADMIN")
-                .antMatchers(HttpMethod.POST, "/api/mentalist-report/**").hasAnyAuthority("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/mentalist-report/*/download").hasAnyAuthority("USER", "ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/mentalist-report/*").hasAuthority("SUPER_ADMIN")
+                .antMatchers(HttpMethod.POST, "/api/mentalist-report/**").hasAuthority("SUPER_ADMIN")
 
                 .anyRequest().denyAll()
                 .and()

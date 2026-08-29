@@ -114,8 +114,11 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findById(newRefreshToken.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
-        // Issue new access token.
-        String accessToken = jwtUtil.generateToken(user);
+        // Keep the signed original-super-admin claim across automatic refreshes.
+        // Normal sessions have a null impersonatorId and follow the old path.
+        String accessToken = newRefreshToken.getImpersonatorId() == null
+                ? jwtUtil.generateToken(user)
+                : jwtUtil.generateImpersonationToken(user, newRefreshToken.getImpersonatorId());
         int accessMaxAge = (int) (jwtUtil.getAccessTokenValidityMs() / 1000);
         cookieUtil.addAccessTokenCookie(response, accessToken, accessMaxAge);
 

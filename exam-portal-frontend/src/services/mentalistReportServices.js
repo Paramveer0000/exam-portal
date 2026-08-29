@@ -26,7 +26,12 @@ const downloadReport = async (quizResId) => {
     });
     return { blob: response.data, error: null };
   } catch (error) {
-    return { blob: null, error: "Could not download the report" };
+    return {
+      blob: null,
+      error: error.response?.status === 404
+        ? "Report not prepared yet."
+        : "Could not download the report",
+    };
   }
 };
 

@@ -29,6 +29,10 @@ public class RefreshToken {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    // Present only while a SUPER_ADMIN is impersonating another account.
+    @Column(name = "impersonator_id")
+    private Long impersonatorId;
+
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 

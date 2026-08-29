@@ -325,7 +325,8 @@ public class AdminServiceImpl implements AdminService {
         int accessMaxAge = (int) (jwtUtil.getAccessTokenValidityMs() / 1000);
         cookieUtil.addAccessTokenCookie(response, accessToken, accessMaxAge);
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(target.getUserId(), false);
+        RefreshToken refreshToken = refreshTokenService.createImpersonationRefreshToken(
+                target.getUserId(), authFacade.getCurrentUserId());
         int refreshMaxAge = refreshTokenService.getExpiryDays() * 24 * 60 * 60;
         cookieUtil.addRefreshTokenCookie(response, refreshToken.getRawToken(), refreshMaxAge);
 
@@ -333,7 +334,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public LoginResponse stopImpersonation(Long impersonatorId, javax.servlet.http.HttpServletResponse response) {
+    public LoginResponse stopImpersonation(Long impersonatorId, String impersonatedRefreshToken,
+                                           javax.servlet.http.HttpServletResponse response) {
         // impersonatorId is read by the controller from the CURRENT session's own
         // JWT claim, never from client-supplied input -- a request body/param id
         // can be forged to name any user, so it must never be trusted for this.
@@ -353,6 +355,9 @@ public class AdminServiceImpl implements AdminService {
         cookieUtil.addAccessTokenCookie(response, accessToken, accessMaxAge);
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(original.getUserId(), false);
+        if (impersonatedRefreshToken != null && !impersonatedRefreshToken.isBlank()) {
+            refreshTokenService.revokeToken(impersonatedRefreshToken);
+        }
         int refreshMaxAge = refreshTokenService.getExpiryDays() * 24 * 60 * 60;
         cookieUtil.addRefreshTokenCookie(response, refreshToken.getRawToken(), refreshMaxAge);
 

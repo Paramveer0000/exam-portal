@@ -70,6 +70,7 @@ const logout = async () => {
     // Logout best-effort; clear client state regardless.
   }
   localStorage.removeItem("user");
+  localStorage.removeItem("impersonatorBackup");
 };
 
 const refreshSession = async () => {

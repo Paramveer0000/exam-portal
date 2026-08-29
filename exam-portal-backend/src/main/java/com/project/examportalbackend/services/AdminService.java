@@ -45,7 +45,8 @@ public interface AdminService {
 
     LoginResponse impersonate(Long adminId, javax.servlet.http.HttpServletResponse response);
 
-    LoginResponse stopImpersonation(Long impersonatorId, javax.servlet.http.HttpServletResponse response);
+    LoginResponse stopImpersonation(Long impersonatorId, String impersonatedRefreshToken,
+                                    javax.servlet.http.HttpServletResponse response);
 
     /** All quiz results grouped by school (partner) then student. */
     List<com.project.examportalbackend.dto.SchoolResultsDto> getResultsBySchool();
