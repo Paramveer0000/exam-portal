@@ -153,9 +153,7 @@ const Header = () => {
               )}
 
               {isLoggedIn ? (
-                <LinkContainer to="/login">
-                  <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
-                </LinkContainer>
+                <Nav.Link onClick={logoutHandler}>Logout</Nav.Link>
               ) : (
                 <LinkContainer to="/register">
                   <Nav.Link>Register</Nav.Link>
