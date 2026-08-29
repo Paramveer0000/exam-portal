@@ -1,10 +1,11 @@
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useDispatch, useSelector } from "react-redux";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import swal from "sweetalert";
 import adminServices from "../services/adminServices";
 import platformServices from "../services/platformServices";
+import { logout } from "../actions/authActions";
 import Header from "./Header";
 
 jest.mock("react-redux", () => ({ useDispatch: jest.fn(), useSelector: jest.fn() }));
@@ -34,6 +35,33 @@ beforeEach(() => {
 afterEach(() => {
   jest.clearAllMocks();
   localStorage.clear();
+});
+
+const CurrentPath = () => <output data-testid="current-path">{useLocation().pathname}</output>;
+
+test("logout waits to navigate until the session has been cleared", async () => {
+  let finishLogout;
+  const logoutPromise = new Promise((resolve) => {
+    finishLogout = resolve;
+  });
+  logout.mockReturnValue(logoutPromise);
+
+  render(
+    <MemoryRouter initialEntries={["/psychometricReport/42"]}>
+      <Header />
+      <CurrentPath />
+    </MemoryRouter>
+  );
+
+  fireEvent.click(screen.getByText("Logout"));
+
+  expect(screen.getByTestId("current-path")).toHaveTextContent("/psychometricReport/42");
+
+  finishLogout();
+
+  await waitFor(() =>
+    expect(screen.getByTestId("current-path")).toHaveTextContent("/login")
+  );
 });
 
 test("failed return keeps recovery state and explains the failure", async () => {
