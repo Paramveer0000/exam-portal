@@ -6,6 +6,7 @@ import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import { fetchPsychReport } from "../../actions/psychometricReportActions";
 import aiServices from "../../services/aiServices";
+import authServices from "../../services/authServices";
 import mentalistReportServices from "../../services/mentalistReportServices";
 import "./PsychometricReportPage.css";
 
@@ -40,16 +41,20 @@ const PsychometricReportPage = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState(null);
-  const currentUser = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("user"));
-    } catch (_) {
-      return null;
-    }
-  })();
-  const isSuperAdmin = !!currentUser?.roles?.some(
+  const [verifiedUser, setVerifiedUser] = useState(null);
+  const isSuperAdmin = !!verifiedUser?.roles?.some(
     (role) => role.roleName === "SUPER_ADMIN"
   );
+
+  useEffect(() => {
+    let active = true;
+    authServices.getCurrentUser().then((user) => {
+      if (active) setVerifiedUser(user);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const generateAi = (regenerate = false) => {
     setAiLoading(true);
