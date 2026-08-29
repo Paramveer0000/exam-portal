@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useDispatch, useSelector } from "react-redux";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { fetchPsychReport } from "../../actions/psychometricReportActions";
+import authServices from "../../services/authServices";
 import mentalistReportServices from "../../services/mentalistReportServices";
 import PsychometricReportPage from "./PsychometricReportPage";
 
@@ -16,6 +17,9 @@ jest.mock("../../actions/psychometricReportActions", () => ({
 jest.mock("../../services/mentalistReportServices", () => ({
   generateReport: jest.fn(),
   downloadReport: jest.fn(),
+}));
+jest.mock("../../services/authServices", () => ({
+  getCurrentUser: jest.fn(),
 }));
 
 const report = {
@@ -33,6 +37,7 @@ const report = {
 
 const renderPage = (roleName) => {
   localStorage.setItem("user", JSON.stringify({ roles: [{ roleName }] }));
+  authServices.getCurrentUser.mockResolvedValue({ roles: [{ roleName }] });
   useDispatch.mockReturnValue(jest.fn());
   useSelector.mockReturnValue({ loading: false, report, error: null });
   fetchPsychReport.mockResolvedValue(undefined);
@@ -66,8 +71,32 @@ test("school sees issued-report download only and never triggers PDF generation"
   expect(mentalistReportServices.downloadReport).toHaveBeenCalledWith("41");
 });
 
-test("super admin sees the AI report generation control", () => {
+test("super admin sees the AI report generation control", async () => {
   renderPage("SUPER_ADMIN");
 
-  expect(screen.getByRole("button", { name: /generate ai report/i })).toBeInTheDocument();
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: /generate ai report/i })).toBeInTheDocument()
+  );
+});
+
+test("a stale super-admin browser label cannot expose report generation to a student session", async () => {
+  localStorage.setItem("user", JSON.stringify({ roles: [{ roleName: "SUPER_ADMIN" }] }));
+  authServices.getCurrentUser.mockResolvedValue({ roles: [{ roleName: "USER" }] });
+  useDispatch.mockReturnValue(jest.fn());
+  useSelector.mockReturnValue({ loading: false, report, error: null });
+  fetchPsychReport.mockResolvedValue(undefined);
+
+  render(
+    <MemoryRouter initialEntries={["/psychometricReport/41"]}>
+      <Routes>
+        <Route path="/psychometricReport/:quizResId" element={<PsychometricReportPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+
+  await waitFor(() =>
+    expect(screen.getByRole("button", { name: /download the mentalist report/i })).toBeInTheDocument()
+  );
+  expect(screen.queryByRole("button", { name: /generate ai report/i })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /rebuild pdf/i })).not.toBeInTheDocument();
 });
