@@ -1021,9 +1021,7 @@ const LandingPage = () => {
             <div>
               <h4 className={styles.footerTitle}>Jalandhar Center</h4>
               <ul className={styles.footerLinks} style={{ color: "var(--mt-text-secondary)", fontSize: "0.95rem" }}>
-                <li>Radisson Enclave Upside,</li>
-                <li>Jalandhar Fitness Center,</li>
-                <li>Opp. D.A.V. College, Jalandhar.</li>
+                <li>SCF- 84, Urban Estate, PH-1, Jalandhar.</li>
                 <li style={{ marginTop: 8, fontWeight: 700, color: "var(--mt-text-primary)" }}>Mon - Sat: 9:30 AM - 7:00 PM</li>
               </ul>
             </div>
@@ -1032,8 +1030,8 @@ const LandingPage = () => {
               <h4 className={styles.footerTitle}>Connect</h4>
               <ul className={styles.footerLinks}>
                 <li><a href={`tel:+${WHATSAPP_NUMBER}`} className={styles.footerLink}><i className="fa-solid fa-phone" /> {PHONE_DISPLAY}</a></li>
-                <li><a href="mailto:thementalistofficial21@gmail.com" className={styles.footerLink}><i className="fa-solid fa-envelope" /> Email Us</a></li>
-                <li><a href="https://instagram.com/Official_thementalist" target="_blank" rel="noreferrer" className={styles.footerLink}><i className="fa-brands fa-instagram" /> Instagram</a></li>
+                <li><a href="mailto:thementalistofficial21@gmail.com" className={styles.footerLink}><i className="fa-solid fa-envelope" /> thementalistofficial21@gmail.com</a></li>
+                <li><a href="https://instagram.com/Official_thementalist" target="_blank" rel="noreferrer" className={styles.footerLink}><i className="fa-brands fa-instagram" /> @Official_thementalist</a></li>
               </ul>
             </div>
           </div>
