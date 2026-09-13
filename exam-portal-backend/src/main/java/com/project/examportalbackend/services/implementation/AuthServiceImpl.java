@@ -57,7 +57,13 @@ public class AuthServiceImpl implements AuthService {
     private LoginAttemptService loginAttemptService;
 
     public LoginResponse loginUserService(LoginRequest loginRequest, HttpServletResponse response) throws Exception {
-        if (loginAttemptService.isLocked(loginRequest.getUsername())) {
+        return loginUserService(loginRequest, response, "unknown");
+    }
+
+    @Override
+    public LoginResponse loginUserService(LoginRequest loginRequest, HttpServletResponse response,
+                                          String clientAddress) throws Exception {
+        if (loginAttemptService.isLocked(loginRequest.getUsername(), clientAddress)) {
             auditLogger.loginFailure(loginRequest.getUsername(), "Account locked");
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
                     "Too many failed attempts. Try again later.");
@@ -66,12 +72,10 @@ public class AuthServiceImpl implements AuthService {
         try {
             authenticate(loginRequest.getUsername(), loginRequest.getPassword());
         } catch (ResponseStatusException e) {
-            loginAttemptService.recordFailure(loginRequest.getUsername());
+            loginAttemptService.recordFailure(loginRequest.getUsername(), clientAddress);
             auditLogger.loginFailure(loginRequest.getUsername(), e.getReason());
             throw e;
         }
-        loginAttemptService.recordSuccess(loginRequest.getUsername());
-
         UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(loginRequest.getUsername());
         User user = userRepository.findByUsername(loginRequest.getUsername());
 
