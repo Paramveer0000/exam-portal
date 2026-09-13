@@ -35,9 +35,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest,
-                                       HttpServletResponse response) {
+                                       HttpServletResponse response,
+                                       HttpServletRequest request) {
         try {
-            return ResponseEntity.ok(authService.loginUserService(loginRequest, response));
+            return ResponseEntity.ok(authService.loginUserService(
+                    loginRequest, response, request.getRemoteAddr()));
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatus())
                     .body(Collections.singletonMap("message", e.getReason()));

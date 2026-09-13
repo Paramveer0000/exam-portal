@@ -109,7 +109,23 @@ public class ReportServiceImpl implements ReportService {
         if (value == null) {
             return "";
         }
-        String escaped = value.replace("\"", "\"\"");
+        String escaped = neutralizeSpreadsheetFormula(value).replace("\"", "\"\"");
         return "\"" + escaped + "\"";
+    }
+
+    private String neutralizeSpreadsheetFormula(String value) {
+        int firstSignificant = 0;
+        while (firstSignificant < value.length()
+                && (Character.isWhitespace(value.charAt(firstSignificant))
+                || Character.isISOControl(value.charAt(firstSignificant)))) {
+            firstSignificant++;
+        }
+        if (firstSignificant < value.length()) {
+            char first = value.charAt(firstSignificant);
+            if (first == '=' || first == '+' || first == '-' || first == '@') {
+                return "'" + value;
+            }
+        }
+        return value;
     }
 }

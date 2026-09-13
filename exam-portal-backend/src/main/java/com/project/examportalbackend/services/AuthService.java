@@ -17,6 +17,9 @@ public interface AuthService {
 
     LoginResponse loginUserService(LoginRequest loginRequest, HttpServletResponse response) throws Exception;
 
+    LoginResponse loginUserService(LoginRequest loginRequest, HttpServletResponse response,
+                                   String clientAddress) throws Exception;
+
     LoginResponse refreshTokens(HttpServletRequest request, HttpServletResponse response);
 
     void logout(HttpServletRequest request, HttpServletResponse response);

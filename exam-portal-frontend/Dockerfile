@@ -7,7 +7,7 @@ ENV NODE_ENV=production
 # by this project's peer-dependency graph. npm cache is cleaned in the same
 # layer so it never ends up in an image layer.
 COPY package.json package-lock.json ./
-RUN npm ci --legacy-peer-deps && npm cache clean --force
+RUN npm ci --include=dev --legacy-peer-deps && npm cache clean --force
 
 # Build the static production bundle (CRA also sets NODE_ENV=production itself
 # during `npm run build`; the ENV above covers any other tooling that reads it).
